@@ -1,0 +1,76 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/home/tumlinson/V200/scripts/v200/bounded_runner.py",
+    "--project-root",
+    "/home/tumlinson/V200",
+    "--seconds",
+    "300",
+    "--allocation-cap-mib",
+    "12288",
+    "--evidence-dir",
+    "/home/tumlinson/V200/evidence/V200-SERVE/runs/serve-20261017T123731Z-9a4f1abf6314",
+    "--bundle",
+    "V200-SERVE",
+    "--expected-uuid",
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "--expected-uuid",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "--",
+    "/usr/bin/env",
+    "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "/usr/bin/python3",
+    "/home/tumlinson/V200/tests/consumer/run_consumer.py",
+    "--workload",
+    "smoke",
+    "--control",
+    "facade_owner",
+    "--preload-library",
+    "/home/tumlinson/V200/build/src/frontdoor/libv200_frontdoor.so",
+    "--preload-library",
+    "/home/tumlinson/V200/build/src/integration/libv200_pair_init.so",
+    "--facade-mode",
+    "pair",
+    "--output-dir",
+    "/home/tumlinson/V200/evidence/V200-SERVE/runs/serve-20261017T123731Z-9a4f1abf6314/consumer",
+    "--execute",
+    "--serve-duration-seconds",
+    "20",
+    "--server-port",
+    "8123"
+  ],
+  "binary_paths": [
+    "build/src/frontdoor/libv200_frontdoor.so",
+    "build/src/integration/libv200_pair_init.so"
+  ],
+  "command_cwd": "/home/tumlinson/V200",
+  "paths": [
+    "scripts/v200/serve.py",
+    "scripts/v200/bounded_runner.py",
+    "tests/consumer/run_consumer.py",
+    "benchmarks/fixtures/llama-server-v200.json",
+    "docs/v200/source-profile.json",
+    "docs/v200/consumer-profile.json",
+    "evidence/foundation/pair-profile.json",
+    "planning/v200-bootstrap/tools/run_bounded.py"
+  ],
+  "project_root": "/home/tumlinson/V200",
+  "recipe": "baseline",
+  "resources": {
+    "cpu_threads": 4,
+    "gpu_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ],
+    "gpus": 2,
+    "isolate_nvlink_domain": true,
+    "isolate_pcie_root": false,
+    "ram_bytes": 34359738368
+  },
+  "schema_version": 1,
+  "timeout": 320,
+  "toolchain": {
+    "require_sanitizer": false,
+    "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9"
+  }
+}

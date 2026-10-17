@@ -1,0 +1,1 @@
+{"application_status": "PASS", "control": "facade_owner", "gpu_qualification": "NOT_CLAIMED", "log_path": "/home/tumlinson/V200/evidence/B03/facade/consumer/smoke-facade_owner-1792240609253615134.log", "result_path": "/home/tumlinson/V200/evidence/B03/facade/consumer/smoke-facade_owner-1792240609253615134.json", "workload": "smoke"}

@@ -1,0 +1,2 @@
+V200_SERVER_READY http://127.0.0.1:8123
+{"application_status": "PASS", "control": "facade_owner", "gpu_qualification": "NOT_CLAIMED", "log_path": "/home/tumlinson/V200/evidence/V200-SERVE/runs/serve-20261017T123731Z-9a4f1abf6314/consumer/smoke-facade_owner-1792240698876414406.log", "result_path": "/home/tumlinson/V200/evidence/V200-SERVE/runs/serve-20261017T123731Z-9a4f1abf6314/consumer/smoke-facade_owner-1792240698876414406.json", "workload": "smoke"}

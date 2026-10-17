@@ -183,6 +183,10 @@ class LauncherPlanTests(unittest.TestCase):
         self.assertEqual(plan["selected_gpu_uuids"], self.uuids)
         self.assertEqual(plan["duration_seconds"], 1800)
         self.assertEqual(plan["endpoint"], "http://127.0.0.1:8123")
+        self.assertEqual(plan["controller_spec"]["toolchain"], {
+            "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9",
+            "require_sanitizer": False,
+        })
         self.assertEqual(plan["bounded_seconds"], 2080)
         self.assertLessEqual(plan["controller_timeout_seconds"], 3600)
         self.assertEqual(plan["controller_spec"]["resources"]["gpus"], 2)
@@ -217,6 +221,10 @@ class LauncherPlanTests(unittest.TestCase):
         self.assertEqual(plan["controls"], ["native_single", "facade_owner"])
         self.assertEqual(plan["bounded_seconds"], 300)
         self.assertEqual(plan["controller_timeout_seconds"], 315)
+        self.assertEqual(plan["controller_spec"]["toolchain"], {
+            "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9",
+            "require_sanitizer": False,
+        })
         self.assertEqual(plan["controller_spec"]["argv"][1],
                          str(serve_launcher.BOOTSTRAP_RUNNER))
         self.assertEqual([item["fits_static_preflight"]

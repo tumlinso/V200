@@ -39,6 +39,7 @@ CUDA_CONTROLLER = Path("/home/tumlinson/.agents/skills/cuda/scripts/cuda_control
 PROJECT_CONTROL_PY = Path("/home/tumlinson/project-control/scripts/pc-dev")
 FRONTDOOR_DSO = REPO_ROOT / "build/src/frontdoor/libv200_frontdoor.so"
 PAIR_INIT_DSO = REPO_ROOT / "build/src/integration/libv200_pair_init.so"
+CUDA_TOOLCHAIN_ROOT = "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9"
 
 APP_LIMIT_MIB = 12288
 SERVE_DEFAULT_SECONDS = 1800
@@ -186,6 +187,10 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         "project_root": str(REPO_ROOT),
         "command_cwd": str(REPO_ROOT),
         "recipe": "baseline",
+        "toolchain": {
+            "root": CUDA_TOOLCHAIN_ROOT,
+            "require_sanitizer": False,
+        },
         "resources": {
             "gpu_uuids": list(uuids),
             "gpus": 2,

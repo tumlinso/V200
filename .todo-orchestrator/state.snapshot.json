@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T12:34:06Z",
+  "generated_at": "2026-10-17T12:42:06Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 59,
+  "project_revision": 65,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 59,
+    "project_revision": 65,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -90,7 +90,7 @@
         "id": "V200-06-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 8,
+        "revision": 63,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-06",
@@ -179,10 +179,10 @@
       {
         "id": "V200-I01-READY",
         "metadata_json": "{}",
-        "reached_at": null,
-        "revision": 56,
+        "reached_at": "2026-10-17T12:35:11Z",
+        "revision": 62,
         "revoked_at": null,
-        "state": "pending",
+        "state": "reached",
         "task_id": "V200-I01",
         "title": "Lazy runtime initializer and controlled launcher are ready for hardware closure"
       },
@@ -788,6 +788,66 @@
         "revision": 59,
         "seq": 59,
         "timestamp": "2026-10-17T12:34:06Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-I01-INTEGRATED-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-I01-INTEGRATED-CPU\"}",
+        "revision": 60,
+        "seq": 60,
+        "timestamp": "2026-10-17T12:35:07Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-I01-INTEGRATED-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"9b617037-45f4-411a-b988-7bdeabac6912\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 61,
+        "seq": 61,
+        "timestamp": "2026-10-17T12:35:11Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-I01",
+        "entity_type": "task",
+        "event_type": "task.completed",
+        "payload_json": "{\"completion_revision\": 62, \"disposition\": \"implemented\", \"reached_checkpoints\": [\"V200-I01-READY\"]}",
+        "revision": 62,
+        "seq": 62,
+        "timestamp": "2026-10-17T12:35:11Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "6c6463a7-0f66-4e12-813f-c17e46185775",
+        "entity_type": "project",
+        "event_type": "plan.applied",
+        "payload_json": "{\"plan_digest\": \"748c0de854dcdbe13f4e51bcc96d5a03f46dbbf2114a67de7d3caa7f77e1561b\", \"source\": \"project-control\"}",
+        "revision": 63,
+        "seq": 63,
+        "timestamp": "2026-10-17T12:35:41Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-RUN-1-06",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-RUN-1-06\", \"run_id\": \"V200-RUN-1\", \"status\": \"claimed\", \"task_id\": \"V200-06\"}",
+        "revision": 64,
+        "seq": 64,
+        "timestamp": "2026-10-17T12:35:41Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "7cec8aa1-7798-4d34-af18-4a65ea51bd21",
+        "entity_type": "gate_binding",
+        "event_type": "workflow.gates.bound",
+        "payload_json": "{\"gate_count\": 2}",
+        "revision": 65,
+        "seq": 65,
+        "timestamp": "2026-10-17T12:42:06Z"
       }
     ],
     "evidence": [
@@ -880,6 +940,19 @@
         "metadata_json": "{\"argv\": [\"python3\", \"tests/memory/run_cpu_gate.py\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"f9b150c0bc02d343c5c1c504aeca2e286b3082a2d3b99b416b651ac147952035\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/memory/run_cpu_gate.py\"], \"cwd\": \".\", \"env\": {\"PYTHONDONTWRITEBYTECODE\": \"1\"}, \"timeout\": 1200}, \"diff_fingerprint\": \"193fe28da991c35b43509216e8c57e3370e2603105855a080e821cd0f6a70bb9\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"benchmarks/fixtures/llama-server-v200.json\", \"docs/v200/completion-contract.md\", \"docs/v200/consumer-profile.json\", \"docs/v200/memory-contract.md\", \"include/v200/execution/owner_execution.hpp\", \"include/v200/execution/owner_execution_c.h\", \"include/v200/frontdoor/abi_profile.hpp\", \"include/v200/frontdoor/runtime.h\", \"include/v200/memory/api.h\", \"include/v200/memory/manager.hpp\", \"src/execution/CMakeLists.txt\", \"src/execution/owner_execution.cpp\", \"src/execution/owner_execution_c.cpp\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/abi_profile.cpp\", \"src/frontdoor/audit.cpp\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/runtime_state.cpp\", \"src/frontdoor/runtime_state.hpp\", \"src/memory/CMakeLists.txt\", \"src/memory/manager.cpp\", \"src/memory/planner.cpp\", \"tests/abi/abi_profile_test.cpp\", \"tests/consumer/CMakeLists.txt\", \"tests/consumer/fake_server.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/execution/owner_execution_gpu_smoke.cpp\", \"tests/execution/owner_execution_test.cpp\", \"tests/memory/CMakeLists.txt\", \"tests/memory/run_cpu_gate.py\", \"tests/memory/test_memory.cpp\", \"todo-status.md\", \"todos.md\", \"todos/v200-01.md\", \"todos/v200-02.md\", \"todos/v200-03.md\", \"todos/v200-04.md\", \"todos/v200-05.md\", \"todos/v200-06.md\", \"todos/v200-07.md\", \"todos/v200-08.md\", \"todos/v200-09.md\", \"todos/v200-10.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\", \"todos/v200-q01.md\"], \"files\": [{\"path\": \"docs/v200/memory-contract.md\", \"sha256\": \"9611bf64d7c2086cba99405c694d62a66cc6b5b2b2a66047789c78910d3078a9\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"16bfa6a59d518c9c7bafa77b67976b51ac4f5502\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 28}",
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/86cd9075-ecc4-4506-9915-152d5faa42b2",
         "revision": 32,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T12:35:11Z",
+        "gate_id": "V200-I01-INTEGRATED-CPU",
+        "id": "9b617037-45f4-411a-b988-7bdeabac6912",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','-S','.','-B','build','-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9','-DV200_EXECUTION_BUILD_GPU_SMOKE=ON','-DV200_INTEGRATION_BUILD_GPU_SMOKE=ON','-DBUILD_TESTING=ON'],check=True); subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','-S','.','-B','build','-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9','-DV200_EXECUTION_BUILD_GPU_SMOKE=ON','-DV200_INTEGRATION_BUILD_GPU_SMOKE=ON','-DBUILD_TESTING=ON'],check=True); subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"c4ca5296b7776e45e653d19be7a89dc4b32169f526b1ab9bd83c2d3c625d88f1\"}, {\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/core\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/execution\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/integration\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/execution\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 60}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/9b617037-45f4-411a-b988-7bdeabac6912",
+        "revision": 61,
         "status": "passed"
       },
       {
@@ -1055,12 +1128,38 @@
       },
       {
         "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"CMakeLists.txt\", \"include/v200\", \"src/frontdoor\", \"src/memory\", \"src/execution\", \"src/integration\", \"tests/integration\", \"tests/consumer\", \"tests/execution\", \"tests/memory\", \"tests/abi\", \"scripts/v200\", \"benchmarks/fixtures\"], \"timeout_seconds\": 180}",
+        "id": "V200-06-HOST",
+        "input_fingerprint": null,
+        "last_run_at": null,
+        "required": 1,
+        "revision": 65,
+        "status": "pending",
+        "task_id": "V200-06",
+        "type": "command",
+        "valid": 0
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"tests/integration/first_consumer.py\", \"--service\"], \"cwd\": \".\", \"input_paths\": [\"tests/integration/first_consumer.py\", \"evidence/B02\", \"evidence/B03\", \"evidence/V200-SERVE\", \"evidence/foundation\", \"docs/v200/consumer-profile.json\", \"docs/v200/source-profile.json\"], \"timeout_seconds\": 60}",
+        "id": "V200-06-RETAINED-EVIDENCE",
+        "input_fingerprint": null,
+        "last_run_at": null,
+        "required": 1,
+        "revision": 65,
+        "status": "pending",
+        "task_id": "V200-06",
+        "type": "command",
+        "valid": 0
+      },
+      {
+        "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','-S','.','-B','build','-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9','-DV200_EXECUTION_BUILD_GPU_SMOKE=ON','-DV200_INTEGRATION_BUILD_GPU_SMOKE=ON','-DBUILD_TESTING=ON'],check=True); subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"CMakeLists.txt\", \"include/v200/core\", \"include/v200/frontdoor\", \"include/v200/memory\", \"include/v200/execution\", \"src/frontdoor\", \"src/memory\", \"src/execution\", \"src/integration\", \"tests/integration\", \"tests/consumer\", \"tests/execution\", \"tests/abi\", \"scripts/v200\", \"benchmarks/fixtures\"], \"timeout_seconds\": 180}",
         "id": "V200-I01-INTEGRATED-CPU",
         "input_fingerprint": "e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80",
-        "last_run_at": "2026-10-17T12:34:06Z",
+        "last_run_at": "2026-10-17T12:35:11Z",
         "required": 1,
-        "revision": 59,
+        "revision": 61,
         "status": "passed",
         "task_id": "V200-I01",
         "type": "command",
@@ -1127,6 +1226,16 @@
         "payload_json": "{\"authority_commit\": \"7f60a68a596797c7a51360bcaced199113eaf24e\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-04-READY\", \"reached_at\": \"2026-10-17T12:11:27Z\", \"state\": \"reached\"}], \"completion_commit\": \"7f60a68a596797c7a51360bcaced199113eaf24e\", \"completion_gates\": [{\"evidence_id\": \"01a658c3-0267-4762-98a2-de84f4c8a31a\", \"evidence_revision\": 37, \"id\": \"V200-04-CPU\", \"input_fingerprint\": \"11628b55e50fc5367f33ed1db135560384063322ab9a085113d578e294df6283\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"7f60a68a596797c7a51360bcaced199113eaf24e\"}], \"completion_revision\": 38, \"finalized_checkpoints\": [\"V200-04-READY\"], \"gates\": [{\"id\": \"V200-04-CPU\", \"input_fingerprint\": \"11628b55e50fc5367f33ed1db135560384063322ab9a085113d578e294df6283\", \"last_run_at\": \"2026-10-17T12:11:27Z\", \"revision\": 37, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \".todo-orchestrator/state.snapshot.json | 1422 ++++++++++++++++++++++++++++----\\n tests/consumer/run_consumer.py         |    4 +-\\n tests/consumer/test_consumer.py        |   13 +\\n todo-status.md                         |   13 +-\\n todos.md                               |   13 +-\\n todos/v200-01.md                       |   10 +-\\n todos/v200-02.md                       |   17 +-\\n todos/v200-03.md                       |   17 +-\\n todos/v200-04.md                       |   17 +-\\n todos/v200-05.md                       |   19 +-\\n todos/v200-06.md                       |   14 +-\\n todos/v200-07.md                       |    2 +\\n todos/v200-08.md                       |    2 +\\n todos/v200-09.md                       |    2 +\\n todos/v200-10.md                       |    2 +\\n todos/v200-11.md                       |    2 +\\n todos/v200-12.md                       |    2 +\\n todos/v200-13.md                       |    2 +\\n todos/v200-14.md                       |    2 +\\n 19 files changed, 1377 insertions(+), 198 deletions(-)\", \"git_head\": \"7f60a68a596797c7a51360bcaced199113eaf24e\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"V200-04 CPUmodule complete: realinjectedDriveradapter/CABI, immutablefullprefix/fanin/context/lifetime/failstop; independentLunareview foundandownerfixed dispatch-observe race, eventcapture/failedfallback recovery and destroy+restorefailure double-destroy; rootidentifiedPTDS lazycapturethreadissue fixedwithsame-thread eagercapturetest. HostCTests passed independently andowner; optionalrealDriverGPUharnessbuilt/linkedonly, noexecution. RequiredCPUgate capturesfinalsource. No genericGPUcompletionclaim until06 runsactualadapterharness.\", \"producer_commit\": \"7f60a68a596797c7a51360bcaced199113eaf24e\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-04\"}",
         "revision": 38,
         "task_id": "V200-04"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T12:35:11Z",
+        "id": "b29b9f41-91d4-4bd5-b83a-8224ac19b869",
+        "kind": "complete",
+        "note": "Integrated lazy pair initializer + controller-mediated foreground/preview launcher, reviewed rollback fail-stop fix. CPU gate passes all9CTest groups (consumer23 tests). B02 frontdoor evidence2c6cad1b-d526-4c1f-837b-a1a66b8d13ba; production96MiB both-owner full-range/zero-ledger evidence63a510fd-21c4-4960-84ca-572232fea914; owner completionf9e1d6eb-599e-41f0-ab7e-54ce164b9c05. Native llama baselinef2b89fd2-0a43-4dc4-82e8-56fade091835 only; facade app acceptance remains06. Failed attempts retained. All leasesreleased.",
+        "payload_json": "{\"authority_commit\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-I01-READY\", \"reached_at\": \"2026-10-17T12:35:11Z\", \"state\": \"reached\"}], \"completion_commit\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"completion_gates\": [{\"evidence_id\": \"9b617037-45f4-411a-b988-7bdeabac6912\", \"evidence_revision\": 61, \"id\": \"V200-I01-INTEGRATED-CPU\", \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\"}], \"completion_revision\": 62, \"finalized_checkpoints\": [\"V200-I01-READY\"], \"gates\": [{\"id\": \"V200-I01-INTEGRATED-CPU\", \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"last_run_at\": \"2026-10-17T12:35:11Z\", \"revision\": 61, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \"\", \"git_head\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Integrated lazy pair initializer + controller-mediated foreground/preview launcher, reviewed rollback fail-stop fix. CPU gate passes all9CTest groups (consumer23 tests). B02 frontdoor evidence2c6cad1b-d526-4c1f-837b-a1a66b8d13ba; production96MiB both-owner full-range/zero-ledger evidence63a510fd-21c4-4960-84ca-572232fea914; owner completionf9e1d6eb-599e-41f0-ab7e-54ce164b9c05. Native llama baselinef2b89fd2-0a43-4dc4-82e8-56fade091835 only; facade app acceptance remains06. Failed attempts retained. All leasesreleased.\", \"producer_commit\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-I01\"}",
+        "revision": 62,
+        "task_id": "V200-I01"
       }
     ],
     "interface_consumers": [],
@@ -1388,6 +1497,16 @@
       },
       {
         "mode": "exclusive",
+        "path": "README.md",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "benchmarks/fixtures",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
         "path": "docs/v200",
         "task_id": "V200-06"
       },
@@ -1403,7 +1522,37 @@
       },
       {
         "mode": "exclusive",
+        "path": "evidence/V200-SERVE",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "include/v200",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
         "path": "include/v200/core",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "planning/BOOTSTRAP_STATUS.md",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "planning/EXECUTION_PLAN.md",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "planning/README.md",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/qualification",
         "task_id": "V200-06"
       },
       {
@@ -1413,7 +1562,37 @@
       },
       {
         "mode": "exclusive",
+        "path": "src/execution",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "src/frontdoor",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
         "path": "src/integration",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "src/memory",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests/abi",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests/consumer",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests/execution",
         "task_id": "V200-06"
       },
       {
@@ -1422,8 +1601,28 @@
         "task_id": "V200-06"
       },
       {
+        "mode": "exclusive",
+        "path": "tests/memory",
+        "task_id": "V200-06"
+      },
+      {
         "mode": "read",
         "path": "build-support",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/foundation",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "read",
+        "path": "planning/execution-v3.todo-plan.json",
+        "task_id": "V200-06"
+      },
+      {
+        "mode": "read",
+        "path": "planning/runtime-integration-v3.todo-plan.json",
         "task_id": "V200-06"
       },
       {
@@ -1879,6 +2078,19 @@
         "task_id": "V200-05",
         "valid": 1,
         "validation_git_head": "df0bc70df7ef55eee1c51af3867a13a4b7fb4366"
+      },
+      {
+        "completion_git_head": "8b6b9a80bcea6edc2eace40e87198b49184bad59",
+        "completion_revision": 62,
+        "evidence_id": "9b617037-45f4-411a-b988-7bdeabac6912",
+        "evidence_revision": 61,
+        "gate_id": "V200-I01-INTEGRATED-CPU",
+        "input_fingerprint": "e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80",
+        "provenance_json": "{\"claim_id\": \"0d57bb33-adf2-4e80-9f24-3a72572109f7\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','-S','.','-B','build','-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9','-DV200_EXECUTION_BUILD_GPU_SMOKE=ON','-DV200_INTEGRATION_BUILD_GPU_SMOKE=ON','-DBUILD_TESTING=ON'],check=True); subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','-S','.','-B','build','-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9','-DV200_EXECUTION_BUILD_GPU_SMOKE=ON','-DV200_INTEGRATION_BUILD_GPU_SMOKE=ON','-DBUILD_TESTING=ON'],check=True); subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"c4ca5296b7776e45e653d19be7a89dc4b32169f526b1ab9bd83c2d3c625d88f1\"}, {\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/core\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/execution\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/integration\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/execution\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 60}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/9b617037-45f4-411a-b988-7bdeabac6912\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-I01",
+        "valid": 1,
+        "validation_git_head": "8b6b9a80bcea6edc2eace40e87198b49184bad59"
       }
     ],
     "task_dependencies": [
@@ -2063,7 +2275,7 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 25,
+        "id": 30,
         "interface_id": null,
         "prerequisite_task_id": "V200-02",
         "task_id": "V200-06",
@@ -2074,7 +2286,7 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 26,
+        "id": 31,
         "interface_id": null,
         "prerequisite_task_id": "V200-03",
         "task_id": "V200-06",
@@ -2085,7 +2297,7 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 27,
+        "id": 32,
         "interface_id": null,
         "prerequisite_task_id": "V200-04",
         "task_id": "V200-06",
@@ -2096,7 +2308,7 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 28,
+        "id": 33,
         "interface_id": null,
         "prerequisite_task_id": "V200-05",
         "task_id": "V200-06",
@@ -2107,7 +2319,7 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 29,
+        "id": 34,
         "interface_id": null,
         "prerequisite_task_id": "V200-Q01",
         "task_id": "V200-06",
@@ -2253,19 +2465,19 @@
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Actual logical enumeration/selection and correct consumer output are recorded.\",\"B01 and B02 hardware evidence matches the exact pair/stack and complete operation contract.\",\"No required API returns false success or bypasses ownership tracking.\",\"Transparency tier and remaining capacity/compute limitations are explicit; T1 cannot be accepted as T2 without user choice.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\",\"D02\",\"D08\"],\"recommended_start\":\"First run bounded B01 pair-memory/completion and B02 ABI closure. Then execute B03 on a small real workload. A legal owner-execution path is acceptable for this first application milestone, but it is not dual-compute success. Resolve observed essential graph/library/VMM calls here rather than hiding them behind a deferred task. If only a rebuilt or special-backend consumer works, use D01/D08.\",\"research_refs\":[\"A-R06\",\"A-E23\",\"W-ENTRY\",\"W-LLAMA-CUDA\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-06.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-06\",\"outputs\":[\"tests/integration/first_consumer.py\",\"docs/v200/first-consumer.md\",\"evidence/B01\",\"evidence/B02\",\"evidence/B03\"],\"parallelism\":\"Root integration outcome. Independent CPU work may continue while a GPU window or user decision is pending.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"build-support\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Build before every admitted bundle\",\"Small focused regression only\"],\"gpu\":[\"B01\",\"B02\",\"B03\"],\"stop\":\"On foundational failure, release GPUs and open D01/D02; do not continue a full sweep.\"},\"workstream\":\"V200 single-device product\"}",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Actual logical enumeration/selection and correct consumer output are recorded.\",\"B01 and B02 hardware evidence matches the exact pair/stack and complete operation contract.\",\"No required API returns false success or bypasses ownership tracking.\",\"Transparency tier and remaining capacity/compute limitations are explicit; T1 cannot be accepted as T2 without user choice.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\",\"D02\",\"D08\"],\"recommended_start\":\"First run bounded B01 pair-memory/completion and B02 ABI closure. Then execute B03 on a small real workload. A legal owner-execution path is acceptable for this first application milestone, but it is not dual-compute success. Resolve observed essential graph/library/VMM calls here rather than hiding them behind a deferred task. If only a rebuilt or special-backend consumer works, use D01/D08.\",\"research_refs\":[\"A-R06\",\"A-E23\",\"W-ENTRY\",\"W-LLAMA-CUDA\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-06.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-06\",\"outputs\":[\"tests/integration/first_consumer.py\",\"docs/v200/first-consumer.md\",\"evidence/B01\",\"evidence/B02\",\"evidence/B03\"],\"parallelism\":\"Root integration outcome. Independent CPU work may continue while a GPU window or user decision is pending.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"build-support\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Build before every admitted bundle\",\"Small focused regression only\"],\"gpu\":[\"B01\",\"B02\",\"B03\"],\"stop\":\"On foundational failure, release GPUs and open D01/D02; do not continue a full sweep.\"},\"workstream\":\"V200 single-device product\"}\nIntegration amendment: prerequisites 02,03,04,05,Q01 and runtime setup I01 are terminal with retained receipts; already-satisfied edges omitted from this standalone scheduling fragment. Root owns scoped cross-module repairs, controlled service test, and preview documentation. Restricted graph-off/partial-offload first deliverable is explicitly labeled, without claiming unrestricted T2, aggregate capacity, dual compute, or speed. All new GPU builds and controller specs pin HPC SDK CUDA12.9.",
         "objective": "Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 8,
-        "status": "planned",
+        "revision": 64,
+        "status": "in_progress",
         "tags_json": "[]",
         "title": "Deliver the first real single-device consumer",
-        "updated_at": "2026-10-17T11:49:55Z",
-        "version": 2
+        "updated_at": "2026-10-17T12:35:41Z",
+        "version": 4
       },
       {
         "attention_reason": null,
@@ -2469,9 +2681,9 @@
       },
       {
         "attention_reason": null,
-        "completion_commit": null,
-        "completion_git_head": null,
-        "completion_revision": null,
+        "completion_commit": "8b6b9a80bcea6edc2eace40e87198b49184bad59",
+        "completion_git_head": "8b6b9a80bcea6edc2eace40e87198b49184bad59",
+        "completion_revision": 62,
         "created_at": "2026-10-17T12:14:25Z",
         "id": "V200-I01",
         "kind": "integration",
@@ -2483,14 +2695,14 @@
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
-        "result": null,
+        "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 56,
-        "status": "in_progress",
+        "revision": 62,
+        "status": "done",
         "tags_json": "[]",
         "title": "Integrate the process pair initializer and opt-in llama launcher",
-        "updated_at": "2026-10-17T12:31:01Z",
-        "version": 7
+        "updated_at": "2026-10-17T12:35:11Z",
+        "version": 8
       },
       {
         "attention_reason": null,
@@ -2865,6 +3077,23 @@
         "created_at": "2026-10-17T11:49:55Z",
         "creation_revision": 8,
         "id": "V200-RUN-1:task_brief:V200-RUN-1-06:V200-06:1",
+        "invalidated_at": "2026-10-17T12:35:41Z",
+        "invalidation_revision": 63,
+        "kind": "task_brief",
+        "lane_id": "V200-RUN-1-06",
+        "owner_scope_json": "{\"lane_id\":\"V200-RUN-1-06\",\"run_id\":\"V200-RUN-1\",\"task_id\":\"V200-06\"}",
+        "run_id": "V200-RUN-1",
+        "series_key": "",
+        "superseded_by": "V200-RUN-1:task_brief:V200-RUN-1-06:V200-06:2",
+        "task_id": "V200-06",
+        "version": 1
+      },
+      {
+        "content_hash": "75e2f37de22da3dc3d96bbaa72ae9b7226aa5e45f4d58cb99f21ceceddcd465b",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"CMakeLists.txt\",\"scripts/v200\",\"include/v200/core\",\"src/integration\",\"tests/integration\",\"docs/v200\",\"evidence/B02\",\"evidence/B03\",\"src/frontdoor\",\"src/memory\",\"src/execution\",\"include/v200\",\"tests/abi\",\"tests/memory\",\"tests/execution\",\"tests/consumer\",\"benchmarks/fixtures\",\"scripts/qualification\",\"evidence/V200-SERVE\",\"README.md\",\"planning/README.md\",\"planning/EXECUTION_PLAN.md\",\"planning/BOOTSTRAP_STATUS.md\"],\"forbidden_paths\":[],\"read_paths\":[\"planning/v200-bootstrap/\",\"build-support\",\"evidence/foundation\",\"planning/execution-v3.todo-plan.json\",\"planning/runtime-integration-v3.todo-plan.json\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T12:35:41Z",
+        "creation_revision": 63,
+        "id": "V200-RUN-1:task_brief:V200-RUN-1-06:V200-06:2",
         "invalidated_at": null,
         "invalidation_revision": null,
         "kind": "task_brief",
@@ -2874,7 +3103,7 @@
         "series_key": "",
         "superseded_by": null,
         "task_id": "V200-06",
-        "version": 1
+        "version": 2
       },
       {
         "content_hash": "435ce3147317985345a3210cebc4dcc5d5afb1d05d7d8639e462fc4504dea8df",
@@ -3018,6 +3247,23 @@
         "created_at": "2026-10-17T11:40:58Z",
         "creation_revision": 2,
         "id": "compat-v2:task_brief:compat-v2-main:V200-06:1",
+        "invalidated_at": "2026-10-17T12:35:41Z",
+        "invalidation_revision": 63,
+        "kind": "task_brief",
+        "lane_id": "compat-v2-main",
+        "owner_scope_json": "{\"lane_id\":\"compat-v2-main\",\"run_id\":\"compat-v2\",\"task_id\":\"V200-06\"}",
+        "run_id": "compat-v2",
+        "series_key": "",
+        "superseded_by": "compat-v2:task_brief:compat-v2-main:V200-06:2",
+        "task_id": "V200-06",
+        "version": 1
+      },
+      {
+        "content_hash": "75e2f37de22da3dc3d96bbaa72ae9b7226aa5e45f4d58cb99f21ceceddcd465b",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"CMakeLists.txt\",\"scripts/v200\",\"include/v200/core\",\"src/integration\",\"tests/integration\",\"docs/v200\",\"evidence/B02\",\"evidence/B03\",\"src/frontdoor\",\"src/memory\",\"src/execution\",\"include/v200\",\"tests/abi\",\"tests/memory\",\"tests/execution\",\"tests/consumer\",\"benchmarks/fixtures\",\"scripts/qualification\",\"evidence/V200-SERVE\",\"README.md\",\"planning/README.md\",\"planning/EXECUTION_PLAN.md\",\"planning/BOOTSTRAP_STATUS.md\"],\"forbidden_paths\":[],\"read_paths\":[\"planning/v200-bootstrap/\",\"build-support\",\"evidence/foundation\",\"planning/execution-v3.todo-plan.json\",\"planning/runtime-integration-v3.todo-plan.json\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T12:35:41Z",
+        "creation_revision": 63,
+        "id": "compat-v2:task_brief:compat-v2-main:V200-06:2",
         "invalidated_at": null,
         "invalidation_revision": null,
         "kind": "task_brief",
@@ -3027,7 +3273,7 @@
         "series_key": "",
         "superseded_by": null,
         "task_id": "V200-06",
-        "version": 1
+        "version": 2
       },
       {
         "content_hash": "b133afab0eb37e981526930e58815c23ee2d6ebc85e49b82da55fdb79c25d201",
@@ -3170,12 +3416,12 @@
     "workflow_lane_tasks": [
       {
         "activated_at": "2026-10-17T12:20:30Z",
-        "completed_at": null,
+        "completed_at": "2026-10-17T12:35:11Z",
         "enqueued_at": "2026-10-17T12:14:25Z",
         "lane_id": "V200-INIT-RUN-1-MAIN",
         "position": 0,
-        "revision": 56,
-        "state": "active",
+        "revision": 62,
+        "state": "completed",
         "task_id": "V200-I01"
       },
       {
@@ -3219,13 +3465,13 @@
         "task_id": "V200-05"
       },
       {
-        "activated_at": null,
+        "activated_at": "2026-10-17T12:35:41Z",
         "completed_at": null,
         "enqueued_at": "2026-10-17T11:49:55Z",
         "lane_id": "V200-RUN-1-06",
         "position": 0,
-        "revision": 8,
-        "state": "queued",
+        "revision": 64,
+        "state": "active",
         "task_id": "V200-06"
       },
       {
@@ -3385,11 +3631,11 @@
         "created_at": "2026-10-17T12:14:25Z",
         "id": "V200-INIT-RUN-1-MAIN",
         "parent_lane_id": null,
-        "revision": 56,
+        "revision": 62,
         "role": "implementer",
         "run_id": "V200-INIT-RUN-1",
-        "state": "active",
-        "updated_at": "2026-10-17T12:31:01Z",
+        "state": "closed",
+        "updated_at": "2026-10-17T12:35:11Z",
         "workspace_mode": "exclusive"
       },
       {
@@ -3445,11 +3691,11 @@
         "created_at": "2026-10-17T11:49:55Z",
         "id": "V200-RUN-1-06",
         "parent_lane_id": "V200-RUN-1-COORD",
-        "revision": 8,
+        "revision": 64,
         "role": "implementer",
         "run_id": "V200-RUN-1",
-        "state": "ready",
-        "updated_at": "2026-10-17T11:49:55Z",
+        "state": "active",
+        "updated_at": "2026-10-17T12:35:41Z",
         "workspace_mode": "exclusive"
       },
       {
@@ -3535,10 +3781,10 @@
         "completed_at": null,
         "created_at": "2026-10-17T12:14:25Z",
         "id": "V200-INIT-RUN-1",
-        "revision": 44,
+        "revision": 62,
         "root_task_id": "V200-I01",
-        "status": "active",
-        "updated_at": "2026-10-17T12:14:25Z"
+        "status": "completed",
+        "updated_at": "2026-10-17T12:35:11Z"
       },
       {
         "active_charter_version": 1,

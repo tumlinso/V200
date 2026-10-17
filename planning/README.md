@@ -1,11 +1,18 @@
 # V200 planning
 
-Start with [the execution plan](EXECUTION_PLAN.md). It records the user's chosen first workload, delivery priorities, economical parallel ownership, and current validation.
+Updated 17 October 2026. Start with the [execution plan](EXECUTION_PLAN.md) and
+[current status](BOOTSTRAP_STATUS.md).
 
-The supplied archive is extracted intact under [v200-bootstrap/](v200-bootstrap/README.md). Its design and task records are proposals; the user's instructions and current evidence govern adoption. The execution plan is an adoption overlay, not an authoritative Todo queue or a claim that implementation outcomes have passed.
+The original bootstrap remains extracted under [v200-bootstrap/](v200-bootstrap/README.md)
+without edits. Its architecture and proposed outcomes are suggestions; Todo
+authority records actual task state, and implementation is governed by the
+current charter and evidence.
 
-Archive: `V200_Todo_Bootstrap.zip`, 66 files, 343,567 expanded bytes.
+The archive contains 66 files and 343,567 expanded bytes. Archive SHA-256:
+`8683ad0fca152a7f833f0215ccae1f7564da65256db957b37c275b75bfb1b0a8`.
 
-Archive SHA256: `8683ad0fca152a7f833f0215ccae1f7564da65256db957b37c275b75bfb1b0a8`.
-
-The package has been checked, canonically recompiled, and applied to V200 Todo authority. See [bootstrap status](BOOTSTRAP_STATUS.md) for the adopted identity and verification. No operational V200 layer has been implemented here.
+The first restricted llama-server preview passed native/facade completion,
+live health/chat access, and clean foreground shutdown. See the
+[usage and evidence](../docs/v200/first-consumer.md). V200-01 through V200-05,
+Q01 and I01 are complete; run 1 / V200-06 is closing acceptance. Application
+capacity beyond one V100 and useful dual-GPU compute remain unqualified.

@@ -1,0 +1,57 @@
+{
+  "endpoint": "http://127.0.0.1:8123",
+  "status": "PASS",
+  "health": {
+    "status": "ok"
+  },
+  "wait_seconds": 21.467213652000282,
+  "request": {
+    "model": "v200-qwen3-coder-30b",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is 1 + 1? Answer with exactly one digit."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 8,
+    "seed": 42
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "2"
+        }
+      }
+    ],
+    "created": 1792240705,
+    "model": "v200-qwen3-coder-30b",
+    "system_fingerprint": "b10615-f280b2698",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 2,
+      "prompt_tokens": 22,
+      "total_tokens": 24,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-EsbuhCqfR8ZIvddUstzUKkmFuTl3vOVu",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 22,
+      "prompt_ms": 606.533,
+      "prompt_per_token_ms": 27.56968181818182,
+      "prompt_per_second": 36.27172800160915,
+      "predicted_n": 2,
+      "predicted_ms": 86.234,
+      "predicted_per_token_ms": 86.234,
+      "predicted_per_second": 11.59635410626899
+    }
+  },
+  "normalized_answer": "2"
+}

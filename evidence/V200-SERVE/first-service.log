@@ -1,0 +1,31 @@
+V200 llama-server mode: serve (V200-SERVE)
+Selected ordered physical UUIDs: GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206
+Graph policy: CUDA graphs are disabled for both matched controls; this is a correctness/ownership preview, not a graph-enabled performance baseline.
+Pinned model: {"name": "qwen3-coder-30b-a3b-instruct-q4-k-m", "path": "/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf", "sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad"}
+Pinned consumer: {"path": "/home/tumlinson/Software/llama.cpp/build/bin/llama-server", "sha256": "b42facfb93d85e1a581862c872615834223dc479871701c0b797aeee1fa11e9d"}
+Smoke configuration: {"context": 2048, "gpu_layers": 28, "oracle": {"expected_exact": "2", "normalization": "strip surrounding Unicode whitespace only", "response_field": "content", "tokens_predicted_max": 8, "tokens_predicted_min": 1}, "request": {"body": {"cache_prompt": false, "frequency_penalty": 0.0, "n_predict": 8, "presence_penalty": 0.0, "prompt": "Answer with exactly one digit and no words. What is 1 + 1?\nAnswer:", "repeat_penalty": 1.0, "seed": 42, "stop": ["\n"], "stream": false, "temperature": 0.0, "top_k": 1, "top_p": 1.0}, "method": "POST", "path": "/completion"}}
+Pair facade preloads: ["/home/tumlinson/V200/build/src/frontdoor/libv200_frontdoor.so", "/home/tumlinson/V200/build/src/integration/libv200_pair_init.so"]
+Static smoke memory preflight: [{"application_limit_bytes_per_owner": 12884901888, "basis": "GGUF tensor descriptors + explicit f16 KV formula + 1 GiB workspace reserve; conservative non-block assignment", "control": "facade_owner", "effective_gpu_layers": 28, "estimated_bytes_per_owner": 6847877125, "estimated_mib_per_owner": 6530.645, "fits_static_preflight": true, "gpu_layer_tensor_bytes_total": 10570248201, "kv_bytes_assumed_per_owner": 58720256, "kv_bytes_total": 117440512, "non_block_tensor_bytes_assumed_per_owner": 430290944, "owner_count_assumed": 2, "requested_gpu_layers": 28, "workload": "smoke", "workspace_reserve_bytes_per_owner": 1073741824}]
+Per-GPU application allocation budget: 12288 MiB
+B01 pair receipt: {"evidence_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec", "path": "/home/tumlinson/V200/evidence/foundation/pair-profile.json", "sha256": "f6e006bd74db1d7d12e877a5cb8968502c0a167ffff294452005273bdf1961c4"}
+Loopback endpoint (announced before controller startup): http://127.0.0.1:8123
+Service duration after the exact startup self-check: 20 seconds
+The command stays in the foreground; query /health until ready and stop it with Ctrl-C.
+Controller hard timeout: 320 seconds
+Controller spec: /home/tumlinson/V200/evidence/V200-SERVE/launch-specs/serve-20261017T123731Z-9a4f1abf6314.controller.json
+Controller spec preview: {"argv": ["/usr/bin/python3", "/home/tumlinson/V200/scripts/v200/bounded_runner.py", "--project-root", "/home/tumlinson/V200", "--seconds", "300", "--allocation-cap-mib", "12288", "--evidence-dir", "/home/tumlinson/V200/evidence/V200-SERVE/runs/serve-20261017T123731Z-9a4f1abf6314", "--bundle", "V200-SERVE", "--expected-uuid", "GPU-21131915-1488-23af-38dd-1743ae1f5cc8", "--expected-uuid", "GPU-d745da9c-7649-8334-41f1-483afa6f3206", "--", "/usr/bin/env", "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206", "/usr/bin/python3", "/home/tumlinson/V200/tests/consumer/run_consumer.py", "--workload", "smoke", "--control", "facade_owner", "--preload-library", "/home/tumlinson/V200/build/src/frontdoor/libv200_frontdoor.so", "--preload-library", "/home/tumlinson/V200/build/src/integration/libv200_pair_init.so", "--facade-mode", "pair", "--output-dir", "/home/tumlinson/V200/evidence/V200-SERVE/runs/serve-20261017T123731Z-9a4f1abf6314/consumer", "--execute", "--serve-duration-seconds", "20", "--server-port", "8123"], "binary_paths": ["build/src/frontdoor/libv200_frontdoor.so", "build/src/integration/libv200_pair_init.so"], "command_cwd": "/home/tumlinson/V200", "paths": ["scripts/v200/serve.py", "scripts/v200/bounded_runner.py", "tests/consumer/run_consumer.py", "benchmarks/fixtures/llama-server-v200.json", "docs/v200/source-profile.json", "docs/v200/consumer-profile.json", "evidence/foundation/pair-profile.json", "planning/v200-bootstrap/tools/run_bounded.py"], "project_root": "/home/tumlinson/V200", "recipe": "baseline", "resources": {"cpu_threads": 4, "gpu_uuids": ["GPU-21131915-1488-23af-38dd-1743ae1f5cc8", "GPU-d745da9c-7649-8334-41f1-483afa6f3206"], "gpus": 2, "isolate_nvlink_domain": true, "isolate_pcie_root": false, "ram_bytes": 34359738368}, "schema_version": 1, "timeout": 320, "toolchain": {"require_sanitizer": false, "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9"}}
+Controller command: ["/home/tumlinson/project-control/scripts/pc-dev", "python", "/home/tumlinson/V200/build-support/run_controller.py", "/home/tumlinson/.agents/skills/cuda/scripts/cuda_controller.py", "run", "--spec", "/home/tumlinson/V200/evidence/V200-SERVE/launch-specs/serve-20261017T123731Z-9a4f1abf6314.controller.json", "--json"]
+Start a separate client with: curl http://127.0.0.1:8123/health
+Admitting through the configured CUDA controller; no direct llama-server launch follows.
+Executing: ["/home/tumlinson/project-control/scripts/pc-dev", "python", "/home/tumlinson/V200/build-support/run_controller.py", "/home/tumlinson/.agents/skills/cuda/scripts/cuda_controller.py", "run", "--spec", "/home/tumlinson/V200/evidence/V200-SERVE/launch-specs/serve-20261017T123731Z-9a4f1abf6314.controller.json", "--json"]
+{
+  "classification": "decision-result",
+  "evidence_id": "547cfd3a-4eba-426a-9e1f-9b3448f7e1b8",
+  "lease_receipt": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/869d6b2d-6589-44b0-9bd3-fe0367d100fe/lease.json",
+  "message": "No action-worthy result; evidence stored.",
+  "ok": true,
+  "returncode": 0,
+  "status": "succeeded",
+  "stderr_path": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/869d6b2d-6589-44b0-9bd3-fe0367d100fe/foreground.stderr.txt",
+  "stdout_path": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/869d6b2d-6589-44b0-9bd3-fe0367d100fe/foreground.stdout.txt"
+}

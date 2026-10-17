@@ -1,0 +1,21 @@
+0.00.355.109 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.355.602 W srv  llama_server: -----------------
+0.00.355.605 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.355.605 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.355.606 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.355.606 W srv  llama_server: -----------------
+0.00.357.072 I srv    load_model: loading model '/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf'
+0.00.560.864 W load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.03.574.754 I cmn          init: llama threadpool init, n_threads = 4
+0.03.920.949 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.03.924.838 I srv  llama_server: model loaded
+0.03.924.845 I srv  llama_server: listening on http://127.0.0.1:49231
+0.04.004.072 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.04.004.126 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.04.796.826 I slot print_timing: id  0 | task 0 | prompt eval time =     620.47 ms /    19 tokens (   32.66 ms per token,    30.62 tokens per second)
+0.04.796.832 I slot print_timing: id  0 | task 0 |        eval time =     172.19 ms /     3 tokens (   86.10 ms per token,    11.61 tokens per second)
+0.04.796.833 I slot print_timing: id  0 | task 0 |       total time =     792.67 ms /    22 tokens
+0.04.796.837 I slot print_timing: id  0 | task 0 |    graphs reused =          2
+0.04.796.912 I slot      release: id  0 | task 0 | stop processing: n_tokens = 21, truncated = 0
+0.04.905.311 I srv    operator(): operator(): cleaning up before exit...
+0.04.911.812 W ~llama_context:  CUDA_Host compute buffer size of   3.0804 MiB, does not match expectation of   1.7510 MiB

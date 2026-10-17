@@ -1,0 +1,55 @@
+{
+  "schema_version": 3,
+  "project": {
+    "name": "V200"
+  },
+  "tasks": [
+    {
+      "checkpoints": [
+        {
+          "id": "V200-06-READY",
+          "title": "V200-06-READY"
+        }
+      ],
+      "id": "V200-06",
+      "kind": "integration",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Actual logical enumeration/selection and correct consumer output are recorded.\",\"B01 and B02 hardware evidence matches the exact pair/stack and complete operation contract.\",\"No required API returns false success or bypasses ownership tracking.\",\"Transparency tier and remaining capacity/compute limitations are explicit; T1 cannot be accepted as T2 without user choice.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\",\"D02\",\"D08\"],\"recommended_start\":\"First run bounded B01 pair-memory/completion and B02 ABI closure. Then execute B03 on a small real workload. A legal owner-execution path is acceptable for this first application milestone, but it is not dual-compute success. Resolve observed essential graph/library/VMM calls here rather than hiding them behind a deferred task. If only a rebuilt or special-backend consumer works, use D01/D08.\",\"research_refs\":[\"A-R06\",\"A-E23\",\"W-ENTRY\",\"W-LLAMA-CUDA\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-06.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-06\",\"outputs\":[\"tests/integration/first_consumer.py\",\"docs/v200/first-consumer.md\",\"evidence/B01\",\"evidence/B02\",\"evidence/B03\"],\"parallelism\":\"Root integration outcome. Independent CPU work may continue while a GPU window or user decision is pending.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"build-support\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Build before every admitted bundle\",\"Small focused regression only\"],\"gpu\":[\"B01\",\"B02\",\"B03\"],\"stop\":\"On foundational failure, release GPUs and open D01/D02; do not continue a full sweep.\"},\"workstream\":\"V200 single-device product\"}\nIntegration amendment: prerequisites 02,03,04,05,Q01 and runtime setup I01 are terminal with retained receipts; already-satisfied edges omitted from this standalone scheduling fragment. Root owns scoped cross-module repairs, controlled service test, and preview documentation. Restricted graph-off/partial-offload first deliverable is explicitly labeled, without claiming unrestricted T2, aggregate capacity, dual compute, or speed. All new GPU builds and controller specs pin HPC SDK CUDA12.9.",
+      "objective": "Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "scripts/v200",
+          "include/v200/core",
+          "src/integration",
+          "tests/integration",
+          "docs/v200",
+          "evidence/B02",
+          "evidence/B03",
+          "src/frontdoor",
+          "src/memory",
+          "src/execution",
+          "include/v200",
+          "tests/abi",
+          "tests/memory",
+          "tests/execution",
+          "tests/consumer",
+          "benchmarks/fixtures",
+          "scripts/qualification",
+          "evidence/V200-SERVE",
+          "README.md",
+          "planning/README.md",
+          "planning/EXECUTION_PLAN.md",
+          "planning/BOOTSTRAP_STATUS.md"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap/",
+          "build-support",
+          "evidence/foundation",
+          "planning/execution-v3.todo-plan.json",
+          "planning/runtime-integration-v3.todo-plan.json"
+        ]
+      },
+      "title": "Deliver the first real single-device consumer"
+    }
+  ]
+}
