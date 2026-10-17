@@ -6,6 +6,7 @@
 #include "v200/operators/graph_rewrite.hpp"
 #include "v200/operators/launch.hpp"
 #include "vmm_location.hpp"
+#include "positive_symbol_cache.hpp"
 
 #include <cuda_runtime_api.h>
 
@@ -65,6 +66,13 @@ extern "C" CUresult CUDAAPI cuStreamSynchronize_ptsz(CUstream);
 extern "C" CUresult CUDAAPI cuStreamWaitEvent_ptsz(CUstream, CUevent, unsigned int);
 
 namespace {
+
+struct CachedCudaGraphLaunch {};
+struct CachedCudaStreamIsCapturing {};
+struct CachedDispatchForward {};
+struct CachedDispatchBeginSubmission {};
+struct CachedDispatchEndSubmission {};
+struct CachedDispatchRetainUse {};
 
 void write_multi_pair_copy_event(uint32_t dst_pair, uint32_t src_pair,
                                  size_t bytes, cudaError_t status,
@@ -213,6 +221,22 @@ bool parse_uuid_list(const char *text, std::array<std::array<unsigned char, 16>,
 template <class Function>
 Function next_fn(const char *symbol) {
     return resolve_next<Function>(symbol);
+}
+
+template <class Tag, class Function>
+Function cached_next_fn(const char *symbol) noexcept {
+    // CUDA runtime DSOs stay loaded for the supported process-scoped consumer;
+    // positive entries therefore remain valid through the preview lifetime.
+    return positive_symbol<Tag, Function>([&]() noexcept { return next_fn<Function>(symbol); });
+}
+
+template <class Tag, class Function>
+Function cached_memory_fn(const char *symbol) noexcept {
+    // The V200 preload remains loaded for the process lifetime. Misses are not
+    // cached, preserving optional/lazy symbol discovery.
+    return positive_symbol<Tag, Function>([&]() noexcept {
+        return reinterpret_cast<Function>(lookup_v200(symbol));
+    });
 }
 
 bool ensure_device_selection() {
@@ -869,7 +893,8 @@ auto dispatch_async(void *stream, Call &&call) -> decltype(call(stream)) {
     // one tracked graph launch accounts for all captured memory uses on replay.
     if (graph_capture_enabled()) {
         using IsCapturing = cudaError_t (CUDARTAPI *)(cudaStream_t, cudaStreamCaptureStatus *);
-        auto is_capturing = next_fn<IsCapturing>("cudaStreamIsCapturing");
+        auto is_capturing = cached_next_fn<CachedCudaStreamIsCapturing, IsCapturing>(
+            "cudaStreamIsCapturing");
         if (is_capturing == nullptr) return frontdoor_error<Result>(CUDA_ERROR_NOT_SUPPORTED);
         cudaStreamCaptureStatus status = cudaStreamCaptureStatusNone;
         cudaError_t query_status;
@@ -904,11 +929,14 @@ auto dispatch_async(void *stream, Call &&call) -> decltype(call(stream)) {
     using Forward = int (*)(v200_execution_handle *, v200_logical_device_id,
                             v200_logical_stream_id, v200_owner_id, void *,
                             v200_execution_enqueue_fn, void *, int *);
-    auto forward = memory_fn<Forward>("v200_execution_forward_native");
-    auto end = memory_fn<MemEndSubmission>("v200_memory_end_submission");
+    auto forward = cached_memory_fn<CachedDispatchForward, Forward>(
+        "v200_execution_forward_native");
+    auto end = cached_memory_fn<CachedDispatchEndSubmission, MemEndSubmission>(
+        "v200_memory_end_submission");
     uint64_t lease = 0;
     if (pair_mode()) {
-        auto begin = memory_fn<MemBeginSubmission>("v200_memory_begin_submission");
+        auto begin = cached_memory_fn<CachedDispatchBeginSubmission, MemBeginSubmission>(
+            "v200_memory_begin_submission");
         if (begin == nullptr || end == nullptr || forward == nullptr)
             return frontdoor_error<Result>(CUDA_ERROR_NOT_SUPPORTED);
         const CUresult started = begin(&lease);
@@ -940,7 +968,8 @@ auto dispatch_async(void *stream, Call &&call) -> decltype(call(stream)) {
     if (completion_recorded && pair_mode()) {
         v200_completion_token token{};
         const int token_status = execution_token_for_stream(stream, &token);
-        auto retain = memory_fn<MemRetainAllUse>("v200_memory_retain_all_use");
+        auto retain = cached_memory_fn<CachedDispatchRetainUse, MemRetainAllUse>(
+            "v200_memory_retain_all_use");
         const CUresult retained = token_status == V200_EXECUTION_OK && retain != nullptr
             ? retain(stream_id(stream), token.slot, token.generation) : CUDA_ERROR_NOT_SUPPORTED;
         if (token_status == V200_EXECUTION_OK) (void)execution_release_token(token);
@@ -1920,7 +1949,7 @@ cudaError_t CUDARTAPI cudaEventSynchronize(cudaEvent_t event) {
 
 cudaError_t CUDARTAPI cudaGraphLaunch(cudaGraphExec_t graph, cudaStream_t stream) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaGraphExec_t, cudaStream_t);
-    auto real = next_fn<Fn>("cudaGraphLaunch");
+    auto real = cached_next_fn<CachedCudaGraphLaunch, Fn>("cudaGraphLaunch");
     if (internal_call()) return real ? real(graph, stream) : cudaErrorNotSupported;
     if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
     StreamPairScope pair_scope(stream);

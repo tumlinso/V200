@@ -1,0 +1,14 @@
+[
+  {
+    "path": "/home/tumlinson/V200/build-multipair/src/frontdoor/libv200_frontdoor.so",
+    "sha256": "2358ec1ba84a8d0dad9c33c475dcc9630d482ac8d46fe1508688c889f48b5664"
+  },
+  {
+    "path": "/home/tumlinson/V200/build-multipair/src/integration/libv200_pair_init.so",
+    "sha256": "59fb7b27a525709a2c0d8c8c14b28b44c2fd81e8289dca34336a68cbe1cbc67b"
+  },
+  {
+    "path": "/home/tumlinson/V200/build-multipair/src/operators/libv200_operators.so",
+    "sha256": "736223513d29e61359619958b4be354d0b785715dfec3b01f71c47f93299b723"
+  }
+]

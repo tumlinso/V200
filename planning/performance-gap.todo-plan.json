@@ -1,0 +1,268 @@
+{
+  "schema_version": 3,
+  "project": {
+    "name": "V200"
+  },
+  "tasks": [
+    {
+      "id": "V200-12",
+      "kind": "task",
+      "title": "Make the measured performance and product decision",
+      "objective": "Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Correctness passes precede performance interpretation for each selected case.\",\"Observed overhead/scaling, raw samples, contamination and uncertainty are documented.\",\"D04 is resolved or explicitly pending user preference; a faster less-transparent route cannot silently redefine V200.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D07\"],\"recommended_start\":\"Run B05 with the strongest matched native pair baseline and facade-owner control, prefill/decode separately. Include conversion, gathering and context/workspace accounting. Start with a few repetitions and increase only if the decision is genuinely ambiguous. Compare four-device results from B06 separately when available. Do not blend incompatible regimes into an arbitrary winner.\",\"research_refs\":[\"A-E16\",\"A-E18\",\"A-E19\",\"A-E20\",\"P-ADAPT\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-12.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-12\",\"outputs\":[\"benchmarks/comparison/\",\"docs/v200/performance.md\",\"evidence/B05\"],\"parallelism\":\"May finish pair performance before V200-11 receives a four-GPU window. Do not block pair decisions on optional deeper experiments.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Matched-case and arithmetic/evidence checks\"],\"gpu\":[\"B05\"],\"stop\":\"No tuning campaign beyond the agreed cap without a specific unresolved decision.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17: 07/08/09/10 hardwareaccepted through2bd3020. Perform a small matched pair performance check using exact qualified binary hashes before broader tuning; this is independent of four-GPU availability. CPU implementation of11 may proceed under root coordination while12 measures pinned unchanged DSOs. Keep build-multipair separate and do not overwrite build qualification artifacts while benchmark runs. Preserve unchangedconsumer, graph-off/nativefallback and exact numerics. 11 must expose TWO logical devices in one process, independent pair accounting and topology-aware copies; separateprocessone-device launchers alone do not complete11. No unsupportedall-to-allpeerclaims.",
+      "depends_on": [],
+      "checkpoints": [
+        {
+          "id": "V200-12-READY",
+          "title": "V200-12-READY",
+          "state": "reached"
+        }
+      ],
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "src",
+          "include/v200",
+          "tests",
+          "scripts/v200",
+          "scripts/qualification",
+          "benchmarks",
+          "docs/v200",
+          "README.md",
+          "evidence/B05",
+          "evidence/B06",
+          "evidence/B03"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap",
+          "planning/EXECUTION_PLAN.md",
+          "build-support",
+          "evidence/foundation",
+          "evidence/B04"
+        ]
+      },
+      "gates": [
+        {
+          "id": "V200-12-B05-MATCHED",
+          "type": "command",
+          "required": true,
+          "argv": [
+            "python3",
+            "-c",
+            "import json,subprocess; from pathlib import Path; subprocess.run(['python3','-m','unittest','discover','-s','tests/comparison','-v'],check=True); p=Path('evidence/B05'); r=json.loads((p/'pair-r1/comparison/comparison.json').read_text()); h=json.loads((p/'pair-r1.host-release.json').read_text()); c=json.loads((p/'pair-r1.controller-result.json').read_text()); assert r['status']=='PASS' and r['response_equivalence']=='MATCH' and len(r['cases'])==3; assert all(x['status']=='PASS' and x['summary']['measured_samples']==3 for x in r['cases']); assert h['state']=='released' and not h['resources']; assert c['evidence_id']=='24630d18-8d52-4a53-912b-79c86c088ba5' and c['returncode']==0; print('B05 matched evidence and release PASS')"
+          ],
+          "cwd": ".",
+          "input_paths": [
+            "benchmarks/comparison",
+            "tests/comparison",
+            "evidence/B05"
+          ],
+          "timeout_seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "V200-11",
+      "kind": "task",
+      "title": "Expose and integrate two logical V200 devices",
+      "objective": "Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Both logical devices enumerate with stable identity and independent resource accounting.\",\"B06 validates selected inter-pair copy and consumer workload over the recorded/rediscovered topology.\",\"No claim that a generic shim infers model layer/sequence/expert semantics without a contract.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D08\"],\"recommended_start\":\"Implement stable two-device enumeration and logical copies using eligible physical endpoints. Separate general peer-load permission from routable bulk copy. Do not advertise arbitrary cross-pair pointers when some constituent paths are inaccessible. Qualify native consumer layer/pipeline distribution across two logical IDs and any needed collective/NVML handling.\",\"research_refs\":[\"A-R07\",\"A-E20\",\"W-LLAMA-SERVER\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-11.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-11\",\"outputs\":[\"src/multi_pair/\",\"tests/multi_pair/\",\"docs/v200/two-device.md\",\"evidence/B06\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"budget\":\"Four-device admission only after pair readiness; keep session short.\",\"cpu\":[\"Directed endpoint/capability map tests\"],\"gpu\":[\"B06\"]},\"workstream\":\"V200 single-device product\"}\n2026-10-17: 07/08/09/10 hardwareaccepted through2bd3020. Perform a small matched pair performance check using exact qualified binary hashes before broader tuning; this is independent of four-GPU availability. CPU implementation of11 may proceed under root coordination while12 measures pinned unchanged DSOs. Keep build-multipair separate and do not overwrite build qualification artifacts while benchmark runs. Preserve unchangedconsumer, graph-off/nativefallback and exact numerics. 11 must expose TWO logical devices in one process, independent pair accounting and topology-aware copies; separateprocessone-device launchers alone do not complete11. No unsupportedall-to-allpeerclaims.\nCorrect B06 gate field to retained server_process.exit_code and preserve the same correctness assertions. No GPU evidence is altered.",
+      "depends_on": [
+        {
+          "type": "task",
+          "task_id": "V200-12"
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "V200-11-READY",
+          "title": "V200-11-READY"
+        }
+      ],
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "src",
+          "include/v200",
+          "tests",
+          "scripts/v200",
+          "scripts/qualification",
+          "benchmarks",
+          "docs/v200",
+          "README.md",
+          "evidence/B05",
+          "evidence/B06",
+          "evidence/B03"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap",
+          "planning/EXECUTION_PLAN.md",
+          "build-support",
+          "evidence/foundation",
+          "evidence/B04"
+        ]
+      },
+      "gates": [
+        {
+          "id": "V200-11-B06-INTEGRATED-CPU",
+          "type": "command",
+          "required": true,
+          "argv": [
+            "ctest",
+            "--test-dir",
+            "build-multipair",
+            "--output-on-failure"
+          ],
+          "cwd": ".",
+          "input_paths": [
+            "src",
+            "include/v200",
+            "tests",
+            "CMakeLists.txt"
+          ],
+          "timeout_seconds": 180
+        },
+        {
+          "id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+          "type": "command",
+          "required": true,
+          "argv": [
+            "python3",
+            "-c",
+            "import json\nfrom pathlib import Path\nroot=Path('.')\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\nassert b['copy_probe']['status']=='PASS'\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\nfor c in b['controls']:\n assert c['application_status']=='PASS' and c['response']['exact_match']\n assert c['server_process']['exit_code']==0\n assert c['cleanup']['no_live_group_members']\n assert c['layer_offload_evidence']['full_gpu_offload']\n assert c['device_count_evidence']['status']=='PASS'\ns=b['v200_summary']\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\nassert h['state']=='released' and h['resources']==[]\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\n"
+          ],
+          "cwd": ".",
+          "input_paths": [
+            "evidence/B06"
+          ],
+          "timeout_seconds": 30
+        }
+      ]
+    },
+    {
+      "checkpoints": [
+        {
+          "id": "V200-13-READY",
+          "title": "V200-13-READY"
+        }
+      ],
+      "depends_on": [
+        {
+          "task_id": "V200-11",
+          "type": "task"
+        },
+        {
+          "task_id": "V200-12",
+          "type": "task"
+        }
+      ],
+      "id": "V200-13",
+      "kind": "task",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Deployment is reproducible for the accepted profile and removable without altering unrelated GPU software.\",\"Unsupported APIs, actual transparency tier, capacity reserve and measured performance are plainly documented.\",\"No hidden watcher/model service/GPU resident daemon is installed.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D08\"],\"recommended_start\":\"Package launcher/facade, versioned profiles and source/binary provenance. Keep native CUDA untouched outside the launch scope. Diagnostics show logical-to-physical mapping and failures. Provide installation/uninstallation steps that do not modify system driver state. Never claim system-wide PCI/NVML device unification unless separately authorized and implemented.\",\"research_refs\":[\"A-HOST\",\"P-README\",\"W-OPEN\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-13.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-13\",\"outputs\":[\"packaging/\",\"tools/v200/\",\"docs/v200/deployment.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Package/load-path/rollback tests\"],\"gpu\":\"Reuse accepted B03/B06 evidence; one focused deployment smoke only if binaries or loader paths changed.\"},\"workstream\":\"V200 single-device product\"}\nReuse existing scoped controller launchers. Add finite two-logical HTTP serving and build/diagnostic/provenance entry point. Preserve build/ baseline. One bounded singlepair extended expert comparison may measure the newly usable code; no broad tuning campaign.",
+      "objective": "Deliver an opt-in application-scoped deployment with accurate identity, compatibility and rollback information. Read planning/v200-bootstrap/tasks/V200-13.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "packaging",
+          "tools/v200",
+          "scripts/v200",
+          "tests/consumer",
+          "tests/multi_pair",
+          "tests/comparison",
+          "benchmarks/comparison",
+          "docs/v200",
+          "README.md",
+          "evidence/B07",
+          "evidence/B06"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap",
+          "planning/EXECUTION_PLAN.md",
+          "build-support",
+          "src",
+          "include/v200",
+          "evidence/B03",
+          "evidence/B04",
+          "evidence/B05",
+          "evidence/foundation"
+        ]
+      },
+      "title": "Package a reversible deployment and diagnostic surface"
+    },
+    {
+      "checkpoints": [
+        {
+          "id": "V200-14-READY",
+          "title": "V200-14-READY"
+        }
+      ],
+      "depends_on": [
+        {
+          "task_id": "V200-13",
+          "type": "task"
+        }
+      ],
+      "id": "V200-14",
+      "kind": "integration",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"All mandatory product outcomes have current evidence or an explicit user-approved revised scope.\",\"Native single-device presentation, capacity and useful dual compute claims match actual tested tier.\",\"Release note includes exact tests and known limits; no GPU lease, background watch or unfinished owned process remains.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D08\"],\"recommended_start\":\"Root reviews producer commits, selected branch decisions, acceptance receipts and dirty-work preservation. Run only tests affected by final integration. Use supported Todo integration/completion mechanisms and retain a restartable next-work backlog. Research negatives remain evidence, not missing acceptance hidden by a green summary.\",\"research_refs\":[\"P-README\",\"P-ADAPT\",\"A-HOST\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-14.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-14\",\"outputs\":[\"docs/v200/release.md\",\"tests/release/\",\"release provenance and Todo integration receipt\"],\"parallelism\":\"Root final acceptance only; helpers may review but cannot change the objective or authorize system mutations.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Final changed-boundary checks and packaging integrity\"],\"gpu\":\"Reuse compatible evidence; do not rerun all bundles by default.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17 user continuation: use parallel Luna streams to find and fix the largest64vs125tokens/s bottleneck, preserve transparentV200interface andworkingpreview, keepGPUchecks short. Root owns GPUcontroller andintegration. Build/ andbuild-multipair remainimmutablequalifiedpreviews; use separatebuild-perf candidates. Source/CPUanalysis first, one shorttimelinecheck ifneeded thenmatchedboundedmeasurement. Preserve exactnumerics/lifetimes andnativefallback; nohidden service orarchitecture downgrade.",
+      "objective": "Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "src",
+          "include/v200",
+          "tests",
+          "benchmarks/comparison",
+          "scripts/v200",
+          "scripts/qualification",
+          "tools/v200",
+          "packaging",
+          "docs/v200",
+          "README.md",
+          "evidence/B08"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap",
+          "planning/EXECUTION_PLAN.md",
+          "build-support",
+          "evidence/B03",
+          "evidence/B04",
+          "evidence/B05",
+          "evidence/B06",
+          "evidence/B07",
+          "evidence/foundation"
+        ]
+      },
+      "title": "Integrate and hand off the accepted V200 release"
+    }
+  ],
+  "runs": [
+    {
+      "id": "V200-DELIVERY-1",
+      "root_task_id": "V200-13",
+      "charter": {
+        "objective": "Deliver the functioning restricted V200 application profile with reproducible reversible launch and truthful acceptance",
+        "boundaries": [
+          "No system driver modifications or hidden daemon",
+          "Preserve native fallback and exact numeric contract",
+          "Finite controller admitted checks only"
+        ],
+        "invariants": [
+          "Two logical devices remain pair based; no ordinary model parallel backend substituted",
+          "Performance limits remain explicit; no universal CUDA claim"
+        ]
+      },
+      "lanes": [
+        {
+          "id": "V200-DELIVERY-1-MAIN",
+          "role": "integrator",
+          "tasks": [
+            "V200-13",
+            "V200-14"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        }
+      ]
+    }
+  ]
+}

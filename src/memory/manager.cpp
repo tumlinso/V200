@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <condition_variable>
+#include <cstdlib>
 #include <cstring>
 #include <limits>
 #include <map>
@@ -81,6 +82,30 @@ int owner_index(const v200_memory_pair_profile &profile, CUdevice device) noexce
         return 1;
     }
     return -1;
+}
+
+PlanResult plan_with_locality(size_t bytes, CUdevice preferred,
+                              const v200_memory_pair_profile &profile,
+                              const size_t used[2]) {
+    const char *policy = std::getenv("V200_PREFER_LOCAL_HBM");
+    const bool local = policy != nullptr && std::strcmp(policy, "1") == 0;
+    if (local) {
+        // The current consumer allocates model weights before its KV/cache
+        // workspace (~0.9 GB in B07). Keep one GiB available to subsequent
+        // small anchor allocations rather than moving that hot state remote.
+        // This is a soft preference: full aggregate capacity remains usable.
+        constexpr uint64_t workspace = uint64_t{1} << 30;
+        const int index = owner_index(profile, preferred);
+        if (index >= 0 && bytes > workspace && profile.owner_budget_bytes[index] > workspace) {
+            auto weights_profile = profile;
+            weights_profile.owner_budget_bytes[index] -= workspace;
+            if (used[index] <= weights_profile.owner_budget_bytes[index]) {
+                auto plan = plan_extents(bytes, preferred, weights_profile, used, true);
+                if (plan.status == CUDA_SUCCESS) return plan;
+            }
+        }
+    }
+    return plan_extents(bytes, preferred, profile, used, local);
 }
 
 bool driver_complete(const v200_memory_driver_api &driver) noexcept {
@@ -685,7 +710,7 @@ CUresult MemoryManager::allocate(CUdevice preferred, size_t bytes, size_t alignm
         return CUDA_ERROR_INVALID_VALUE;
     }
     const size_t used[2] = {impl_->used_bytes[0], impl_->used_bytes[1]};
-    PlanResult plan = plan_extents(mapped_bytes, preferred, effective, used);
+    PlanResult plan = plan_with_locality(mapped_bytes, preferred, effective, used);
     if (plan.status != CUDA_SUCCESS) {
         return plan.status;
     }
@@ -1019,7 +1044,7 @@ CUresult MemoryManager::vmm_create(CUmemGenericAllocationHandle *handle, size_t 
     }
     effective.owner_granularity[static_cast<size_t>(preferred_index)] = preferred_granularity;
     const size_t used[2] = {impl_->used_bytes[0], impl_->used_bytes[1]};
-    PlanResult plan = plan_extents(size, prop->location.id, effective, used);
+    PlanResult plan = plan_with_locality(size, prop->location.id, effective, used);
     if (plan.status != CUDA_SUCCESS) {
         return plan.status;
     }

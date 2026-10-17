@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -245,6 +246,84 @@ void test_planner() {
     used[1] = 0;
     plan = v200::memory::plan_extents(10000000006ULL, 0, profile, used);
     assert(plan.status == CUDA_ERROR_INVALID_VALUE);
+}
+
+void test_preferred_placement_matches_exhaustive_oracle() {
+    // Independent enumeration checks both policies against every legal split,
+    // including unequal granularities, nonzero usage, and reversed owners.
+    for (size_t g0 = 1; g0 <= 8; ++g0) {
+        for (size_t g1 = 1; g1 <= 8; ++g1) {
+            for (int preferred = 0; preferred <= 1; ++preferred) {
+                auto profile = make_profile();
+                profile.owner_granularity[0] = g0;
+                profile.owner_granularity[1] = g1;
+                profile.owner_budget_bytes[0] = 32;
+                profile.owner_budget_bytes[1] = 31;
+                size_t used[2] = {g0, g1};
+                const size_t gran[] = {g0, g1};
+                const size_t cap[] = {(32 - g0) / g0 * g0, (31 - g1) / g1 * g1};
+                const size_t p = static_cast<size_t>(preferred), q = 1 - p;
+                for (size_t bytes = gran[p]; bytes <= 64; bytes += gran[p]) {
+                    size_t lo = 65, hi = 0;
+                    bool found = false;
+                    for (size_t first = 0; first <= bytes; ++first) {
+                        if (first <= cap[p] && bytes - first <= cap[q] &&
+                            first % gran[p] == 0 && (bytes - first) % gran[q] == 0) {
+                            found = true;
+                            lo = std::min(lo, first);
+                            hi = std::max(hi, first);
+                        }
+                    }
+                    for (bool fill : {false, true}) {
+                        const auto plan = v200::memory::plan_extents(bytes, preferred, profile, used, fill);
+                        assert((plan.status == CUDA_SUCCESS) == found);
+                        if (!found) continue;
+                        size_t actual_preferred = 0, total = 0;
+                        for (const auto &extent : plan.extents) {
+                            assert(extent.logical_offset == total);
+                            total += extent.size;
+                            if (extent.owner == preferred) actual_preferred += extent.size;
+                        }
+                        assert(total == bytes);
+                        const size_t expected = bytes <= cap[p] ? bytes : fill ? hi : lo;
+                        assert(actual_preferred == expected);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void test_local_placement_keeps_workspace_and_full_capacity() {
+    const char *prior = std::getenv("V200_PREFER_LOCAL_HBM");
+    const bool had_prior = prior != nullptr;
+    const std::string saved = prior != nullptr ? prior : "";
+    setenv("V200_PREFER_LOCAL_HBM", "1", 1);
+    constexpr size_t gib = size_t{1} << 30;
+    FakeDriver fake;
+    auto profile = make_profile();
+    profile.owner_budget_bytes[0] = profile.owner_budget_bytes[1] = 12 * gib;
+    v200::memory::MemoryManager manager;
+    assert(manager.configure(profile, make_driver(fake)) == CUDA_SUCCESS);
+    void *weights = nullptr, *kv = nullptr;
+    assert(manager.allocate(0, 18 * gib, 0, &weights) == CUDA_SUCCESS);
+    v200_allocation_info info{};
+    info.struct_size = sizeof(info);
+    assert(manager.query(weights, &info) == CUDA_SUCCESS);
+    assert(info.owner_bytes[0] <= 11 * gib && info.owner_bytes[0] > 11 * gib - 12);
+    assert(info.owner_bytes[1] >= 7 * gib);
+    assert(manager.allocate(0, 3 * gib / 4, 0, &kv) == CUDA_SUCCESS);
+    assert(manager.query(kv, &info) == CUDA_SUCCESS);
+    assert(info.owner_bytes[0] == 3 * gib / 4 && info.owner_bytes[1] == 0);
+    assert(manager.release(kv) == CUDA_SUCCESS);
+    assert(manager.release(weights) == CUDA_SUCCESS);
+    // Soft workspace headroom must not reduce the total advertised capacity.
+    assert(manager.allocate(0, 24 * gib, 0, &weights) == CUDA_SUCCESS);
+    assert(manager.query(weights, &info) == CUDA_SUCCESS);
+    assert(info.owner_bytes[0] == 12 * gib && info.owner_bytes[1] == 12 * gib);
+    assert(manager.release(weights) == CUDA_SUCCESS);
+    if (had_prior) setenv("V200_PREFER_LOCAL_HBM", saved.c_str(), 1);
+    else unsetenv("V200_PREFER_LOCAL_HBM");
 }
 
 void test_compound_vmm_and_lifetime() {
@@ -736,6 +815,8 @@ void test_pair_local_registry_routes_by_owner() {
 
 int main() {
     test_planner();
+    test_preferred_placement_matches_exhaustive_oracle();
+    test_local_placement_keeps_workspace_and_full_capacity();
     test_single_extent_allocation_has_pair_access();
     test_first_extent_owner_flags();
     test_single_extent_vmm_anchor_access_expands_to_pair();

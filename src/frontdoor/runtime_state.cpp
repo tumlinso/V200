@@ -1,4 +1,5 @@
 #include "runtime_state.hpp"
+#include "positive_symbol_cache.hpp"
 
 #include <dlfcn.h>
 #include <link.h>
@@ -17,6 +18,9 @@
 
 namespace v200::frontdoor::detail {
 namespace {
+struct CachedExecutionCurrentToken {};
+struct CachedExecutionReleaseToken {};
+
 thread_local unsigned internal_depth = 0;
 thread_local bool resolving = false;
 std::atomic<std::uint64_t> next_stream_id{3};
@@ -297,7 +301,9 @@ int execution_token_for_stream(void *stream, v200_completion_token *token) noexc
     if (registered != V200_EXECUTION_OK && registered != V200_EXECUTION_DUPLICATE_BINDING) return registered;
     using Current = int (*)(v200_execution_handle *, v200_logical_device_id,
                             v200_logical_stream_id, v200_completion_token *);
-    auto fn = reinterpret_cast<Current>(lookup_v200("v200_execution_current_token"));
+    auto fn = positive_symbol<CachedExecutionCurrentToken, Current>([]() noexcept {
+        return reinterpret_cast<Current>(lookup_v200("v200_execution_current_token"));
+    });
     return fn ? fn(handle, execution_device(), stream_id(stream), token) : V200_EXECUTION_UNAVAILABLE;
 }
 
@@ -321,7 +327,9 @@ int execution_release_token(v200_completion_token token) noexcept {
     auto *handle = execution_handle();
     if (handle == nullptr) return V200_EXECUTION_UNAVAILABLE;
     using Release = int (*)(v200_execution_handle *, v200_completion_token);
-    auto fn = reinterpret_cast<Release>(lookup_v200("v200_execution_release"));
+    auto fn = positive_symbol<CachedExecutionReleaseToken, Release>([]() noexcept {
+        return reinterpret_cast<Release>(lookup_v200("v200_execution_release"));
+    });
     return fn ? fn(handle, token) : V200_EXECUTION_UNAVAILABLE;
 }
 

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T15:59:11Z",
+  "generated_at": "2026-10-17T16:00:46Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 133,
+  "project_revision": 134,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 133,
+    "project_revision": 134,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -140,7 +140,7 @@
         "id": "V200-11-READY",
         "metadata_json": "{}",
         "reached_at": "2026-10-17T15:17:25Z",
-        "revision": 128,
+        "revision": 134,
         "revoked_at": null,
         "state": "reached",
         "task_id": "V200-11",
@@ -150,7 +150,7 @@
         "id": "V200-12-READY",
         "metadata_json": "{}",
         "reached_at": "2026-10-17T14:38:39Z",
-        "revision": 123,
+        "revision": 134,
         "revoked_at": null,
         "state": "reached",
         "task_id": "V200-12",
@@ -160,7 +160,7 @@
         "id": "V200-13-READY",
         "metadata_json": "{}",
         "reached_at": "2026-10-17T15:24:53Z",
-        "revision": 130,
+        "revision": 134,
         "revoked_at": null,
         "state": "reached",
         "task_id": "V200-13",
@@ -170,7 +170,7 @@
         "id": "V200-14-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 123,
+        "revision": 134,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-14",
@@ -1528,6 +1528,16 @@
         "revision": 133,
         "seq": 133,
         "timestamp": "2026-10-17T15:59:11Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "6c6463a7-0f66-4e12-813f-c17e46185775",
+        "entity_type": "project",
+        "event_type": "plan.applied",
+        "payload_json": "{\"plan_digest\": \"b1792b309a44cc768a6d11b245390300aa5573081a10938b1c48a825d7d8d6fe\", \"source\": \"project-control\"}",
+        "revision": 134,
+        "seq": 134,
+        "timestamp": "2026-10-17T16:00:46Z"
       }
     ],
     "evidence": [
@@ -2164,7 +2174,7 @@
         "input_fingerprint": "b21703933977f0aa3f3b9a5f9aed1f0d984f11a51e344a500e4bc5a942fa3224",
         "last_run_at": "2026-10-17T15:17:25Z",
         "required": 1,
-        "revision": 125,
+        "revision": 134,
         "status": "passed",
         "task_id": "V200-11",
         "type": "command",
@@ -2177,7 +2187,7 @@
         "input_fingerprint": "441e8480135428e44f2c049c1649523c02235a8c3a4489c7107d354e4dfd0d16",
         "last_run_at": "2026-10-17T15:17:25Z",
         "required": 1,
-        "revision": 127,
+        "revision": 134,
         "status": "passed",
         "task_id": "V200-11",
         "type": "command",
@@ -2190,7 +2200,7 @@
         "input_fingerprint": "ac2eb40abab9deff5f1d3699dc6ccec803e3b80c63eb79d389f6fe3c1376c0d9",
         "last_run_at": "2026-10-17T14:38:39Z",
         "required": 1,
-        "revision": 123,
+        "revision": 134,
         "status": "passed",
         "task_id": "V200-12",
         "type": "command",
@@ -3386,47 +3396,102 @@
       },
       {
         "mode": "exclusive",
-        "path": "docs/v200/release.md",
-        "task_id": "V200-14"
-      },
-      {
-        "mode": "exclusive",
-        "path": "tests/release",
-        "task_id": "V200-14"
-      },
-      {
-        "mode": "read",
         "path": "README.md",
         "task_id": "V200-14"
       },
       {
-        "mode": "read",
+        "mode": "exclusive",
+        "path": "benchmarks/comparison",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "exclusive",
         "path": "docs/v200",
         "task_id": "V200-14"
       },
       {
-        "mode": "read",
-        "path": "evidence",
+        "mode": "exclusive",
+        "path": "evidence/B08",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "exclusive",
+        "path": "include/v200",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "exclusive",
+        "path": "packaging",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/qualification",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/v200",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "exclusive",
+        "path": "src",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tools/v200",
         "task_id": "V200-14"
       },
       {
         "mode": "read",
-        "path": "packaging",
+        "path": "build-support",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B03",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B04",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B05",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B06",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B07",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/foundation",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "planning/EXECUTION_PLAN.md",
         "task_id": "V200-14"
       },
       {
         "mode": "read",
         "path": "planning/v200-bootstrap",
-        "task_id": "V200-14"
-      },
-      {
-        "mode": "read",
-        "path": "scripts/v200",
-        "task_id": "V200-14"
-      },
-      {
-        "mode": "read",
-        "path": "tools/v200",
         "task_id": "V200-14"
       },
       {
@@ -3949,7 +4014,7 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 42,
+        "id": 46,
         "interface_id": null,
         "prerequisite_task_id": "V200-12",
         "task_id": "V200-11",
@@ -3960,7 +4025,7 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 43,
+        "id": 47,
         "interface_id": null,
         "prerequisite_task_id": "V200-11",
         "task_id": "V200-13",
@@ -3971,7 +4036,7 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 44,
+        "id": 48,
         "interface_id": null,
         "prerequisite_task_id": "V200-12",
         "task_id": "V200-13",
@@ -3982,7 +4047,7 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 45,
+        "id": 49,
         "interface_id": null,
         "prerequisite_task_id": "V200-13",
         "task_id": "V200-14",
@@ -4260,12 +4325,12 @@
         "priority": 0,
         "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 128,
+        "revision": 134,
         "status": "done",
         "tags_json": "[]",
         "title": "Expose and integrate two logical V200 devices",
-        "updated_at": "2026-10-17T15:17:25Z",
-        "version": 6
+        "updated_at": "2026-10-17T16:00:46Z",
+        "version": 7
       },
       {
         "attention_reason": null,
@@ -4285,12 +4350,12 @@
         "priority": 0,
         "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 123,
+        "revision": 134,
         "status": "done",
         "tags_json": "[]",
         "title": "Make the measured performance and product decision",
-        "updated_at": "2026-10-17T15:17:16Z",
-        "version": 8
+        "updated_at": "2026-10-17T16:00:46Z",
+        "version": 9
       },
       {
         "attention_reason": null,
@@ -4310,12 +4375,12 @@
         "priority": 0,
         "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 130,
+        "revision": 134,
         "status": "done",
         "tags_json": "[]",
         "title": "Package a reversible deployment and diagnostic surface",
-        "updated_at": "2026-10-17T15:24:53Z",
-        "version": 5
+        "updated_at": "2026-10-17T16:00:46Z",
+        "version": 6
       },
       {
         "attention_reason": "Usable restricted preview delivered; full V200 final acceptance remains open for performance and broader transparent CUDA execution.",
@@ -4328,19 +4393,19 @@
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"All mandatory product outcomes have current evidence or an explicit user-approved revised scope.\",\"Native single-device presentation, capacity and useful dual compute claims match actual tested tier.\",\"Release note includes exact tests and known limits; no GPU lease, background watch or unfinished owned process remains.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D08\"],\"recommended_start\":\"Root reviews producer commits, selected branch decisions, acceptance receipts and dirty-work preservation. Run only tests affected by final integration. Use supported Todo integration/completion mechanisms and retain a restartable next-work backlog. Research negatives remain evidence, not missing acceptance hidden by a green summary.\",\"research_refs\":[\"P-README\",\"P-ADAPT\",\"A-HOST\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-14.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-14\",\"outputs\":[\"docs/v200/release.md\",\"tests/release/\",\"release provenance and Todo integration receipt\"],\"parallelism\":\"Root final acceptance only; helpers may review but cannot change the objective or authorize system mutations.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Final changed-boundary checks and packaging integrity\"],\"gpu\":\"Reuse compatible evidence; do not rerun all bundles by default.\"},\"workstream\":\"V200 single-device product\"}",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"All mandatory product outcomes have current evidence or an explicit user-approved revised scope.\",\"Native single-device presentation, capacity and useful dual compute claims match actual tested tier.\",\"Release note includes exact tests and known limits; no GPU lease, background watch or unfinished owned process remains.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D08\"],\"recommended_start\":\"Root reviews producer commits, selected branch decisions, acceptance receipts and dirty-work preservation. Run only tests affected by final integration. Use supported Todo integration/completion mechanisms and retain a restartable next-work backlog. Research negatives remain evidence, not missing acceptance hidden by a green summary.\",\"research_refs\":[\"P-README\",\"P-ADAPT\",\"A-HOST\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-14.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-14\",\"outputs\":[\"docs/v200/release.md\",\"tests/release/\",\"release provenance and Todo integration receipt\"],\"parallelism\":\"Root final acceptance only; helpers may review but cannot change the objective or authorize system mutations.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Final changed-boundary checks and packaging integrity\"],\"gpu\":\"Reuse compatible evidence; do not rerun all bundles by default.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17 user continuation: use parallel Luna streams to find and fix the largest64vs125tokens/s bottleneck, preserve transparentV200interface andworkingpreview, keepGPUchecks short. Root owns GPUcontroller andintegration. Build/ andbuild-multipair remainimmutablequalifiedpreviews; use separatebuild-perf candidates. Source/CPUanalysis first, one shorttimelinecheck ifneeded thenmatchedboundedmeasurement. Preserve exactnumerics/lifetimes andnativefallback; nohidden service orarchitecture downgrade.",
         "objective": "Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 133,
+        "revision": 134,
         "status": "in_progress",
         "tags_json": "[]",
         "title": "Integrate and hand off the accepted V200 release",
-        "updated_at": "2026-10-17T15:59:11Z",
-        "version": 6
+        "updated_at": "2026-10-17T16:00:46Z",
+        "version": 7
       },
       {
         "attention_reason": null,
@@ -4519,6 +4584,23 @@
         "created_at": "2026-10-17T15:16:35Z",
         "creation_revision": 113,
         "id": "V200-DELIVERY-1:task_brief:V200-DELIVERY-1-MAIN:V200-14:1",
+        "invalidated_at": "2026-10-17T16:00:46Z",
+        "invalidation_revision": 134,
+        "kind": "task_brief",
+        "lane_id": "V200-DELIVERY-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-DELIVERY-1-MAIN\",\"run_id\":\"V200-DELIVERY-1\",\"task_id\":\"V200-14\"}",
+        "run_id": "V200-DELIVERY-1",
+        "series_key": "",
+        "superseded_by": "V200-DELIVERY-1:task_brief:V200-DELIVERY-1-MAIN:V200-14:2",
+        "task_id": "V200-14",
+        "version": 1
+      },
+      {
+        "content_hash": "5c999900ce007cc703628bee0de21bbefe51147dfd162cbf70df4064a9abaa4d",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"src\",\"include/v200\",\"tests\",\"benchmarks/comparison\",\"scripts/v200\",\"scripts/qualification\",\"tools/v200\",\"packaging\",\"docs/v200\",\"README.md\",\"evidence/B08\"],\"forbidden_paths\":[],\"read_paths\":[\"planning/v200-bootstrap\",\"planning/EXECUTION_PLAN.md\",\"build-support\",\"evidence/B03\",\"evidence/B04\",\"evidence/B05\",\"evidence/B06\",\"evidence/B07\",\"evidence/foundation\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T16:00:46Z",
+        "creation_revision": 134,
+        "id": "V200-DELIVERY-1:task_brief:V200-DELIVERY-1-MAIN:V200-14:2",
         "invalidated_at": null,
         "invalidation_revision": null,
         "kind": "task_brief",
@@ -4528,7 +4610,7 @@
         "series_key": "",
         "superseded_by": null,
         "task_id": "V200-14",
-        "version": 1
+        "version": 2
       },
       {
         "content_hash": "56088e8acc9899e00d8cb8a29a2aff1ae061a420d94fc8d8e28638e33d6d011e",
@@ -5375,7 +5457,7 @@
         "enqueued_at": "2026-10-17T15:16:35Z",
         "lane_id": "V200-DELIVERY-1-MAIN",
         "position": 0,
-        "revision": 130,
+        "revision": 134,
         "state": "completed",
         "task_id": "V200-13"
       },
@@ -5385,7 +5467,7 @@
         "enqueued_at": "2026-10-17T15:16:35Z",
         "lane_id": "V200-DELIVERY-1-MAIN",
         "position": 1,
-        "revision": 133,
+        "revision": 134,
         "state": "active",
         "task_id": "V200-14"
       },
@@ -5658,11 +5740,11 @@
         "created_at": "2026-10-17T15:16:35Z",
         "id": "V200-DELIVERY-1-MAIN",
         "parent_lane_id": null,
-        "revision": 133,
+        "revision": 134,
         "role": "integrator",
         "run_id": "V200-DELIVERY-1",
         "state": "active",
-        "updated_at": "2026-10-17T15:59:11Z",
+        "updated_at": "2026-10-17T16:00:46Z",
         "workspace_mode": "exclusive"
       },
       {

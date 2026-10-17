@@ -24,7 +24,7 @@ struct PlanResult {
 /* Pure planning helper: no CUDA calls and no budget mutation. */
 PlanResult plan_extents(size_t logical_bytes, CUdevice preferred,
                         const v200_memory_pair_profile &profile,
-                        const size_t used_bytes[2]);
+                        const size_t used_bytes[2], bool fill_preferred = false);
 
 class MemoryManager {
 public:

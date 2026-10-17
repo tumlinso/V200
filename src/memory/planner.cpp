@@ -80,7 +80,7 @@ bool modular_inverse(uint64_t value, uint64_t modulus, uint64_t *inverse) noexce
 
 PlanResult plan_extents(size_t logical_bytes, CUdevice preferred,
                         const v200_memory_pair_profile &profile,
-                        const size_t used_bytes[2]) {
+                        const size_t used_bytes[2], bool fill_preferred) {
     PlanResult result;
     if (logical_bytes == 0 || used_bytes == nullptr ||
         profile.owner_device[0] == profile.owner_device[1] ||
@@ -181,6 +181,13 @@ PlanResult plan_extents(size_t logical_bytes, CUdevice preferred,
     if (first > maximum_first || logical_bytes - first > other_capacity) {
         result.status = CUDA_ERROR_OUT_OF_MEMORY;
         return result;
+    }
+
+    // All legal splits share this residue modulo the LCM. Move to the
+    // largest legal preferred extent without changing alignment or budgets.
+    // The default retains the previously qualified placement for fallback.
+    if (fill_preferred) {
+        first += ((maximum_first - first) / lcm) * lcm;
     }
 
     if (first != 0) {
