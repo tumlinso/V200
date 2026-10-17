@@ -1,0 +1,40 @@
+{
+  "project_root": "/home/tumlinson/V200",
+  "package_relative": "planning/v200-bootstrap",
+  "toolkit_root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9",
+  "gpu_uuids": [
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+  ],
+  "approved": true,
+  "cpu_threads": 2,
+  "argv": [
+    "/home/tumlinson/V200/build/planning/v200-bootstrap/examples/v200_pair_probe",
+    "--execute",
+    "--expect-a",
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "--expect-b",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+  ],
+  "build_argv": [
+    "cmake",
+    "--build",
+    "build",
+    "--target",
+    "v200_pair_probe",
+    "--parallel",
+    "2"
+  ],
+  "binary_paths": [
+    "build/planning/v200-bootstrap/examples/v200_pair_probe"
+  ],
+  "source_paths": [
+    "planning/v200-bootstrap/examples/cuda/pair_vmm_probe.cpp",
+    "planning/v200-bootstrap/examples/include/v200/planning.hpp"
+  ],
+  "evidence_relative": "evidence/foundation/B01",
+  "wall_seconds": 90,
+  "allocation_cap_mib_per_gpu": 512,
+  "fixture_enforces_allocation_cap": true,
+  "notes": "User-authorized foreground qualification; expected UUIDs selected from current NV6 topology, not historical ordinals."
+}

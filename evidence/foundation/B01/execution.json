@@ -1,0 +1,31 @@
+{
+  "returncode": 0,
+  "timed_out": false,
+  "interrupted": false,
+  "orphaned_children": false,
+  "termination_uncertain": false,
+  "wall_seconds": 0.5158392449993698,
+  "stdout_sha256": "55a13f01c44bb495a36b745703119e161ab6afdb63a295b35fd5947f3fd602af",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "bundle": "B01",
+  "argv": [
+    "/home/tumlinson/V200/build/planning/v200-bootstrap/examples/v200_pair_probe",
+    "--execute",
+    "--expect-a",
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "--expect-b",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+  ],
+  "lease": {
+    "receipt": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/b6981e0e-fb61-4eb8-8c11-863cbe93424b/lease.json",
+    "owner_pid": 193688,
+    "visible_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ]
+  },
+  "allocation_cap_mib_per_gpu": 512,
+  "memory_cap_enforcement": "fixture responsibility; not an OS hard quota",
+  "gpu_correctness": "read case-level fixture output; child exit alone is not GPU acceptance",
+  "status": "CHILD_COMPLETED"
+}

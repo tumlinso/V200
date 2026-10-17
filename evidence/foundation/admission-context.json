@@ -1,0 +1,15 @@
+{
+  "selected_uuids": [
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+  ],
+  "observed_topology": "GPU0 <-> GPU2 NV6; index-to-UUID mapping read using controller inspect on 2026-10-17",
+  "stopped_service": "project-control-inference.service",
+  "owned_llama_pids": [
+    31269,
+    38347
+  ],
+  "gpu_process_list_after_stop": [],
+  "service_after_stop": "failed; physical GPU processes released, inspect result separately",
+  "no_gpu_reset_or_driver_change": true
+}

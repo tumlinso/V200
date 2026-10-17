@@ -1,0 +1,35 @@
+{
+  "status": "GPU_PASS",
+  "evidence_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec",
+  "physical_uuids": [
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+  ],
+  "toolkit_version": "12.9",
+  "fixture": {
+    "status": "GPU_PASS",
+    "qualification_only": true,
+    "requested_bytes_per_owner": 65536,
+    "mapped_bytes_per_owner": 2097152,
+    "checked_u32_per_device": 1048576,
+    "errors": 0,
+    "arbitrary_kernel_transparency": false,
+    "nvlink_route_proven": false
+  },
+  "source_sha256": {
+    "planning/v200-bootstrap/examples/cuda/pair_vmm_probe.cpp": "782c4f4136916af0883291e9028afcc9751cc3f38e670e63086248a673d78aa4",
+    "planning/v200-bootstrap/examples/include/v200/planning.hpp": "abca9201b23df174ed544c6a8388c17bbae3c3d0aea37ef50bc7cf964808efc5"
+  },
+  "binaries": [
+    {
+      "path": "/home/tumlinson/V200/build/planning/v200-bootstrap/examples/v200_pair_probe",
+      "sha256": "4f73b25e647338c36a816dce57e17471430fd90a450fb7824a2cb45d60795e49"
+    }
+  ],
+  "host_reservation": "released",
+  "scope": "explicit disjoint writes, joined completion, both-device full-view verification",
+  "arbitrary_kernel_transparency": false,
+  "consumer_compatibility": "NOT_RUN",
+  "capacity_beyond_one_gpu": "NOT_RUN",
+  "performance": "NOT_MEASURED"
+}

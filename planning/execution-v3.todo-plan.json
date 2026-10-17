@@ -1,0 +1,314 @@
+{
+  "project": {
+    "name": "V200"
+  },
+  "runs": [
+    {
+      "charter": {
+        "acceptance_conditions": [
+          "V200-01 foundation and source identity are recorded.",
+          "V200-Q01 records the bounded B01 outcome and any stop condition.",
+          "V200-02 through V200-05 are completed by nonoverlapping owners.",
+          "V200-06 records actual llama consumer behavior and the tested transparency tier."
+        ],
+        "boundaries": [
+          "Keep the facade application-scoped and reversible.",
+          "Do not silently narrow the supported one-logical-device-per-physical-pair contract.",
+          "Use the package probe and existing CUDA controller; do not add a scheduler or test framework."
+        ],
+        "glossary": {
+          "B01": "bounded pair-memory probe",
+          "llama-server": "the selected existing first consumer"
+        },
+        "invariants": [
+          "Memory ownership, completion ordering, and observed consumer calls must not return false success.",
+          "CPU checks and compilation are not GPU qualification.",
+          "Release the GPU allocation after the bounded B01 decision; the implementation lanes do CPU work only."
+        ],
+        "objective": "Deliver the earliest correct, opt-in single-logical-device preview for the existing llama.cpp/llama-server workload, with pair feasibility measured early and honest evidence boundaries."
+      },
+      "id": "V200-RUN-1",
+      "lanes": [
+        {
+          "id": "V200-RUN-1-COORD",
+          "role": "coordinator",
+          "tasks": [],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        },
+        {
+          "id": "V200-RUN-1-Q01",
+          "parent_lane_id": "V200-RUN-1-COORD",
+          "role": "validator",
+          "tasks": [
+            "V200-Q01"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        },
+        {
+          "id": "V200-RUN-1-02",
+          "parent_lane_id": "V200-RUN-1-COORD",
+          "role": "implementer",
+          "tasks": [
+            "V200-02"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        },
+        {
+          "id": "V200-RUN-1-03",
+          "parent_lane_id": "V200-RUN-1-COORD",
+          "role": "implementer",
+          "tasks": [
+            "V200-03"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        },
+        {
+          "id": "V200-RUN-1-04",
+          "parent_lane_id": "V200-RUN-1-COORD",
+          "role": "implementer",
+          "tasks": [
+            "V200-04"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        },
+        {
+          "id": "V200-RUN-1-05",
+          "parent_lane_id": "V200-RUN-1-COORD",
+          "role": "implementer",
+          "tasks": [
+            "V200-05"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        },
+        {
+          "id": "V200-RUN-1-06",
+          "parent_lane_id": "V200-RUN-1-COORD",
+          "role": "implementer",
+          "tasks": [
+            "V200-06"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        }
+      ],
+      "rendezvous": [],
+      "root_task_id": "V200-06"
+    }
+  ],
+  "schema_version": 3,
+  "tasks": [
+    {
+      "checkpoints": [
+        {
+          "id": "V200-Q01-READY",
+          "title": "V200-Q01-READY"
+        }
+      ],
+      "depends_on": [],
+      "id": "V200-Q01",
+      "kind": "task",
+      "notes": "Run only the existing bounded B01 probe through the approved CUDA controller. Store the pair profile and controller receipt under evidence/foundation. Use exact pair and stack identity; record case-level result. Build on the V200-01 CPU foundation. Stop at the first foundational failure, release GPU allocation, and report the negative result. Do not create a new test framework or claim full consumer qualification.",
+      "objective": "Run the package existing B01 pair-memory probe on the approved V100 pair as soon as V200-01 is complete; record actual feasibility before consumer implementation concludes.",
+      "parallel_policy": "parallel_safe",
+      "priority": 90,
+      "scope": {
+        "exclusive_paths": [
+          "scripts/qualification",
+          "evidence/foundation"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap/",
+          "build/bootstrap-examples"
+        ]
+      },
+      "title": "Qualify pair memory early with the existing bounded probe"
+    },
+    {
+      "checkpoints": [
+        {
+          "id": "V200-02-READY",
+          "title": "V200-02-READY"
+        }
+      ],
+      "depends_on": [],
+      "id": "V200-02",
+      "kind": "task",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"CPU dispatch-table and handle-routing tests cover observed ABI signatures and default-stream variants.\",\"Original-binary and any source-unmodified-rebuild tier are distinguished.\",\"A bounded B02 closure fixture is built; unresolved private paths and GPU state are explicitly pending V200-06.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\"],\"recommended_start\":\"Use source/ELF audit before runtime tracing. Prototype anchor-backed versus synthetic handle families. Version driver entry-point wrappers and PTDS behavior; account for direct driver calls and dynamic resolution. Unknown APIs must be classified, not silently forwarded. Do not implement all CUDA APIs before the observed consumer surface is known.\",\"research_refs\":[\"W-ENTRY\",\"W-LLAMA-CMAKE\",\"W-LLAMA-CUDA\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-02.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-02\",\"outputs\":[\"src/frontdoor/\",\"include/v200/frontdoor/\",\"tests/abi/\",\"docs/v200/abi-profile.json\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200/charter.md\",\"docs/v200/source-profile.json\",\"docs/v200/interfaces.md\",\"docs/v200/bundle-binding.md\",\"CMakeLists.txt\",\"build-support\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"ELF/source inventory\",\"Resolver recursion/version/handle tests\",\"Compile only against pinned headers\"],\"gpu\":\"B02 owned by V200-06; no claim of live closure here.\"},\"workstream\":\"V200 single-device product\"}",
+      "objective": "Produce the smallest consistent device/ABI boundary for the actual first consumer, ready for an early hardware closure test. Read planning/v200-bootstrap/tasks/V200-02.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "docs/v200/abi-profile.json",
+          "include/v200/frontdoor",
+          "src/frontdoor",
+          "tests/abi"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap/",
+          "docs/v200/charter.md",
+          "docs/v200/source-profile.json",
+          "docs/v200/interfaces.md",
+          "docs/v200/bundle-binding.md",
+          "CMakeLists.txt",
+          "build-support"
+        ]
+      },
+      "title": "Implement a coherent and auditable CUDA presentation boundary"
+    },
+    {
+      "checkpoints": [
+        {
+          "id": "V200-03-READY",
+          "title": "V200-03-READY"
+        }
+      ],
+      "depends_on": [],
+      "id": "V200-03",
+      "kind": "task",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Checked sizes, granularity, accounting, fragmentation and partial-failure rollback are CPU-tested.\",\"A single logical allocation larger than an owner has a specified legal representation; direct VMM queries/lifetimes are covered or explicitly blocked.\",\"B01 qualification and later B04 capacity fixture are prepared; hardware behavior remains pending V200-06/07.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D02\"],\"recommended_start\":\"Start from explicit two-owner extents and I02. Adapt the small pair probe, but build a real ownership ledger for consumer allocations, direct VMM, pointer queries and cleanup. Keep aliases/remapping out of the first live path. Address compound logical handles rather than assuming cudaMalloc interception captures everything.\",\"research_refs\":[\"A-R08\",\"A-E23\",\"W-VMM\",\"W-LLAMA-CUDA\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-03.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-03\",\"outputs\":[\"src/memory/\",\"include/v200/memory/\",\"tests/memory/\",\"docs/v200/memory-contract.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200/charter.md\",\"docs/v200/source-profile.json\",\"docs/v200/interfaces.md\",\"docs/v200/bundle-binding.md\",\"CMakeLists.txt\",\"build-support\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Extent/overlap/overflow/rollback tests\",\"Build pair VMM probe\"],\"gpu\":\"B01 joint foundation proof in V200-06; B04 capacity in V200-07.\"},\"workstream\":\"V200 single-device product\"}",
+      "objective": "Provide a pair-backed canonical allocation model and consumer VMM lifecycle candidate with correct accounting and rollback. Read planning/v200-bootstrap/tasks/V200-03.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "docs/v200/memory-contract.md",
+          "include/v200/memory",
+          "src/memory",
+          "tests/memory"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap/",
+          "docs/v200/charter.md",
+          "docs/v200/source-profile.json",
+          "docs/v200/interfaces.md",
+          "docs/v200/bundle-binding.md",
+          "CMakeLists.txt",
+          "build-support"
+        ]
+      },
+      "title": "Implement canonical pair memory and ownership lifetimes"
+    },
+    {
+      "checkpoints": [
+        {
+          "id": "V200-04-READY",
+          "title": "V200-04-READY"
+        }
+      ],
+      "depends_on": [],
+      "id": "V200-04",
+      "kind": "task",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"CPU dependency tests reject cycles, stale event generations and premature frees.\",\"Asynchronous peer failure has a defined fail-stop path; no reset or arbitrary replay.\",\"Finite B01/B02 tests cover joined completion, remote visibility and current-context restoration once run; implementation is labeled pending hardware proof.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\",\"D03\",\"D06\"],\"recommended_start\":\"Begin with explicit owner execution and event fan-out/fan-in; use a conservative host wait only as measured temporary debt. Preserve context stacks and error propagation. Qualify module globals and remote memory/atomic scope before owner fallback. Graph semantics are not automatically inherited from ordinary stream support.\",\"research_refs\":[\"A-R06\",\"A-E19\",\"A-E22\",\"W-CUDA12\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-04.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-04\",\"outputs\":[\"src/execution/\",\"include/v200/execution/\",\"tests/execution/\",\"docs/v200/completion-contract.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200/charter.md\",\"docs/v200/source-profile.json\",\"docs/v200/interfaces.md\",\"docs/v200/bundle-binding.md\",\"CMakeLists.txt\",\"build-support\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Completion prefix/handle lifetime tests\",\"Compilation of explicit event probe\"],\"gpu\":\"B01/B02 accepted jointly by V200-06; no permanent polling benchmark.\"},\"workstream\":\"V200 single-device product\"}",
+      "objective": "Provide stream/context/module ownership and completion semantics that can safely join both physical workers. Read planning/v200-bootstrap/tasks/V200-04.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "docs/v200/completion-contract.md",
+          "include/v200/execution",
+          "src/execution",
+          "tests/execution"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap/",
+          "docs/v200/charter.md",
+          "docs/v200/source-profile.json",
+          "docs/v200/interfaces.md",
+          "docs/v200/bundle-binding.md",
+          "CMakeLists.txt",
+          "build-support"
+        ]
+      },
+      "title": "Implement logical completion and safe owner execution"
+    },
+    {
+      "checkpoints": [
+        {
+          "id": "V200-05-READY",
+          "title": "V200-05-READY"
+        }
+      ],
+      "depends_on": [],
+      "id": "V200-05",
+      "kind": "task",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Fixture binds actual binary/DSOs/model/configuration and provides an independent output oracle.\",\"Native single, pair and facade-owner controls are defined where applicable.\",\"Automatic fit/offload/precision changes cannot silently alter useful work.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\",\"D07\"],\"recommended_start\":\"Use the actual working llama-server binary first, and the pinned source build as a comparison. Freeze model/tokenizer hashes and all meaningful workload flags. Prepare a fitting smoke workload plus a resident-capacity workload. Identify custom kernels and direct VMM from source. Do not download a model just to fill a fixture; bind an authorized existing asset.\",\"research_refs\":[\"W-LLAMA-CUDA\",\"W-LLAMA-SERVER\",\"A-E20\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-05.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-05\",\"outputs\":[\"tests/consumer/\",\"benchmarks/fixtures/\",\"docs/v200/consumer-profile.json\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200/charter.md\",\"docs/v200/source-profile.json\",\"docs/v200/interfaces.md\",\"docs/v200/bundle-binding.md\",\"CMakeLists.txt\",\"build-support\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Validate fixture schema, hashes and explicit controls\",\"Compile existing consumer only if authorized and needed\"],\"gpu\":\"B03 baseline/application session in V200-06; larger fixtures deferred.\"},\"workstream\":\"V200 single-device product\"}",
+      "objective": "Create one reproducible application fixture and truthful compatibility/performance controls, without a broad model benchmark collection. Read planning/v200-bootstrap/tasks/V200-05.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "benchmarks/fixtures",
+          "docs/v200/consumer-profile.json",
+          "tests/consumer"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap/",
+          "docs/v200/charter.md",
+          "docs/v200/source-profile.json",
+          "docs/v200/interfaces.md",
+          "docs/v200/bundle-binding.md",
+          "CMakeLists.txt",
+          "build-support"
+        ]
+      },
+      "title": "Prepare the real consumer and matched native baseline fixture"
+    },
+    {
+      "checkpoints": [
+        {
+          "id": "V200-06-READY",
+          "title": "V200-06-READY"
+        }
+      ],
+      "depends_on": [
+        {
+          "task_id": "V200-02",
+          "type": "task"
+        },
+        {
+          "task_id": "V200-03",
+          "type": "task"
+        },
+        {
+          "task_id": "V200-04",
+          "type": "task"
+        },
+        {
+          "task_id": "V200-05",
+          "type": "task"
+        },
+        {
+          "task_id": "V200-Q01",
+          "type": "task"
+        }
+      ],
+      "id": "V200-06",
+      "kind": "integration",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Actual logical enumeration/selection and correct consumer output are recorded.\",\"B01 and B02 hardware evidence matches the exact pair/stack and complete operation contract.\",\"No required API returns false success or bypasses ownership tracking.\",\"Transparency tier and remaining capacity/compute limitations are explicit; T1 cannot be accepted as T2 without user choice.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\",\"D02\",\"D08\"],\"recommended_start\":\"First run bounded B01 pair-memory/completion and B02 ABI closure. Then execute B03 on a small real workload. A legal owner-execution path is acceptable for this first application milestone, but it is not dual-compute success. Resolve observed essential graph/library/VMM calls here rather than hiding them behind a deferred task. If only a rebuilt or special-backend consumer works, use D01/D08.\",\"research_refs\":[\"A-R06\",\"A-E23\",\"W-ENTRY\",\"W-LLAMA-CUDA\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-06.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-06\",\"outputs\":[\"tests/integration/first_consumer.py\",\"docs/v200/first-consumer.md\",\"evidence/B01\",\"evidence/B02\",\"evidence/B03\"],\"parallelism\":\"Root integration outcome. Independent CPU work may continue while a GPU window or user decision is pending.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"build-support\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Build before every admitted bundle\",\"Small focused regression only\"],\"gpu\":[\"B01\",\"B02\",\"B03\"],\"stop\":\"On foundational failure, release GPUs and open D01/D02; do not continue a full sweep.\"},\"workstream\":\"V200 single-device product\"}",
+      "objective": "Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "scripts/v200",
+          "include/v200/core",
+          "src/integration",
+          "tests/integration",
+          "docs/v200",
+          "evidence/B02",
+          "evidence/B03"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap/",
+          "build-support"
+        ]
+      },
+      "title": "Deliver the first real single-device consumer"
+    }
+  ]
+}

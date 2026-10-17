@@ -1,0 +1,1 @@
+{"status":"GPU_PASS","qualification_only":true,"requested_bytes_per_owner":65536,"mapped_bytes_per_owner":2097152,"checked_u32_per_device":1048576,"errors":0,"arbitrary_kernel_transparency":false,"nvlink_route_proven":false}
