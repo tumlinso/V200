@@ -1,0 +1,2 @@
+V200_SERVER_READY http://127.0.0.1:54377
+{"failure": "server exited unsuccessfully during cleanup: -9", "result_path": "/home/tumlinson/V200/evidence/B08/trace-baseline-r1/comparison/v200_extended/consumer/resident_capacity-facade_owner-1792253491367520010.json", "worker_status": "FAIL"}

@@ -131,7 +131,8 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
                pair_compute: bool = False,
                verify_pair_compute: bool = False,
                cuda_graphs_enabled: bool = False,
-               extended_expert_compute: bool = False) -> dict[str, Any]:
+               extended_expert_compute: bool = False,
+               prefer_local_hbm: bool = False) -> dict[str, Any]:
     fixture = _read_json(FIXTURE_PATH)
     selected_port = DEFAULT_SERVER_PORT if mode == "serve" and port is None else port
     controls, bundle, duration = _server_args(
@@ -140,6 +141,10 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         raise LaunchError("operator verification requires --pair-compute")
     if extended_expert_compute and not pair_compute:
         raise LaunchError("extended expert compute requires --pair-compute")
+    if prefer_local_hbm and not pair_compute:
+        raise LaunchError("local HBM preference requires --pair-compute")
+    if prefer_local_hbm and not extended_expert_compute:
+        raise LaunchError("local HBM preference requires --extended-expert-compute")
     if len(uuids) != 2 or len(set(uuids)) != 2 or any(UUID_RE.fullmatch(item) is None for item in uuids):
         raise LaunchError("launch requires the exact two UUIDs from the B01 pair profile")
     python = python_executable or sys.executable
@@ -171,7 +176,9 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
             controller_timeout = PREVIEW_BOUNDED_SECONDS + PREVIEW_CONTROLLER_MARGIN_SECONDS
             wrapper = BOOTSTRAP_RUNNER
 
-    build_directory = REPO_ROOT / ("build-multipair" if extended_expert_compute else "build")
+    build_name = ("build-perf" if prefer_local_hbm else
+                  "build-multipair" if extended_expert_compute else "build")
+    build_directory = REPO_ROOT / build_name
     frontdoor_dso = build_directory / "src/frontdoor/libv200_frontdoor.so"
     pair_init_dso = build_directory / "src/integration/libv200_pair_init.so"
     pair_operators_dso = build_directory / "src/operators/libv200_operators.so"
@@ -206,6 +213,7 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         "-u", "V200_OPERATOR_VERIFY",
         "-u", "V200_GRAPH_CAPTURE",
         "-u", "V200_EXTENDED_EXPERT_COMPUTE",
+        "-u", "V200_PREFER_LOCAL_HBM",
         f"V200_DEVICE_UUIDS={','.join(uuids)}",
     ]
     if pair_compute:
@@ -214,6 +222,8 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
             child_env.append("V200_OPERATOR_VERIFY=1")
         if extended_expert_compute:
             child_env.append("V200_EXTENDED_EXPERT_COMPUTE=1")
+        if prefer_local_hbm:
+            child_env.append("V200_PREFER_LOCAL_HBM=1")
     bounded_argv.extend(["--", "/usr/bin/env", *child_env, *inner])
 
     paths = [
@@ -229,6 +239,11 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         "src/frontdoor/abi_profile.cpp",
         "docs/v200/abi-profile.json",
     ]
+    if prefer_local_hbm:
+        paths.extend(["src/memory/manager.cpp", "src/memory/planner.cpp",
+                      "include/v200/memory/manager.hpp",
+                      "src/frontdoor/runtime_state.cpp",
+                      "src/frontdoor/positive_symbol_cache.hpp"])
     if pair_compute:
         paths.extend([
             "src/operators/launch.cpp",
@@ -290,6 +305,7 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         "preload_libraries": [str(path) for path in preload_libraries],
         "pair_compute": pair_compute,
         "extended_expert_compute": extended_expert_compute,
+        "prefer_local_hbm": prefer_local_hbm,
         "build_directory": str(build_directory.relative_to(REPO_ROOT)),
         "operator_verification": verify_pair_compute,
         "cuda_graphs_enabled": cuda_graphs_enabled,
@@ -413,6 +429,8 @@ def _print_plan(plan: dict[str, Any], missing: list[str], execute: bool) -> None
         print(f"Pair compute: enabled{verification}")
     if plan["extended_expert_compute"]:
         print("Extended expert compute: enabled (768-column Q4_K/Q6_K paths)")
+    if plan["prefer_local_hbm"]:
+        print("Local HBM preference: enabled for the qualified pair facade")
     if plan["cuda_graphs_enabled"]:
         print("CUDA graphs: enabled by explicit opt-in; native control stays unwrapped and facade capture is tracked.")
     print(f"Static smoke memory preflight: {json.dumps(plan['static_memory_preflight'], sort_keys=True)}")
@@ -476,6 +494,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="opt in to the pair operator library for supported operations")
     parser.add_argument("--extended-expert-compute", action="store_true",
                         help="opt in to extended Q4_K/Q6_K expert paths (requires --pair-compute)")
+    parser.add_argument("--prefer-local-hbm", action="store_true",
+                        help="prefer legal local-owner extents (requires pair and extended expert compute)")
     parser.add_argument("--cuda-graphs", action="store_true",
                         help="opt in to matched llama CUDA graph capture/replay")
     parser.add_argument("--execute", action="store_true",
@@ -488,6 +508,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.extended_expert_compute and not args.pair_compute:
             raise LaunchError("extended expert compute requires --pair-compute")
+        if args.prefer_local_hbm and not args.pair_compute:
+            raise LaunchError("local HBM preference requires --pair-compute")
+        if args.prefer_local_hbm and not args.extended_expert_compute:
+            raise LaunchError("local HBM preference requires --extended-expert-compute")
         authorized_pair, pair_identity = _load_selected_pair()
         selected = _parse_gpu_option(args.gpus, authorized_pair)
         run_id = f"{args.mode}-{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}-{uuid.uuid4().hex[:12]}"
@@ -497,6 +521,7 @@ def main(argv: list[str] | None = None) -> int:
                           pair_compute=args.pair_compute,
                           cuda_graphs_enabled=args.cuda_graphs,
                           extended_expert_compute=args.extended_expert_compute,
+                          prefer_local_hbm=args.prefer_local_hbm,
                           verify_pair_compute=(args.pair_compute
                                                and os.environ.get("V200_OPERATOR_VERIFY") == "1"))
         plan["pair_profile_identity"] = pair_identity

@@ -1,0 +1,2 @@
+V200_SERVER_READY http://127.0.0.1:52607
+{"failure": null, "result_path": "/home/tumlinson/V200/evidence/B08/locality-r1/comparison/v200_extended/consumer/resident_capacity-facade_owner-1792253630243382414.json", "worker_status": "PASS"}

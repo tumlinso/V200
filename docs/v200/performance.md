@@ -1,5 +1,23 @@
 # Performance records
 
+## Anchor-local placement (B08, 17 October 2026)
+
+The new opt-in allocation policy fixes a confirmed locality bottleneck. The old spill planner selected the **smallest** legal preferred-owner extent, filling peer HBM first. The pinned model therefore put about 12 GiB on the peer and 5.28 GiB on the anchor while unrecognized operations continued to execute on the anchor. The candidate selects the largest legal preferred extent, leaving 1 GiB of soft anchor headroom for subsequent KV/workspace allocations. If that preference cannot satisfy a large allocation, it uses the full original pair budgets; aggregate capacity is preserved.
+
+| Case | Median decode tokens/s | Median server prefill |
+| --- | ---: | ---: |
+| Native two-V100 layer split | 123.357 | 58.621 ms |
+| Candidate dispatch cache, original placement | 63.146 | See raw ablation |
+| Same candidate binaries, locality enabled | **78.053** | 129.012 ms |
+
+The placement change increased decode throughput by **23.6%** against the same-binary ablation. It still reaches only 63.3% of the matched native rate. The cache-only result does not establish a host-cache speedup over B07. These are descriptive three-request medians for the existing prompt/model, one preceding warmup and 64 generated tokens per request. Native/locality cases ran together for 44.464 seconds; the separate cache-only ablation used the same DSOs and flags except placement. All warmup and measured outputs matched the native reference exactly.
+
+The locality case retained the full 18,550,716,425-byte GPU tensor payload. Peak owner backing was [12,696,158,208,6,740,246,528] bytes, with zero final accounting, normal process exit and successful graph capture/replay. Peer graph rewrites fell from 68 in B07 to 35; qualified Q4/Q6 peer computation remained present. This associates the gain with placement, without distinguishing remote-memory cost from the effect of fewer cross-device graph dependencies. The remaining performance gap is not explained conclusively.
+
+Evidence: [matched native/locality run](../../evidence/B08/locality-r1/comparison/comparison.json), [cache-only ablation](../../evidence/B08/cache-only-r1/comparison/comparison.json), and [qualification/identity summary](../../evidence/B08/locality-qualification.json). Controller IDs are `827f2d85-d588-4403-84ff-56d185933cdb` and `d2b1df8f-1b21-4a5d-862f-2ca225abb94f`; both canonical owners are released. The 15 CPU candidate CTests and 16 comparison checks passed. The immutable `build-multipair` preview remains available; the candidate uses `build-perf`.
+
+An earlier node-level Nsight diagnostic (`da67c8cc-2ac9-49e4-b4c0-d050948188b9`) hit the finite service limit under instrumentation and required forced child cleanup. Its final application accounting did not close before process termination; the canonical host reservation was released and GPU memory was reclaimed. It is retained as a failed diagnostic, not a successful qualification or throughput result. No additional profiling run was started before the user's requested pause.
+
 ## Extended expert path (B07, 17 October 2026)
 
 The newer Q4_K small-K and Q6_K expert paths execute useful peer work correctly, but do not close the native-pair performance gap. This remains an opt-in capacity/compute preview, not a native-speed replacement.

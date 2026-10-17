@@ -1,0 +1,30 @@
+{
+  "returncode": 0,
+  "timed_out": false,
+  "interrupted": false,
+  "orphaned_children": false,
+  "termination_uncertain": false,
+  "wall_seconds": 22.932010374002857,
+  "stdout_sha256": "11f700c3a5e18fd20f44714b7fc184cec49c4626c788f66a54a2964b464cdb5a",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "bundle": "B08",
+  "argv": [
+    "env",
+    "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "python3",
+    "-c",
+    "import json,sys; from pathlib import Path; sys.path.insert(0,'benchmarks/comparison'); import run_extended_comparison as e; r=e.run_comparison(Path('evidence/B08/cache-only-r1/comparison'),v200_build_dir='build-perf',case_definitions=(e.CASES[1],),repetitions=3,service_seconds=15,max_bundle_seconds=35,prefer_local_hbm=False); print(json.dumps({'status':r['status'],'failure':r['failure'],'elapsed_seconds':r['elapsed_seconds']})); raise SystemExit(0 if r['status']=='PASS' else 1)"
+  ],
+  "lease": {
+    "receipt": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/d4d9c2f9-5842-4021-b2b6-10966e90e79c/lease.json",
+    "owner_pid": 615743,
+    "visible_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ]
+  },
+  "allocation_cap_mib_per_gpu": 12288,
+  "memory_cap_enforcement": "fixture responsibility; not an OS hard quota",
+  "gpu_correctness": "read case-level fixture output; child exit alone is not GPU acceptance",
+  "status": "CHILD_COMPLETED"
+}

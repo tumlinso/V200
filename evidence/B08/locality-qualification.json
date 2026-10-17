@@ -1,0 +1,185 @@
+{
+  "schema": "v200-locality-qualification/v1",
+  "status": "PASS_RESTRICTED_SINGLE_PAIR_LOCALITY",
+  "source": {
+    "commit": "a3d4ca9f475dca9fed4f0fcebe6e831175fe2d1d",
+    "repository": "/home/tumlinson/V200",
+    "tracked_status": "",
+    "tracked_worktree_clean": true
+  },
+  "controller_evidence_ids": {
+    "locality_vs_native": "827f2d85-d588-4403-84ff-56d185933cdb",
+    "cache_only_ablation": "d2b1df8f-1b21-4a5d-862f-2ca225abb94f"
+  },
+  "physical_gpu_uuids": [
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+  ],
+  "source_inputs": [
+    {
+      "identity": "profile-pinned",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/llama-server",
+      "role": "llama_server",
+      "sha256": "b42facfb93d85e1a581862c872615834223dc479871701c0b797aeee1fa11e9d",
+      "status": "PASS"
+    },
+    {
+      "identity": "profile-pinned",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-server-impl.so",
+      "role": "llama_server_implementation",
+      "sha256": "a176f2a62eeab92491cd112a09b12799961249be7c5341c59c415694cca0eaa0",
+      "status": "PASS"
+    },
+    {
+      "identity": "profile-pinned",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-common.so.0.2.0",
+      "role": "llama_common",
+      "sha256": "628a832efc253d1da29ff09a225f74e98c3d0a7bda72ac0bd4f074c19f764e7b",
+      "status": "PASS"
+    },
+    {
+      "identity": "profile-pinned",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libmtmd.so.0.2.0",
+      "role": "llama_multimodal",
+      "sha256": "4c980a736b41e0fbb7929c8bbe2dfbd188bba8ee3d9f5c716f1ac65f619d5bd1",
+      "status": "PASS"
+    },
+    {
+      "identity": "profile-pinned",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama.so.0.2.0",
+      "role": "llama_llama",
+      "sha256": "d56c7c416032867451483a0b5b8a4563f3caeed725b39d924924fe11fcf7feb4",
+      "status": "PASS"
+    },
+    {
+      "identity": "profile-pinned",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml.so.0.21.0",
+      "role": "llama_ggml_loader",
+      "sha256": "d76b41c497feced8853cc2c9d55352a382ab429e3de84ef94983dd914ebeb566",
+      "status": "PASS"
+    },
+    {
+      "identity": "profile-pinned",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cpu.so.0.21.0",
+      "role": "llama_cpu_backend",
+      "sha256": "d2e3a5c6e3fb838f2c94ed3cb2d4b940c34838518f3f0233198aee22aee5c71c",
+      "status": "PASS"
+    },
+    {
+      "identity": "profile-pinned",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cuda.so.0.21.0",
+      "role": "llama_cuda_backend",
+      "sha256": "df90ec2ea474f130cc253a6c0776ff0e2d7fdd4d821bcc6be4bcc940b59767a9",
+      "status": "PASS"
+    },
+    {
+      "identity": "profile-pinned",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-base.so.0.21.0",
+      "role": "llama_ggml_base",
+      "sha256": "3836344472b5092b77eaea16b3584f13028107ae44fa750d27183ba22628d345",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/tests/consumer/run_consumer.py",
+      "role": "consumer_harness",
+      "sha256": "6b03b7a77b36ab8e44aa1374639cd3781a047a30e92b2d490c38a1b5b8e9e8e6",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/benchmarks/comparison/run_pair_comparison.py",
+      "role": "pair_comparison_helper",
+      "sha256": "6b31bbd7437a5e1a1666bfd5177209db47f1e200a6b97847066ee6879d9d4a0f",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/benchmarks/comparison/run_extended_comparison.py",
+      "role": "extended_comparison_runner",
+      "sha256": "83e704e01fce3a7c5ad7f707ed92472ce2dcd046c6ed379668bdd4831cadd220",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/benchmarks/fixtures/llama-server-v200.json",
+      "role": "consumer_fixture",
+      "sha256": "4bbc9324556131939e2a23478ffc2feb7a523eefd32a3a7fe2191d91a7f90c8b",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/docs/v200/consumer-profile.json",
+      "role": "consumer_profile",
+      "sha256": "f6bb541df61c98d613cbd07e4519bf32b2300ef2a042ed6f844b0d00d2a14d65",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/docs/v200/multipair-profile.json",
+      "role": "multipair_build_profile",
+      "sha256": "2289b870d4a7c8e6d61288120596e615df9e9d50aa42f00b698bb74d4fb58b9f",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/build-perf/src/frontdoor/libv200_frontdoor.so",
+      "role": "v200_frontdoor",
+      "sha256": "6260d515d000cad55a7064737782b4c0e57a877fcfd2b098b5c75c0ecd758981",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/build-perf/src/integration/libv200_pair_init.so",
+      "role": "v200_pair_initializer",
+      "sha256": "d5d5b09c141df003ea4b64453d2a9148797f78ca288535e150ddac8f3502939e",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/build-perf/src/operators/libv200_operators.so",
+      "role": "v200_operators",
+      "sha256": "a4b0d25d041272e3a8ef95a2c9f2508f00552b5358808515325ff35f77179d33",
+      "status": "PASS"
+    },
+    {
+      "identity": "captured-current-build",
+      "path": "/home/tumlinson/V200/build-perf/CMakeCache.txt",
+      "role": "selected_v200_cmake_cache",
+      "sha256": "fca25979da49ca9848ae61471cba794be99d471eb067f1776af7b6505dff6b8a",
+      "status": "PASS"
+    }
+  ],
+  "decode_tps_medians": {
+    "native_pair": 123.35743698490927,
+    "candidate_locality_off": 63.14586695266064,
+    "candidate_locality_on": 78.05347034401757
+  },
+  "locality_gain_percent": 23.60820131352841,
+  "all_generated_outputs_match_native": true,
+  "peak_owner_backing_bytes": [
+    12696158208,
+    6740246528
+  ],
+  "graph": {
+    "enabled": true,
+    "max_matched_nodes": 35,
+    "max_rewritten_nodes": 35,
+    "status": "PASS_CAPTURE_AND_REPLAY",
+    "successful_capture_count": 6,
+    "successful_replay_samples": 16
+  },
+  "flags": {
+    "V200_PAIR_COMPUTE": "1",
+    "V200_EXTENDED_EXPERT_COMPUTE": "1",
+    "V200_GRAPH_CAPTURE": "1",
+    "V200_PREFER_LOCAL_HBM": "1"
+  },
+  "build_directory": "build-perf",
+  "limits": [
+    "One pinned model/prompt, one warmup plus3 measured64-token requests; descriptive only",
+    "New policy qualified for one logical pair; two-logical-device profile stays frozen",
+    "1GiB soft anchor headroom for large allocations; full-capacity fallback preserved",
+    "Node-level profiler attempt failed under instrumentation; not a performance qualification"
+  ]
+}

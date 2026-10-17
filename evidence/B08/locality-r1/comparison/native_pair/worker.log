@@ -1,0 +1,2 @@
+V200_SERVER_READY http://127.0.0.1:40895
+{"failure": null, "result_path": "/home/tumlinson/V200/evidence/B08/locality-r1/comparison/native_pair/consumer/resident_capacity-native_pair-1792253608226247684.json", "worker_status": "PASS"}

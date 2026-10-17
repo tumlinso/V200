@@ -3,6 +3,14 @@ set -euo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 BUILD_DIR="$ROOT/build-multipair"
+if [[ "${1:-}" == --candidate ]]; then
+  BUILD_DIR="$ROOT/build-perf"
+  shift
+fi
+if (($#)); then
+  echo "usage: $0 [--candidate]" >&2
+  exit 2
+fi
 CUDA_ROOT="/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9"
 
 if [[ "$BUILD_DIR" == "$ROOT/build" || -L "$BUILD_DIR" ]]; then
@@ -29,7 +37,7 @@ if [[ -f "$BUILD_DIR/CMakeCache.txt" ]]; then
   fi
 fi
 
-echo "Building V200 multipair CPU/runtime artifacts in $BUILD_DIR with HPC CUDA 12.9."
+echo "Building V200 CPU/runtime artifacts in $BUILD_DIR with HPC CUDA 12.9."
 echo "This script does not initialize a GPU, download a model, start a service, or install system files."
 cmake -S "$ROOT" -B "$BUILD_DIR" \
   -DCUDAToolkit_ROOT="$CUDA_ROOT" \

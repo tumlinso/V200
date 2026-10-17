@@ -1,0 +1,1 @@
+{"elapsed_seconds": 44.464073107999866, "failure": null, "result": "/home/tumlinson/V200/evidence/B08/locality-r1/comparison/comparison.json", "status": "PASS"}

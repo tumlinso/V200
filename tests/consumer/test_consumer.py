@@ -210,6 +210,33 @@ class FixtureTests(unittest.TestCase):
                     "facade_owner", self.fixture, [preload, initializer], env,
                     facade_mode="pair", selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
 
+    def test_local_hbm_preference_is_scrubbed_and_injected_only_on_extended_pair_facade(self) -> None:
+        env = {"PATH": "/bin", "CUDA_VISIBLE_DEVICES": "GPU-a,GPU-b",
+               "V200_DEVICE_UUIDS": "GPU-aaaaaaaa,GPU-bbbbbbbb",
+               "V200_PAIR_COMPUTE": "1", "V200_EXTENDED_EXPERT_COMPUTE": "1",
+               "V200_PREFER_LOCAL_HBM": "1",
+               "LD_PRELOAD": "/tmp/libv200_operators.so"}
+        native = consumer._clean_environment(
+            "native_pair", self.fixture, None, env,
+            selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
+        self.assertNotIn("V200_PREFER_LOCAL_HBM", native)
+        with tempfile.TemporaryDirectory() as directory:
+            preloads = [Path(directory) / name for name in
+                        ("libv200_frontdoor.so", "libv200_pair_init.so", "libv200_operators.so")]
+            for path in preloads:
+                path.touch()
+            facade = consumer._clean_environment(
+                "facade_owner", self.fixture, preloads, env,
+                facade_mode="pair", selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
+            self.assertEqual(facade["V200_PREFER_LOCAL_HBM"], "1")
+
+            no_extended = dict(env)
+            no_extended.pop("V200_EXTENDED_EXPERT_COMPUTE")
+            with self.assertRaisesRegex(consumer.ConsumerError, "requires pair mode"):
+                consumer._clean_environment(
+                    "facade_owner", self.fixture, preloads, no_extended,
+                    facade_mode="pair", selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
+
     def test_cuda_graph_opt_in_is_matched_but_frontdoor_flag_is_facade_only(self) -> None:
         env = {"PATH": "/bin", "CUDA_VISIBLE_DEVICES": "GPU-a,GPU-b",
                "V200_GRAPH_CAPTURE": "stale", "GGML_CUDA_DISABLE_GRAPHS": "1"}
@@ -510,6 +537,50 @@ class LauncherPlanTests(unittest.TestCase):
         args = serve_launcher._parse_args(["--pair-compute", "--extended-expert-compute"])
         self.assertTrue(args.pair_compute)
         self.assertTrue(args.extended_expert_compute)
+
+    def test_local_hbm_preference_requires_extended_compute_and_selects_perf_dsos(self) -> None:
+        with self.assertRaisesRegex(serve_launcher.LaunchError, "requires --pair-compute"):
+            serve_launcher._make_plan("serve", self.uuids, "local-no-pair",
+                                      prefer_local_hbm=True)
+        with self.assertRaisesRegex(serve_launcher.LaunchError, "requires --extended-expert-compute"):
+            serve_launcher._make_plan("serve", self.uuids, "local-no-extended",
+                                      pair_compute=True, prefer_local_hbm=True)
+
+        plan = serve_launcher._make_plan(
+            "serve", self.uuids, "local-hbm", pair_compute=True,
+            extended_expert_compute=True, prefer_local_hbm=True)
+        self.assertTrue(plan["prefer_local_hbm"])
+        self.assertEqual(plan["build_directory"], "build-perf")
+        self.assertEqual(plan["preload_libraries"], [
+            str(serve_launcher.REPO_ROOT / "build-perf/src/frontdoor/libv200_frontdoor.so"),
+            str(serve_launcher.REPO_ROOT / "build-perf/src/integration/libv200_pair_init.so"),
+            str(serve_launcher.REPO_ROOT / "build-perf/src/operators/libv200_operators.so"),
+        ])
+        self.assertEqual(plan["controller_spec"]["binary_paths"], [
+            "build-perf/src/frontdoor/libv200_frontdoor.so",
+            "build-perf/src/integration/libv200_pair_init.so",
+            "build-perf/src/operators/libv200_operators.so",
+        ])
+        self.assertIn("src/memory/manager.cpp", plan["controller_spec"]["paths"])
+        self.assertTrue(all(path.startswith(str(serve_launcher.REPO_ROOT / "build-perf"))
+                            for path in plan["required_files"] if "libv200_" in path))
+        self.assertIn("-u", plan["bounded_child_argv"])
+        self.assertIn("V200_PREFER_LOCAL_HBM=1", plan["bounded_child_argv"])
+        printed = io.StringIO()
+        with redirect_stdout(printed):
+            serve_launcher._print_plan(plan, [], execute=False)
+        self.assertIn("Build outputs: build-perf", printed.getvalue())
+        self.assertIn("Local HBM preference: enabled", printed.getvalue())
+
+        args = serve_launcher._parse_args([
+            "--pair-compute", "--extended-expert-compute", "--prefer-local-hbm"])
+        self.assertTrue(args.prefer_local_hbm)
+
+    def test_prefer_local_hbm_cli_rejects_missing_prerequisites_before_profile(self) -> None:
+        with mock.patch.object(serve_launcher, "_load_selected_pair") as load_pair, \
+             redirect_stderr(io.StringIO()):
+            self.assertEqual(serve_launcher.main(["--prefer-local-hbm"]), 2)
+        load_pair.assert_not_called()
 
     def test_extended_expert_cli_requires_pair_compute_before_loading_hardware_profile(self) -> None:
         with mock.patch.object(serve_launcher, "_load_selected_pair") as load_pair, \

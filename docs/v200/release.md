@@ -1,5 +1,7 @@
 # V200 usable preview checkpoint — 17 October 2026
 
+Latest checkpoint: the opt-in `--prefer-local-hbm` candidate now measures 78.053 versus 63.146 tokens/s with the same binaries and original placement, against 123.357 native. It preserves full model residency and exact output. Use `./packaging/build.sh --candidate`, then add `--prefer-local-hbm` to the single-pair command below. The frozen single-/two-device preview remains available. See [B08 performance](performance.md) and the [requested pause checkpoint](pause-checkpoint.md).
+
 The first usable restricted llama-server deliverable is available. **The full V200 product is not accepted as complete.** Capacity, selected peer execution and two logical devices now work; native-competitive performance and broad transparent CUDA execution remain open. V200-14 stays open for that final acceptance. The architecture remains pair virtualization; the faster native layer split is a fallback, not a replacement V200 backend.
 
 ## Working application capabilities

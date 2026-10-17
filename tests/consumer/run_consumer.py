@@ -279,6 +279,7 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
     pair_compute_requested = child.pop("V200_PAIR_COMPUTE", None) == "1"
     operator_verify_requested = child.pop("V200_OPERATOR_VERIFY", None) == "1"
     extended_expert_requested = child.pop("V200_EXTENDED_EXPERT_COMPUTE", None) == "1"
+    prefer_local_hbm_requested = child.pop("V200_PREFER_LOCAL_HBM", None) == "1"
     child.pop("V200_GRAPH_CAPTURE", None)
     inherited = [part for part in child.pop("LD_PRELOAD", "").split()
                  if "libv200" not in Path(part).name.lower()]
@@ -289,6 +290,7 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
     for key, value in fixture["server"].get("environment", {}).items():
         child[str(key)] = str(value)
     child.pop("V200_EXTENDED_EXPERT_COMPUTE", None)
+    child.pop("V200_PREFER_LOCAL_HBM", None)
     if cuda_graphs_enabled:
         # The native and facade controls must exercise the same llama graph
         # path. Only the pair facade receives V200's explicit capture opt-in.
@@ -303,6 +305,10 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
             raise ConsumerError("facade fixture must define a mode and inherit controller UUIDs")
         if mode == "pair" and len(preloads) < 2:
             raise ConsumerError("facade pair mode requires frontdoor and root pair-initializer libraries")
+        if prefer_local_hbm_requested and (
+                mode != "pair" or not pair_compute_requested or not extended_expert_requested):
+            raise ConsumerError(
+                "local HBM preference requires pair mode, pair compute and extended expert compute")
         if pair_compute_requested and mode == "pair":
             if not any(Path(path).name == "libv200_operators.so" for path in preloads):
                 raise ConsumerError("pair compute requires the pair operator library preload")
@@ -311,6 +317,8 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
                 child["V200_OPERATOR_VERIFY"] = "1"
             if extended_expert_requested:
                 child["V200_EXTENDED_EXPERT_COMPUTE"] = "1"
+            if prefer_local_hbm_requested:
+                child["V200_PREFER_LOCAL_HBM"] = "1"
         child["V200_MODE"] = mode
         child["V200_DEVICE_UUIDS"] = selected
         child["LD_PRELOAD"] = ":".join([*(str(path) for path in preloads), *inherited])

@@ -1,0 +1,58 @@
+{
+  "capture": {
+    "build_variant": "build-multipair",
+    "llama_source_commit": "f280b26983ad0fdb705a0d9ebf0503e76f2899b0",
+    "model_sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad",
+    "nsys_version": "2025.3.1.90-253135822126v0",
+    "report_bytes": 6456683,
+    "report_path": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/0e329db7-f45b-4ae4-a06a-04489959eb3a/nsys/run/report.nsys-rep",
+    "report_sha256": "a6aaafe410aea4cdfc1b4e9ca549c21b814f74c01e6798238d9b8834c6747ac6",
+    "v200_source_commit": "a3d4ca9f475dca9fed4f0fcebe6e831175fe2d1d"
+  },
+  "cuda_activity": {
+    "api_summary_source": "Nsight Systems cuda_api_sum",
+    "apis": [
+      {
+        "average_ns": 144843,
+        "calls": 1,
+        "maximum_ns": 144843,
+        "name": "cudaGetDeviceProperties_v2_v12000",
+        "total_ns": 144843
+      },
+      {
+        "average_ns": 1974.5,
+        "calls": 2,
+        "maximum_ns": 2139,
+        "name": "cuInit",
+        "total_ns": 3949
+      },
+      {
+        "average_ns": 495,
+        "calls": 1,
+        "maximum_ns": 495,
+        "name": "cuModuleGetLoadingMode",
+        "total_ns": 495
+      }
+    ],
+    "kernel_summary": "NO_DATA: Nsight Systems cuda_gpu_kern_sum reports the SQLite capture has no CUDA kernel data.",
+    "kernel_vs_host_vs_remote_conclusion": "UNRESOLVED: no kernel activity or marked request window was captured; absence of rows does not establish that inference ran without GPU kernels."
+  },
+  "interpretation": "The capture ended before a completed measured 64-token request. Server log records a 20.59028 s prompt-cache update, longer than the 15 s service bound, but this is a setup/cache-path observation and cannot explain steady-state decode throughput. Do not interpret as performance, regression, or product qualification.",
+  "purpose": "Partial diagnosis of V200 64-vs-125 tok/s gap; not throughput or qualification evidence.",
+  "run": {
+    "comparison_status": "FAIL",
+    "consumer_elapsed_seconds": 37.441644250000536,
+    "controller_wall_seconds": 39.94594705400232,
+    "failure": "RemoteDisconnected: Remote end closed connection without response",
+    "llama_prompt_cache_update_ms_observed_in_server_log": 20590.28,
+    "nvtx_range": "v200_decode",
+    "nvtx_ranges_observed": 0,
+    "server_cleanup_sigkill": true,
+    "server_exit_code": -9,
+    "service_observed_seconds": 15.000180410999747,
+    "service_requested_seconds": 15,
+    "successful_timed_requests": 0
+  },
+  "schema": "v200-partial-nsys-decode-diagnostic/v1",
+  "status": "INCOMPLETE_TRACE_NO_DECODE_SAMPLE"
+}

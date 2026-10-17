@@ -18,8 +18,7 @@ CUDA execution or performance qualification. B06 evidence records the pinned
 full-resident two-device correctness result and a finite 10-second HTTP service
 smoke. It does not establish four-GPU throughput.
 
-The build script always configures `build-multipair/`; it refuses a symlinked
-directory or a CMake cache belonging to another checkout. It does not modify
+The build script configures `build-multipair/` by default; `./packaging/build.sh --candidate` builds the isolated `build-perf/` locality candidate. Both modes refuse symlinked build directories or a CMake cache belonging to another checkout. It does not modify
 the single-pair `build/` tree. It builds with the HPC CUDA 12.9 toolkit and
 runs CTest with GPU tests disabled. The generated probe executable is only
 compiled; it is not run by this script.
@@ -107,3 +106,5 @@ rm -rf -- build-multipair
 
 This leaves source, evidence, the native llama.cpp checkout, other CUDA
 software, and `build/` untouched. The repository itself is not removed.
+
+The faster single-pair locality candidate is opt-in and keeps both frozen preview builds available. Build it with `./packaging/build.sh --candidate`, then add `--prefer-local-hbm --cuda-graphs` to the extended expert service command above. This selects the qualified `build-perf` DSOs and changes allocation placement while preserving the same logical CUDA interface. B08 measured 78.053 versus 63.146 tokens/s with placement on/off using the same binaries; native measured 123.357. All generated outputs matched and cleanup passed. The two-device service keeps its existing profile; this new policy is qualified for one pair only. See [performance](performance.md).

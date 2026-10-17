@@ -1,0 +1,5 @@
+activity,name,total_ns,calls,average_ns,maximum_ns,status
+cuda_api,cudaGetDeviceProperties_v2_v12000,144843,1,144843,144843,captured
+cuda_api,cuInit,3949,2,1974.5,2139,captured
+cuda_api,cuModuleGetLoadingMode,495,1,495,495,captured
+cuda_kernel,*,,,,,no CUDA kernel data in report

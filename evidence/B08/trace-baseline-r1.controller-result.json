@@ -1,0 +1,11 @@
+{
+  "classification": "measurement-failure",
+  "evidence_id": "da67c8cc-2ac9-49e4-b4c0-d050948188b9",
+  "lease_receipt": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/0e329db7-f45b-4ae4-a06a-04489959eb3a/lease.json",
+  "message": "MEASUREMENT FAILURE: foreground recipe failed. [e:da67c8cc-2ac9-49e4-b4c0-d050948188b9]",
+  "ok": false,
+  "returncode": 1,
+  "status": "failed",
+  "stderr_path": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/0e329db7-f45b-4ae4-a06a-04489959eb3a/foreground.stderr.txt",
+  "stdout_path": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/0e329db7-f45b-4ae4-a06a-04489959eb3a/foreground.stdout.txt"
+}

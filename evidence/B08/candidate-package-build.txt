@@ -1,0 +1,73 @@
+Building V200 CPU/runtime artifacts in /home/tumlinson/V200/build-perf with HPC CUDA 12.9.
+This script does not initialize a GPU, download a model, start a service, or install system files.
+-- Configuring done (1.2s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/tumlinson/V200/build-perf
+[  3%] Built target v200_abi_audit
+[ 10%] Built target v200_frontdoor
+[ 15%] Built target v200_abi_profile_test
+[ 19%] Built target v200_fake_cuda_driver
+[ 22%] Built target v200_fake_cudart
+[ 26%] Built target v200_rtld_local_closure_test
+[ 29%] Built target v200_fake_lazy_cuda_driver
+[ 33%] Built target v200_fake_lazy_cudart
+[ 36%] Built target v200_lazy_driver_discovery_test
+[ 40%] Built target v200_vmm_location_test
+[ 43%] Built target v200_positive_symbol_cache_test
+[ 49%] Built target v200_memory
+[ 54%] Built target v200_execution
+[ 59%] Built target v200_operator_plan_tests
+[ 63%] Built target v200_multi_pair_copy_probe
+[ 68%] Built target v200_multi_pair_copy_contract
+[ 71%] Built target v200_frontdoor_closure
+[ 75%] Built target v200_memory_tests
+[ 78%] Built target v200_execution_tests
+[ 82%] Built target v200_pair_init
+[ 85%] Built target v200_runtime_init_tests
+[ 96%] Built target v200_operators
+[100%] Built target v200_operator_metadata_tests
+Internal ctest changing into directory: /home/tumlinson/V200/build-perf
+Test project /home/tumlinson/V200/build-perf
+      Start  1: v200_source_profile_schema
+ 1/15 Test  #1: v200_source_profile_schema ...........   Passed    0.05 sec
+      Start  2: v200_abi_profile
+ 2/15 Test  #2: v200_abi_profile .....................   Passed    0.00 sec
+      Start  3: v200_frontdoor_export_closure
+ 3/15 Test  #3: v200_frontdoor_export_closure ........   Passed    0.00 sec
+      Start  4: v200_rtld_local_native_dispatch
+ 4/15 Test  #4: v200_rtld_local_native_dispatch ......   Passed    0.00 sec
+      Start  5: v200_lazy_runtime_driver_discovery
+ 5/15 Test  #5: v200_lazy_runtime_driver_discovery ...   Passed    0.00 sec
+      Start  6: v200_vmm_device_location_mapping
+ 6/15 Test  #6: v200_vmm_device_location_mapping .....   Passed    0.00 sec
+      Start  7: v200_positive_symbol_cache
+ 7/15 Test  #7: v200_positive_symbol_cache ...........   Passed    0.00 sec
+      Start  8: v200_memory_tests
+ 8/15 Test  #8: v200_memory_tests ....................   Passed    0.03 sec
+      Start  9: v200_execution_host
+ 9/15 Test  #9: v200_execution_host ..................   Passed    0.00 sec
+      Start 10: v200_runtime_init_host
+10/15 Test #10: v200_runtime_init_host ...............   Passed    0.00 sec
+      Start 11: v200_operator_mmvq_plan
+11/15 Test #11: v200_operator_mmvq_plan ..............   Passed    0.00 sec
+      Start 12: v200_operator_mmvq_metadata
+12/15 Test #12: v200_operator_mmvq_metadata ..........   Passed    0.00 sec
+      Start 13: v200_consumer_fixture_cpu
+13/15 Test #13: v200_consumer_fixture_cpu ............   Passed    3.49 sec
+      Start 14: v200_multi_pair_copy_contract
+14/15 Test #14: v200_multi_pair_copy_contract ........   Passed    0.06 sec
+      Start 15: v200_multi_pair_host
+15/15 Test #15: v200_multi_pair_host .................   Passed    0.14 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Label Time Summary:
+CPU         =   3.49 sec*proc (1 test)
+consumer    =   3.49 sec*proc (1 test)
+
+Total Test time (real) =   3.80 sec
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.003s
+
+OK
