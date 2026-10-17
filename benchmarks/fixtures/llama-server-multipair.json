@@ -1,0 +1,231 @@
+{
+  "schema": "v200-llama-server-multi-pair-fixture/v1",
+  "fixture_id": "llama-server-qwen3-coder-30b-q4km-multipair-v1",
+  "model": {
+    "name": "qwen3-coder-30b-a3b-instruct-q4-k-m",
+    "path": "/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf",
+    "sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad",
+    "tokenizer": {
+      "source": "embedded GGUF tokenizer metadata and token table; no separate tokenizer artifact was found",
+      "sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad",
+      "identity_scope": "whole GGUF hash pins model tensors and embedded tokenizer together"
+    },
+    "size_bytes": 18556689568,
+    "format": "GGUF v3",
+    "architecture": "qwen3moe",
+    "quantization": "Q4_K_M",
+    "block_count": 48,
+    "kv_heads": 4,
+    "key_length": 128,
+    "value_length": 128,
+    "tensor_layout": {
+      "data_start_bytes": 5973143,
+      "total_tensor_bytes": 18550716425,
+      "non_block_tensor_bytes": 430290944,
+      "block_tensor_bytes": 18120425481,
+      "last_24_block_tensor_bytes": 9060212745,
+      "last_28_block_tensor_bytes": 10570248201,
+      "last_36_block_tensor_bytes": 13485969417,
+      "all_block_tensor_bytes": 18120425481,
+      "method": "GGUF v3 header and tensor descriptor offsets; tensor data was not read"
+    },
+    "selection": "Smallest existing inference GGUF found locally; no download or model copy. The Q4 model is larger than one V100's 16 GiB physical memory, so smoke uses explicit partial CPU offload and capacity uses all layers across the selected pair."
+  },
+  "deferred_larger_candidate": {
+    "name": "qwen3.6-35b-a3b-q4-k-m",
+    "path": "/home/tumlinson/.local/share/core4/models/qwen3.6-35b-a3b-q4-k-m/671e47e0ec53c665d048b98c3ecbfd5236b5ca9c3e02ed19fc8f81f7b85140c7/model.gguf",
+    "size_bytes": 20419565568,
+    "selected": false,
+    "sha256_verified": false
+  },
+  "server": {
+    "bind_host": "127.0.0.1",
+    "port": "ephemeral-loopback-port",
+    "environment": {
+      "GGML_CUDA_DISABLE_GRAPHS": "1"
+    },
+    "preview_policy": "Finite, graph-off correctness run. Native uses four physical CUDA devices; V200 exposes two pair-backed logical CUDA devices. No throughput claim.",
+    "fixed_arguments": [
+      "--model",
+      "{model}",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "{port}",
+      "--ctx-size",
+      "{ctx_size}",
+      "--batch-size",
+      "64",
+      "--ubatch-size",
+      "64",
+      "--parallel",
+      "1",
+      "--threads",
+      "4",
+      "--threads-batch",
+      "4",
+      "--n-gpu-layers",
+      "{n_gpu_layers}",
+      "--fit",
+      "off",
+      "--flash-attn",
+      "off",
+      "--cache-type-k",
+      "f16",
+      "--cache-type-v",
+      "f16",
+      "--alias",
+      "v200-qwen3-coder-30b"
+    ],
+    "fit_policy": "off; no automatic context, batch, offload or precision changes",
+    "precision_policy": "Q4_K_M model weights; f16 K/V cache; no runtime quantization override",
+    "boundaries": {
+      "api": "POST /completion",
+      "readiness": "GET /health",
+      "loopback_only": true,
+      "streaming": false,
+      "api_key": null
+    },
+    "timeouts_seconds": {
+      "startup": 90,
+      "request": 45,
+      "shutdown": 10
+    }
+  },
+  "controls": {
+    "native_four": {
+      "backend": "native",
+      "arguments": [
+        "--device",
+        "CUDA0,CUDA1,CUDA2,CUDA3",
+        "--split-mode",
+        "layer",
+        "--tensor-split",
+        "1,1,1,1"
+      ],
+      "visible_device_count": 4,
+      "role": "matched native four-physical-GPU layer split."
+    },
+    "v200_two": {
+      "backend": "v200-preload",
+      "arguments": [
+        "--device",
+        "CUDA0,CUDA1",
+        "--split-mode",
+        "layer",
+        "--tensor-split",
+        "1,1"
+      ],
+      "visible_device_count": 2,
+      "v200_mode": "pair",
+      "required_b01_evidence_ids": [
+        "8426eab5-278d-4687-ab7d-f5ec937e46ec",
+        "1c97d504-468e-434c-81ea-112a4bb83e74"
+      ],
+      "role": "unchanged llama-server sees two logical V200 devices, each backed by its independently qualified physical pair.",
+      "requires_preload_libraries": true
+    }
+  },
+  "workloads": {
+    "two_v200_resident": {
+      "purpose": "Full-GPU-resident multipair correctness candidate: unchanged llama-server uses two visible logical V200 devices, with the same 49/49-layer and CUDA0 input embedding requirements as the single-pair capacity fixture.",
+      "ctx_size": 8192,
+      "n_gpu_layers": 999,
+      "controls": [
+        "native_four",
+        "v200_two"
+      ],
+      "request": {
+        "method": "POST",
+        "path": "/completion",
+        "body": {
+          "prompt": "Answer with exactly one digit and no words. What is 1 + 1?\nAnswer:",
+          "temperature": 0.0,
+          "top_k": 1,
+          "top_p": 1.0,
+          "seed": 42,
+          "n_predict": 8,
+          "stop": [
+            "\n"
+          ],
+          "repeat_penalty": 1.0,
+          "presence_penalty": 0.0,
+          "frequency_penalty": 0.0,
+          "stream": false,
+          "cache_prompt": false
+        }
+      },
+      "oracle": {
+        "response_field": "content",
+        "normalization": "strip surrounding Unicode whitespace only",
+        "expected_exact": "2",
+        "tokens_predicted_min": 1,
+        "tokens_predicted_max": 8
+      },
+      "gpu_layer_tensor_bytes": 18120425481
+    }
+  },
+  "memory_guard": {
+    "per_physical_gpu_application_limit_mib": 12288,
+    "context_overhead_is_separately_budgeted": true,
+    "workspace_reserve_bytes_per_gpu": 1073741824,
+    "kv_cache_formula": "ctx_size * gpu_layers_on_owner * kv_heads * (key_length + value_length) * 2 bytes for f16",
+    "facade_runtime_enforcement": "V200 allocation ledger owner budgets enforce 12,288 MiB application allocations per physical owner; a missing or over-budget result is a facade failure",
+    "native_control_enforcement": "Explicit flags and descriptor-based preflight refuse estimates over 12,288 MiB per physical GPU; this is a candidate bound, not an allocator ledger",
+    "physical_process_used_memory_guard_mib": 14336,
+    "physical_guard_scope": "Owned llama-server process usage only; 14,336 MiB includes an explicit context-overhead allowance and is a physical safety stop, not the 12,288 MiB application-allocation cap",
+    "runtime_enforcement": "V200 owner ledger for facade application allocations plus fail-closed process-scoped nvidia-smi physical guard; a missing or over-budget result stops the owned server process group",
+    "nvidia_smi_poll_seconds": 1.0,
+    "owner_budgets_mib_per_v200_pair": [
+      4096,
+      12288
+    ],
+    "owner_budget_policy": "For this bounded qualification only: owner0=4096 MiB and owner1=12288 MiB for each pair, forcing anchor-first spill to both peer GPUs while staying below the 12 GiB per-owner cap.",
+    "controller_allocation_cap_mib_per_owner": 12288
+  },
+  "qualification": {
+    "consumer_runtime": "NOT_RUN",
+    "gpu": "NOT_RUN",
+    "performance": "NOT_MEASURED",
+    "notes": [
+      "The first multipair deliverable is a finite exact-output and ownership-correctness candidate.",
+      "The paired native run is a functional control, not a speed baseline.",
+      "The explicit cross-pair probe verifies both directions at a small payload; its elapsed time is not a bandwidth claim."
+    ]
+  },
+  "topology": {
+    "physical_uuid_order": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+      "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505",
+      "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a"
+    ],
+    "logical_pairs": [
+      {
+        "pair_index": 0,
+        "logical_device_id": 1,
+        "anchor_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+        "peer_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+        "b01_evidence_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec"
+      },
+      {
+        "pair_index": 1,
+        "logical_device_id": 2,
+        "anchor_uuid": "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505",
+        "peer_uuid": "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a",
+        "b01_evidence_id": "1c97d504-468e-434c-81ea-112a4bb83e74"
+      }
+    ],
+    "uuid_environment": "CUDA_VISIBLE_DEVICES order is physical indices 0,2,1,3; CUDA ordinals 0/1 belong to logical V200 pair 0 and ordinals 2/3 to logical V200 pair 1."
+  },
+  "copy_probe": {
+    "executable": "build-multipair/tests/multi_pair/v200_multi_pair_copy_probe",
+    "bytes_per_direction": 65536,
+    "required_directions": [
+      "pair0_to_pair1",
+      "pair1_to_pair0"
+    ],
+    "expected_route": "host_stage",
+    "purpose": "Small correctness probe through the same frontdoor peer-copy route; elapsed time is diagnostic only and is not bandwidth evidence."
+  }
+}

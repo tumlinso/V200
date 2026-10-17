@@ -1,0 +1,133 @@
+{
+  "schema": "v200-multi-pair-profile/v1",
+  "consumer": "llama-server",
+  "compatibility_target": "Unchanged pinned llama-server with two visible logical CUDA devices backed by two independently initialized V200 pairs.",
+  "source": {
+    "repository": "/home/tumlinson/Software/llama.cpp",
+    "commit": "f280b26983ad0fdb705a0d9ebf0503e76f2899b0",
+    "worktree_at_inventory": "clean",
+    "binary_source_binding": "CMake cache points to this tree; executable has no embedded source identity. The runner verifies source HEAD and tracked cleanliness before a live session."
+  },
+  "binary": {
+    "path": "/home/tumlinson/Software/llama.cpp/build/bin/llama-server",
+    "sha256": "b42facfb93d85e1a581862c872615834223dc479871701c0b797aeee1fa11e9d",
+    "build_id": "8f8a089510c6eb0d5306d0c49de90c4f55931323",
+    "format": "ELF64-x86_64"
+  },
+  "runtime_closure": [
+    {
+      "role": "server_implementation",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-server-impl.so",
+      "sha256": "a176f2a62eeab92491cd112a09b12799961249be7c5341c59c415694cca0eaa0"
+    },
+    {
+      "role": "common",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-common.so.0.2.0",
+      "sha256": "628a832efc253d1da29ff09a225f74e98c3d0a7bda72ac0bd4f074c19f764e7b"
+    },
+    {
+      "role": "multimodal",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libmtmd.so.0.2.0",
+      "sha256": "4c980a736b41e0fbb7929c8bbe2dfbd188bba8ee3d9f5c716f1ac65f619d5bd1"
+    },
+    {
+      "role": "llama",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama.so.0.2.0",
+      "sha256": "d56c7c416032867451483a0b5b8a4563f3caeed725b39d924924fe11fcf7feb4"
+    },
+    {
+      "role": "ggml_loader",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml.so.0.21.0",
+      "sha256": "d76b41c497feced8853cc2c9d55352a382ab429e3de84ef94983dd914ebeb566"
+    },
+    {
+      "role": "cpu_backend",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cpu.so.0.21.0",
+      "sha256": "d2e3a5c6e3fb838f2c94ed3cb2d4b940c34838518f3f0233198aee22aee5c71c"
+    },
+    {
+      "role": "cuda_backend",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cuda.so.0.21.0",
+      "sha256": "df90ec2ea474f130cc253a6c0776ff0e2d7fdd4d821bcc6be4bcc940b59767a9"
+    },
+    {
+      "role": "ggml_base",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-base.so.0.21.0",
+      "sha256": "3836344472b5092b77eaea16b3584f13028107ae44fa750d27183ba22628d345"
+    }
+  ],
+  "build_stack_caveat": "CUDA objects were compiled by HPC SDK CUDA 12.9 while CMake FindCUDAToolkit and recorded link inputs resolve CUDA 12.0-era libraries. This is an unresolved runtime qualification item, not a compatibility verdict.",
+  "fixture": "../../benchmarks/fixtures/llama-server-multipair.json",
+  "fixture_sha256": "3e864624c35fb126959265a498a553ad17909099bd5c3090579cb9da2801f274",
+  "runner": "tests/multi_pair/run_multi_consumer.py",
+  "launcher": "scripts/v200/serve_multi.py",
+  "build": {
+    "directory": "build-multipair",
+    "cuda_toolkit_root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9",
+    "cuda_toolkit_version": "12.9",
+    "targets": [
+      "v200_frontdoor",
+      "v200_pair_init",
+      "v200_operators",
+      "v200_multi_pair_copy_probe"
+    ],
+    "configure_before_controller_admission": true,
+    "build_outputs_are_hashed_into_run_evidence": true
+  },
+  "pairs": [
+    {
+      "pair_index": 0,
+      "logical_device_id": 1,
+      "anchor_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "peer_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+      "b01_evidence_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec"
+    },
+    {
+      "pair_index": 1,
+      "logical_device_id": 2,
+      "anchor_uuid": "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505",
+      "peer_uuid": "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a",
+      "b01_evidence_id": "1c97d504-468e-434c-81ea-112a4bb83e74"
+    }
+  ],
+  "runtime_libraries": [
+    "build-multipair/src/frontdoor/libv200_frontdoor.so",
+    "build-multipair/src/integration/libv200_pair_init.so",
+    "build-multipair/src/operators/libv200_operators.so"
+  ],
+  "copy_route": {
+    "schema": "v200-multi-pair-copy/v1",
+    "event": "cross_pair_copy",
+    "route": "host_stage",
+    "blocking": true,
+    "limit_bytes_per_call": 1073741824,
+    "chunk_bytes": 8388608,
+    "claim_boundary": "The small bidirectional correctness probe does not establish bandwidth or performance."
+  },
+  "resource_envelope": {
+    "gpus": 4,
+    "cpu_threads": 4,
+    "bounded_seconds": 300,
+    "owner_cap_mib": 12288
+  },
+  "qualification": {
+    "status": "PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS",
+    "controller_evidence_id": "bdf88682-63b9-4788-8943-b411c03ee1f1",
+    "bundle": "evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json",
+    "controller_result": "evidence/B06/qualification-r5.controller-result.json",
+    "host_release": "evidence/B06/qualification-r5.host-release.json",
+    "limits": [
+      "Pinned unchanged llama/model only; no arbitrary-kernel distribution claim",
+      "Graphs disabled for two-logical-device profile",
+      "Blocking pinned-host staging between pairs; no arbitrary cross-pair peer access",
+      "No four-GPU performance claim"
+    ],
+    "finite_service": {
+      "status": "PASS",
+      "controller_evidence_id": "d34961d6-ac1d-4998-81e8-24195639c9f6",
+      "result": "evidence/B06/serving/runs/multipair-20261017T151911Z-e871dbfdf1/consumer/service.json",
+      "host_release": "evidence/B06/serving-smoke-r1.host-release.json",
+      "duration_seconds": 10
+    }
+  }
+}

@@ -135,6 +135,13 @@
     "server_exit_code": 0,
     "cleanup_accounting_zero": true,
     "host_resources_released": true,
-    "performance": "NOT_MEASURED_FOR_THIS_EXTENSION"
+    "performance": "NOT_MEASURED_FOR_THIS_EXTENSION",
+    "observed_qualified_families": [
+      "Q4_K 768-column small-K plain expert banks",
+      "Q6_K 768-column small-K plain expert banks"
+    ],
+    "unobserved_families": [
+      "Q6_K gate-only fused expert banks (CPU checked only)"
+    ]
   }
 }

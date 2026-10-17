@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T14:38:40Z",
+  "generated_at": "2026-10-17T15:17:29Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 109,
+  "project_revision": 129,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 109,
+    "project_revision": 129,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -139,10 +139,10 @@
       {
         "id": "V200-11-READY",
         "metadata_json": "{}",
-        "reached_at": null,
-        "revision": 101,
+        "reached_at": "2026-10-17T15:17:25Z",
+        "revision": 128,
         "revoked_at": null,
-        "state": "pending",
+        "state": "reached",
         "task_id": "V200-11",
         "title": "V200-11-READY"
       },
@@ -150,7 +150,7 @@
         "id": "V200-12-READY",
         "metadata_json": "{}",
         "reached_at": "2026-10-17T14:38:39Z",
-        "revision": 109,
+        "revision": 123,
         "revoked_at": null,
         "state": "reached",
         "task_id": "V200-12",
@@ -160,7 +160,7 @@
         "id": "V200-13-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 2,
+        "revision": 123,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-13",
@@ -170,7 +170,7 @@
         "id": "V200-14-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 2,
+        "revision": 123,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-14",
@@ -1288,6 +1288,206 @@
         "revision": 109,
         "seq": 109,
         "timestamp": "2026-10-17T14:38:40Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-PAIR-PERF-MULTIPAIR-1-MAIN\", \"run_id\": \"V200-PAIR-PERF-MULTIPAIR-1\", \"status\": \"claimed\", \"task_id\": \"V200-11\"}",
+        "revision": 110,
+        "seq": 110,
+        "timestamp": "2026-10-17T14:38:48Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-PAIR-PERF-MULTIPAIR-1-MAIN\", \"run_id\": \"V200-PAIR-PERF-MULTIPAIR-1\", \"status\": \"resumed\", \"task_id\": \"V200-11\"}",
+        "revision": 111,
+        "seq": 111,
+        "timestamp": "2026-10-17T15:13:17Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "aef1802f-b239-4e5a-a927-353aea2783c4",
+        "entity_type": "gate_binding",
+        "event_type": "workflow.gates.bound",
+        "payload_json": "{\"gate_count\": 2}",
+        "revision": 112,
+        "seq": 112,
+        "timestamp": "2026-10-17T15:13:54Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "6c6463a7-0f66-4e12-813f-c17e46185775",
+        "entity_type": "project",
+        "event_type": "plan.applied",
+        "payload_json": "{\"plan_digest\": \"b121654d4ec0544ab737a16a1821d0aad45cc29b781634a9b67eb39f8fc78ed6\", \"source\": \"project-control\"}",
+        "revision": 113,
+        "seq": 113,
+        "timestamp": "2026-10-17T15:16:35Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-PAIR-PERF-MULTIPAIR-1-MAIN\", \"run_id\": \"V200-PAIR-PERF-MULTIPAIR-1\", \"status\": \"resumed\", \"task_id\": \"V200-11\"}",
+        "revision": 114,
+        "seq": 114,
+        "timestamp": "2026-10-17T15:16:39Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-INTEGRATED-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-11-B06-INTEGRATED-CPU\"}",
+        "revision": 115,
+        "seq": 115,
+        "timestamp": "2026-10-17T15:16:44Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-INTEGRATED-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"9412b22b-885a-41ce-a9e7-e39e381cfe87\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 116,
+        "seq": 116,
+        "timestamp": "2026-10-17T15:16:48Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-11-B06-TWO-LOGICAL-RESIDENT\"}",
+        "revision": 117,
+        "seq": 117,
+        "timestamp": "2026-10-17T15:16:48Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"b19a848d-7ca8-4cb8-afd1-31bed033eda1\", \"status\": \"failed\", \"valid\": false}",
+        "revision": 118,
+        "seq": 118,
+        "timestamp": "2026-10-17T15:16:48Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-INTEGRATED-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-11-B06-INTEGRATED-CPU\"}",
+        "revision": 119,
+        "seq": 119,
+        "timestamp": "2026-10-17T15:16:56Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-INTEGRATED-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"6c1520a0-e6ba-4d2d-abca-d5d6ea2bc0ca\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 120,
+        "seq": 120,
+        "timestamp": "2026-10-17T15:17:00Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-11-B06-TWO-LOGICAL-RESIDENT\"}",
+        "revision": 121,
+        "seq": 121,
+        "timestamp": "2026-10-17T15:17:00Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"fc77deb2-ce20-4b89-8427-f7481a20388c\", \"status\": \"failed\", \"valid\": false}",
+        "revision": 122,
+        "seq": 122,
+        "timestamp": "2026-10-17T15:17:00Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "6c6463a7-0f66-4e12-813f-c17e46185775",
+        "entity_type": "project",
+        "event_type": "plan.applied",
+        "payload_json": "{\"plan_digest\": \"d64199445f34e545aa3407d447b3c5944c7a31c24c7ccf72c82574bdc4c60fa8\", \"source\": \"project-control\"}",
+        "revision": 123,
+        "seq": 123,
+        "timestamp": "2026-10-17T15:17:16Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-INTEGRATED-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-11-B06-INTEGRATED-CPU\"}",
+        "revision": 124,
+        "seq": 124,
+        "timestamp": "2026-10-17T15:17:21Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-INTEGRATED-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"afdd4f59-2031-430b-b69e-a746d33dc011\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 125,
+        "seq": 125,
+        "timestamp": "2026-10-17T15:17:25Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-11-B06-TWO-LOGICAL-RESIDENT\"}",
+        "revision": 126,
+        "seq": 126,
+        "timestamp": "2026-10-17T15:17:25Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"c878ebdf-f97b-451d-bb48-d2b780a46406\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 127,
+        "seq": 127,
+        "timestamp": "2026-10-17T15:17:25Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-11",
+        "entity_type": "task",
+        "event_type": "task.completed",
+        "payload_json": "{\"completion_revision\": 128, \"disposition\": \"implemented\", \"reached_checkpoints\": [\"V200-11-READY\"]}",
+        "revision": 128,
+        "seq": 128,
+        "timestamp": "2026-10-17T15:17:25Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-DELIVERY-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-DELIVERY-1-MAIN\", \"run_id\": \"V200-DELIVERY-1\", \"status\": \"claimed\", \"task_id\": \"V200-13\"}",
+        "revision": 129,
+        "seq": 129,
+        "timestamp": "2026-10-17T15:17:29Z"
       }
     ],
     "evidence": [
@@ -1386,6 +1586,19 @@
         "checkpoint_id": null,
         "claim_id": null,
         "content_hash": null,
+        "created_at": "2026-10-17T15:17:00Z",
+        "gate_id": "V200-11-B06-INTEGRATED-CPU",
+        "id": "6c1520a0-e6ba-4d2d-abca-d5d6ea2bc0ca",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"ctest\", \"--test-dir\", \"build-multipair\", \"--output-on-failure\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"b21703933977f0aa3f3b9a5f9aed1f0d984f11a51e344a500e4bc5a942fa3224\", \"inputs\": {\"command_contract\": {\"argv\": [\"ctest\", \"--test-dir\", \"build-multipair\", \"--output-on-failure\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"76d59851494b32b6905f77b0e6eae383baecf966b39ffab5bd99cacc949535e5\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"CMakeLists.txt\", \"benchmarks/comparison/run_extended_comparison.py\", \"benchmarks/fixtures/llama-server-multipair.json\", \"docs/v200/multipair-profile.json\", \"docs/v200/operator-profile.json\", \"docs/v200/two-device.md\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145347Z-c580f56988.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145621Z-206724d8bf.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150129Z-193456267c.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150350Z-3b5c5a9998.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stdout.txt\", \"evidence/B06/qualification-r1.controller-evidence.json\", \"evidence/B06/qualification-r1.controller-result.json\", \"evidence/B06/qualification-r1.host-release.json\", \"evidence/B06/qualification-r1.launch.log\", \"evidence/B06/qualification-r2.controller-evidence.json\", \"evidence/B06/qualification-r2.controller-result.json\", \"evidence/B06/qualification-r2.host-release.json\", \"evidence/B06/qualification-r2.launch.log\", \"evidence/B06/qualification-r3.controller-evidence.json\", \"evidence/B06/qualification-r3.controller-result.json\", \"evidence/B06/qualification-r3.host-release.json\", \"evidence/B06/qualification-r3.launch.log\", \"evidence/B06/qualification-r4.controller-evidence.json\", \"evidence/B06/qualification-r4.controller-result.json\", \"evidence/B06/qualification-r4.host-release.json\", \"evidence/B06/qualification-r4.launch.log\", \"evidence/B06/qualification-r5.controller-evidence.json\", \"evidence/B06/qualification-r5.controller-result.json\", \"evidence/B06/qualification-r5.host-release.json\", \"evidence/B06/qualification-r5.launch.log\", \"planning/delivery.todo-plan.json\", \"scripts/v200/serve.py\", \"scripts/v200/serve_multi.py\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/vmm_location.hpp\", \"tests/abi/fake_cuda_library.c\", \"tests/abi/lazy_driver_discovery.cpp\", \"tests/abi/vmm_location_test.cpp\", \"tests/comparison/test_extended_comparison.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/multi_pair/CMakeLists.txt\", \"tests/multi_pair/copy_contract.cpp\", \"tests/multi_pair/copy_probe.cpp\", \"tests/multi_pair/fixtures/native-four-device-info.log\", \"tests/multi_pair/run_multi_consumer.py\", \"tests/multi_pair/test_multi_pair.py\", \"todo-status.md\", \"todos.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"6c79229872b69759318954fef991a434162148dd7a2cea1e4f7a4133de8f22f9\"}, {\"path\": \"include/v200\", \"sha256\": \"missing\"}, {\"path\": \"src\", \"sha256\": \"missing\"}, {\"path\": \"tests\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 119}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/6c1520a0-e6ba-4d2d-abca-d5d6ea2bc0ca",
+        "revision": 120,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
         "created_at": "2026-10-17T12:03:33Z",
         "gate_id": "V200-05-CONSUMER-CPU",
         "id": "7e770951-dc6a-4b22-bf80-2251f8f1568a",
@@ -1464,6 +1677,19 @@
         "checkpoint_id": null,
         "claim_id": null,
         "content_hash": null,
+        "created_at": "2026-10-17T15:16:48Z",
+        "gate_id": "V200-11-B06-INTEGRATED-CPU",
+        "id": "9412b22b-885a-41ce-a9e7-e39e381cfe87",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"ctest\", \"--test-dir\", \"build-multipair\", \"--output-on-failure\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"b21703933977f0aa3f3b9a5f9aed1f0d984f11a51e344a500e4bc5a942fa3224\", \"inputs\": {\"command_contract\": {\"argv\": [\"ctest\", \"--test-dir\", \"build-multipair\", \"--output-on-failure\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"76d59851494b32b6905f77b0e6eae383baecf966b39ffab5bd99cacc949535e5\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"CMakeLists.txt\", \"benchmarks/comparison/run_extended_comparison.py\", \"benchmarks/fixtures/llama-server-multipair.json\", \"docs/v200/multipair-profile.json\", \"docs/v200/operator-profile.json\", \"docs/v200/two-device.md\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145347Z-c580f56988.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145621Z-206724d8bf.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150129Z-193456267c.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150350Z-3b5c5a9998.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stdout.txt\", \"evidence/B06/qualification-r1.controller-evidence.json\", \"evidence/B06/qualification-r1.controller-result.json\", \"evidence/B06/qualification-r1.host-release.json\", \"evidence/B06/qualification-r1.launch.log\", \"evidence/B06/qualification-r2.controller-evidence.json\", \"evidence/B06/qualification-r2.controller-result.json\", \"evidence/B06/qualification-r2.host-release.json\", \"evidence/B06/qualification-r2.launch.log\", \"evidence/B06/qualification-r3.controller-evidence.json\", \"evidence/B06/qualification-r3.controller-result.json\", \"evidence/B06/qualification-r3.host-release.json\", \"evidence/B06/qualification-r3.launch.log\", \"evidence/B06/qualification-r4.controller-evidence.json\", \"evidence/B06/qualification-r4.controller-result.json\", \"evidence/B06/qualification-r4.host-release.json\", \"evidence/B06/qualification-r4.launch.log\", \"evidence/B06/qualification-r5.controller-evidence.json\", \"evidence/B06/qualification-r5.controller-result.json\", \"evidence/B06/qualification-r5.host-release.json\", \"evidence/B06/qualification-r5.launch.log\", \"planning/delivery.todo-plan.json\", \"scripts/v200/serve.py\", \"scripts/v200/serve_multi.py\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/vmm_location.hpp\", \"tests/abi/fake_cuda_library.c\", \"tests/abi/lazy_driver_discovery.cpp\", \"tests/abi/vmm_location_test.cpp\", \"tests/comparison/test_extended_comparison.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/multi_pair/CMakeLists.txt\", \"tests/multi_pair/copy_contract.cpp\", \"tests/multi_pair/copy_probe.cpp\", \"tests/multi_pair/fixtures/native-four-device-info.log\", \"tests/multi_pair/run_multi_consumer.py\", \"tests/multi_pair/test_multi_pair.py\", \"todo-status.md\", \"todos.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"6c79229872b69759318954fef991a434162148dd7a2cea1e4f7a4133de8f22f9\"}, {\"path\": \"include/v200\", \"sha256\": \"missing\"}, {\"path\": \"src\", \"sha256\": \"missing\"}, {\"path\": \"tests\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 115}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/9412b22b-885a-41ce-a9e7-e39e381cfe87",
+        "revision": 116,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
         "created_at": "2026-10-17T12:35:11Z",
         "gate_id": "V200-I01-INTEGRATED-CPU",
         "id": "9b617037-45f4-411a-b988-7bdeabac6912",
@@ -1485,6 +1711,32 @@
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/a4ea8206-6569-4ca6-bc65-a8c2053609f3",
         "revision": 99,
         "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T15:17:25Z",
+        "gate_id": "V200-11-B06-INTEGRATED-CPU",
+        "id": "afdd4f59-2031-430b-b69e-a746d33dc011",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"ctest\", \"--test-dir\", \"build-multipair\", \"--output-on-failure\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"b21703933977f0aa3f3b9a5f9aed1f0d984f11a51e344a500e4bc5a942fa3224\", \"inputs\": {\"command_contract\": {\"argv\": [\"ctest\", \"--test-dir\", \"build-multipair\", \"--output-on-failure\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"76d59851494b32b6905f77b0e6eae383baecf966b39ffab5bd99cacc949535e5\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"CMakeLists.txt\", \"benchmarks/comparison/run_extended_comparison.py\", \"benchmarks/fixtures/llama-server-multipair.json\", \"docs/v200/multipair-profile.json\", \"docs/v200/operator-profile.json\", \"docs/v200/two-device.md\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145347Z-c580f56988.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145621Z-206724d8bf.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150129Z-193456267c.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150350Z-3b5c5a9998.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stdout.txt\", \"evidence/B06/qualification-r1.controller-evidence.json\", \"evidence/B06/qualification-r1.controller-result.json\", \"evidence/B06/qualification-r1.host-release.json\", \"evidence/B06/qualification-r1.launch.log\", \"evidence/B06/qualification-r2.controller-evidence.json\", \"evidence/B06/qualification-r2.controller-result.json\", \"evidence/B06/qualification-r2.host-release.json\", \"evidence/B06/qualification-r2.launch.log\", \"evidence/B06/qualification-r3.controller-evidence.json\", \"evidence/B06/qualification-r3.controller-result.json\", \"evidence/B06/qualification-r3.host-release.json\", \"evidence/B06/qualification-r3.launch.log\", \"evidence/B06/qualification-r4.controller-evidence.json\", \"evidence/B06/qualification-r4.controller-result.json\", \"evidence/B06/qualification-r4.host-release.json\", \"evidence/B06/qualification-r4.launch.log\", \"evidence/B06/qualification-r5.controller-evidence.json\", \"evidence/B06/qualification-r5.controller-result.json\", \"evidence/B06/qualification-r5.host-release.json\", \"evidence/B06/qualification-r5.launch.log\", \"planning/delivery.todo-plan.json\", \"scripts/v200/serve.py\", \"scripts/v200/serve_multi.py\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/vmm_location.hpp\", \"tests/abi/fake_cuda_library.c\", \"tests/abi/lazy_driver_discovery.cpp\", \"tests/abi/vmm_location_test.cpp\", \"tests/comparison/test_extended_comparison.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/multi_pair/CMakeLists.txt\", \"tests/multi_pair/copy_contract.cpp\", \"tests/multi_pair/copy_probe.cpp\", \"tests/multi_pair/fixtures/native-four-device-info.log\", \"tests/multi_pair/run_multi_consumer.py\", \"tests/multi_pair/test_multi_pair.py\", \"todo-status.md\", \"todos.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"6c79229872b69759318954fef991a434162148dd7a2cea1e4f7a4133de8f22f9\"}, {\"path\": \"include/v200\", \"sha256\": \"missing\"}, {\"path\": \"src\", \"sha256\": \"missing\"}, {\"path\": \"tests\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 124}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/afdd4f59-2031-430b-b69e-a746d33dc011",
+        "revision": 125,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T15:16:48Z",
+        "gate_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "id": "b19a848d-7ca8-4cb8-afd1-31bed033eda1",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import json\\nfrom pathlib import Path\\nroot=Path('.')\\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\\nassert b['copy_probe']['status']=='PASS'\\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\\nfor c in b['controls']:\\n assert c['application_status']=='PASS' and c['response']['exact_match']\\n assert c['server_process']['returncode']==0\\n assert c['cleanup']['no_live_group_members']\\n assert c['layer_offload_evidence']['full_gpu_offload']\\n assert c['device_count_evidence']['status']=='PASS'\\ns=b['v200_summary']\\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\\nassert h['state']=='released' and h['resources']==[]\\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\\n\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"9ee6ea011ba0922084351dd785ea38e68a690b7c3b3317c2885549018d7f2072\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import json\\nfrom pathlib import Path\\nroot=Path('.')\\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\\nassert b['copy_probe']['status']=='PASS'\\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\\nfor c in b['controls']:\\n assert c['application_status']=='PASS' and c['response']['exact_match']\\n assert c['server_process']['returncode']==0\\n assert c['cleanup']['no_live_group_members']\\n assert c['layer_offload_evidence']['full_gpu_offload']\\n assert c['device_count_evidence']['status']=='PASS'\\ns=b['v200_summary']\\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\\nassert h['state']=='released' and h['resources']==[]\\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\\n\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"76d59851494b32b6905f77b0e6eae383baecf966b39ffab5bd99cacc949535e5\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"CMakeLists.txt\", \"benchmarks/comparison/run_extended_comparison.py\", \"benchmarks/fixtures/llama-server-multipair.json\", \"docs/v200/multipair-profile.json\", \"docs/v200/operator-profile.json\", \"docs/v200/two-device.md\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145347Z-c580f56988.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145621Z-206724d8bf.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150129Z-193456267c.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150350Z-3b5c5a9998.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stdout.txt\", \"evidence/B06/qualification-r1.controller-evidence.json\", \"evidence/B06/qualification-r1.controller-result.json\", \"evidence/B06/qualification-r1.host-release.json\", \"evidence/B06/qualification-r1.launch.log\", \"evidence/B06/qualification-r2.controller-evidence.json\", \"evidence/B06/qualification-r2.controller-result.json\", \"evidence/B06/qualification-r2.host-release.json\", \"evidence/B06/qualification-r2.launch.log\", \"evidence/B06/qualification-r3.controller-evidence.json\", \"evidence/B06/qualification-r3.controller-result.json\", \"evidence/B06/qualification-r3.host-release.json\", \"evidence/B06/qualification-r3.launch.log\", \"evidence/B06/qualification-r4.controller-evidence.json\", \"evidence/B06/qualification-r4.controller-result.json\", \"evidence/B06/qualification-r4.host-release.json\", \"evidence/B06/qualification-r4.launch.log\", \"evidence/B06/qualification-r5.controller-evidence.json\", \"evidence/B06/qualification-r5.controller-result.json\", \"evidence/B06/qualification-r5.host-release.json\", \"evidence/B06/qualification-r5.launch.log\", \"planning/delivery.todo-plan.json\", \"scripts/v200/serve.py\", \"scripts/v200/serve_multi.py\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/vmm_location.hpp\", \"tests/abi/fake_cuda_library.c\", \"tests/abi/lazy_driver_discovery.cpp\", \"tests/abi/vmm_location_test.cpp\", \"tests/comparison/test_extended_comparison.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/multi_pair/CMakeLists.txt\", \"tests/multi_pair/copy_contract.cpp\", \"tests/multi_pair/copy_probe.cpp\", \"tests/multi_pair/fixtures/native-four-device-info.log\", \"tests/multi_pair/run_multi_consumer.py\", \"tests/multi_pair/test_multi_pair.py\", \"todo-status.md\", \"todos.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\"], \"files\": [{\"path\": \"evidence/B06\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 1, \"started_revision\": 117}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/b19a848d-7ca8-4cb8-afd1-31bed033eda1",
+        "revision": 118,
+        "status": "failed"
       },
       {
         "checkpoint_id": null,
@@ -1523,6 +1775,19 @@
         "metadata_json": "{\"argv\": [\"ctest\", \"--test-dir\", \"build\", \"--output-on-failure\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"5304559533162be313b7e11585d81b35c6daf8743036c68c2a6fc4586dab1222\", \"inputs\": {\"command_contract\": {\"argv\": [\"ctest\", \"--test-dir\", \"build\", \"--output-on-failure\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"96d955b77aec44fbc5150c4935a1301c39cb09acb6264b6bef64b02dbaa231ce\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"todo-status.md\", \"todos.md\", \"todos/v200-01.md\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"4bdb2fc91c16d7b93b6dc7af516d0f725aa42c3e7eaa7fc3f59170ba9d4b63ac\"}, {\"path\": \"build-support\", \"sha256\": \"missing\"}, {\"path\": \"docs/v200\", \"sha256\": \"missing\"}, {\"path\": \"tests/host\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"6c5d035c1eba4149a78709f2618fb9d69ecf79de\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 5}",
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/c5f92509-9d35-4d91-9aa9-707c44e6bb39",
         "revision": 6,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T15:17:25Z",
+        "gate_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "id": "c878ebdf-f97b-451d-bb48-d2b780a46406",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import json\\nfrom pathlib import Path\\nroot=Path('.')\\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\\nassert b['copy_probe']['status']=='PASS'\\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\\nfor c in b['controls']:\\n assert c['application_status']=='PASS' and c['response']['exact_match']\\n assert c['server_process']['exit_code']==0\\n assert c['cleanup']['no_live_group_members']\\n assert c['layer_offload_evidence']['full_gpu_offload']\\n assert c['device_count_evidence']['status']=='PASS'\\ns=b['v200_summary']\\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\\nassert h['state']=='released' and h['resources']==[]\\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\\n\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"441e8480135428e44f2c049c1649523c02235a8c3a4489c7107d354e4dfd0d16\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import json\\nfrom pathlib import Path\\nroot=Path('.')\\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\\nassert b['copy_probe']['status']=='PASS'\\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\\nfor c in b['controls']:\\n assert c['application_status']=='PASS' and c['response']['exact_match']\\n assert c['server_process']['exit_code']==0\\n assert c['cleanup']['no_live_group_members']\\n assert c['layer_offload_evidence']['full_gpu_offload']\\n assert c['device_count_evidence']['status']=='PASS'\\ns=b['v200_summary']\\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\\nassert h['state']=='released' and h['resources']==[]\\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\\n\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"76d59851494b32b6905f77b0e6eae383baecf966b39ffab5bd99cacc949535e5\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"CMakeLists.txt\", \"benchmarks/comparison/run_extended_comparison.py\", \"benchmarks/fixtures/llama-server-multipair.json\", \"docs/v200/multipair-profile.json\", \"docs/v200/operator-profile.json\", \"docs/v200/two-device.md\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145347Z-c580f56988.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145621Z-206724d8bf.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150129Z-193456267c.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150350Z-3b5c5a9998.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stdout.txt\", \"evidence/B06/qualification-r1.controller-evidence.json\", \"evidence/B06/qualification-r1.controller-result.json\", \"evidence/B06/qualification-r1.host-release.json\", \"evidence/B06/qualification-r1.launch.log\", \"evidence/B06/qualification-r2.controller-evidence.json\", \"evidence/B06/qualification-r2.controller-result.json\", \"evidence/B06/qualification-r2.host-release.json\", \"evidence/B06/qualification-r2.launch.log\", \"evidence/B06/qualification-r3.controller-evidence.json\", \"evidence/B06/qualification-r3.controller-result.json\", \"evidence/B06/qualification-r3.host-release.json\", \"evidence/B06/qualification-r3.launch.log\", \"evidence/B06/qualification-r4.controller-evidence.json\", \"evidence/B06/qualification-r4.controller-result.json\", \"evidence/B06/qualification-r4.host-release.json\", \"evidence/B06/qualification-r4.launch.log\", \"evidence/B06/qualification-r5.controller-evidence.json\", \"evidence/B06/qualification-r5.controller-result.json\", \"evidence/B06/qualification-r5.host-release.json\", \"evidence/B06/qualification-r5.launch.log\", \"planning/delivery.todo-plan.json\", \"scripts/v200/serve.py\", \"scripts/v200/serve_multi.py\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/vmm_location.hpp\", \"tests/abi/fake_cuda_library.c\", \"tests/abi/lazy_driver_discovery.cpp\", \"tests/abi/vmm_location_test.cpp\", \"tests/comparison/test_extended_comparison.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/multi_pair/CMakeLists.txt\", \"tests/multi_pair/copy_contract.cpp\", \"tests/multi_pair/copy_probe.cpp\", \"tests/multi_pair/fixtures/native-four-device-info.log\", \"tests/multi_pair/run_multi_consumer.py\", \"tests/multi_pair/test_multi_pair.py\", \"todo-status.md\", \"todos.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\"], \"files\": [{\"path\": \"evidence/B06\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 126}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/c878ebdf-f97b-451d-bb48-d2b780a46406",
+        "revision": 127,
         "status": "passed"
       },
       {
@@ -1628,6 +1893,19 @@
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/f5616733-c898-4ef8-b8a0-282a423be879",
         "revision": 42,
         "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T15:17:00Z",
+        "gate_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "id": "fc77deb2-ce20-4b89-8427-f7481a20388c",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import json\\nfrom pathlib import Path\\nroot=Path('.')\\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\\nassert b['copy_probe']['status']=='PASS'\\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\\nfor c in b['controls']:\\n assert c['application_status']=='PASS' and c['response']['exact_match']\\n assert c['server_process']['returncode']==0\\n assert c['cleanup']['no_live_group_members']\\n assert c['layer_offload_evidence']['full_gpu_offload']\\n assert c['device_count_evidence']['status']=='PASS'\\ns=b['v200_summary']\\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\\nassert h['state']=='released' and h['resources']==[]\\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\\n\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"9ee6ea011ba0922084351dd785ea38e68a690b7c3b3317c2885549018d7f2072\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import json\\nfrom pathlib import Path\\nroot=Path('.')\\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\\nassert b['copy_probe']['status']=='PASS'\\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\\nfor c in b['controls']:\\n assert c['application_status']=='PASS' and c['response']['exact_match']\\n assert c['server_process']['returncode']==0\\n assert c['cleanup']['no_live_group_members']\\n assert c['layer_offload_evidence']['full_gpu_offload']\\n assert c['device_count_evidence']['status']=='PASS'\\ns=b['v200_summary']\\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\\nassert h['state']=='released' and h['resources']==[]\\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\\n\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"76d59851494b32b6905f77b0e6eae383baecf966b39ffab5bd99cacc949535e5\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"CMakeLists.txt\", \"benchmarks/comparison/run_extended_comparison.py\", \"benchmarks/fixtures/llama-server-multipair.json\", \"docs/v200/multipair-profile.json\", \"docs/v200/operator-profile.json\", \"docs/v200/two-device.md\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145347Z-c580f56988.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145621Z-206724d8bf.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150129Z-193456267c.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150350Z-3b5c5a9998.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stdout.txt\", \"evidence/B06/qualification-r1.controller-evidence.json\", \"evidence/B06/qualification-r1.controller-result.json\", \"evidence/B06/qualification-r1.host-release.json\", \"evidence/B06/qualification-r1.launch.log\", \"evidence/B06/qualification-r2.controller-evidence.json\", \"evidence/B06/qualification-r2.controller-result.json\", \"evidence/B06/qualification-r2.host-release.json\", \"evidence/B06/qualification-r2.launch.log\", \"evidence/B06/qualification-r3.controller-evidence.json\", \"evidence/B06/qualification-r3.controller-result.json\", \"evidence/B06/qualification-r3.host-release.json\", \"evidence/B06/qualification-r3.launch.log\", \"evidence/B06/qualification-r4.controller-evidence.json\", \"evidence/B06/qualification-r4.controller-result.json\", \"evidence/B06/qualification-r4.host-release.json\", \"evidence/B06/qualification-r4.launch.log\", \"evidence/B06/qualification-r5.controller-evidence.json\", \"evidence/B06/qualification-r5.controller-result.json\", \"evidence/B06/qualification-r5.host-release.json\", \"evidence/B06/qualification-r5.launch.log\", \"planning/delivery.todo-plan.json\", \"scripts/v200/serve.py\", \"scripts/v200/serve_multi.py\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/vmm_location.hpp\", \"tests/abi/fake_cuda_library.c\", \"tests/abi/lazy_driver_discovery.cpp\", \"tests/abi/vmm_location_test.cpp\", \"tests/comparison/test_extended_comparison.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/multi_pair/CMakeLists.txt\", \"tests/multi_pair/copy_contract.cpp\", \"tests/multi_pair/copy_probe.cpp\", \"tests/multi_pair/fixtures/native-four-device-info.log\", \"tests/multi_pair/run_multi_consumer.py\", \"tests/multi_pair/test_multi_pair.py\", \"todo-status.md\", \"todos.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\"], \"files\": [{\"path\": \"evidence/B06\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 1, \"started_revision\": 121}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/fc77deb2-ce20-4b89-8427-f7481a20388c",
+        "revision": 122,
+        "status": "failed"
       },
       {
         "checkpoint_id": null,
@@ -1841,12 +2119,38 @@
       },
       {
         "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"ctest\", \"--test-dir\", \"build-multipair\", \"--output-on-failure\"], \"cwd\": \".\", \"input_paths\": [\"src\", \"include/v200\", \"tests\", \"CMakeLists.txt\"], \"timeout_seconds\": 180}",
+        "id": "V200-11-B06-INTEGRATED-CPU",
+        "input_fingerprint": "b21703933977f0aa3f3b9a5f9aed1f0d984f11a51e344a500e4bc5a942fa3224",
+        "last_run_at": "2026-10-17T15:17:25Z",
+        "required": 1,
+        "revision": 125,
+        "status": "passed",
+        "task_id": "V200-11",
+        "type": "command",
+        "valid": 1
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"-c\", \"import json\\nfrom pathlib import Path\\nroot=Path('.')\\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\\nassert b['copy_probe']['status']=='PASS'\\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\\nfor c in b['controls']:\\n assert c['application_status']=='PASS' and c['response']['exact_match']\\n assert c['server_process']['exit_code']==0\\n assert c['cleanup']['no_live_group_members']\\n assert c['layer_offload_evidence']['full_gpu_offload']\\n assert c['device_count_evidence']['status']=='PASS'\\ns=b['v200_summary']\\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\\nassert h['state']=='released' and h['resources']==[]\\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\\n\"], \"cwd\": \".\", \"input_paths\": [\"evidence/B06\"], \"timeout_seconds\": 30}",
+        "id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "input_fingerprint": "441e8480135428e44f2c049c1649523c02235a8c3a4489c7107d354e4dfd0d16",
+        "last_run_at": "2026-10-17T15:17:25Z",
+        "required": 1,
+        "revision": 127,
+        "status": "passed",
+        "task_id": "V200-11",
+        "type": "command",
+        "valid": 1
+      },
+      {
+        "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"-c\", \"import json,subprocess; from pathlib import Path; subprocess.run(['python3','-m','unittest','discover','-s','tests/comparison','-v'],check=True); p=Path('evidence/B05'); r=json.loads((p/'pair-r1/comparison/comparison.json').read_text()); h=json.loads((p/'pair-r1.host-release.json').read_text()); c=json.loads((p/'pair-r1.controller-result.json').read_text()); assert r['status']=='PASS' and r['response_equivalence']=='MATCH' and len(r['cases'])==3; assert all(x['status']=='PASS' and x['summary']['measured_samples']==3 for x in r['cases']); assert h['state']=='released' and not h['resources']; assert c['evidence_id']=='24630d18-8d52-4a53-912b-79c86c088ba5' and c['returncode']==0; print('B05 matched evidence and release PASS')\"], \"cwd\": \".\", \"input_paths\": [\"benchmarks/comparison\", \"tests/comparison\", \"evidence/B05\"], \"timeout_seconds\": 60}",
         "id": "V200-12-B05-MATCHED",
         "input_fingerprint": "ac2eb40abab9deff5f1d3699dc6ccec803e3b80c63eb79d389f6fe3c1376c0d9",
         "last_run_at": "2026-10-17T14:38:39Z",
         "required": 1,
-        "revision": 108,
+        "revision": 123,
         "status": "passed",
         "task_id": "V200-12",
         "type": "command",
@@ -1886,6 +2190,16 @@
         "payload_json": "{\"authority_commit\": \"6c5d035c1eba4149a78709f2618fb9d69ecf79de\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-01-READY\", \"reached_at\": \"2026-10-17T11:48:17Z\", \"state\": \"reached\"}], \"completion_commit\": \"6c5d035c1eba4149a78709f2618fb9d69ecf79de\", \"completion_gates\": [{\"evidence_id\": \"c5f92509-9d35-4d91-9aa9-707c44e6bb39\", \"evidence_revision\": 6, \"id\": \"V200-01-CPU\", \"input_fingerprint\": \"5304559533162be313b7e11585d81b35c6daf8743036c68c2a6fc4586dab1222\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"6c5d035c1eba4149a78709f2618fb9d69ecf79de\"}], \"completion_revision\": 7, \"finalized_checkpoints\": [\"V200-01-READY\"], \"gates\": [{\"id\": \"V200-01-CPU\", \"input_fingerprint\": \"5304559533162be313b7e11585d81b35c6daf8743036c68c2a6fc4586dab1222\", \"last_run_at\": \"2026-10-17T11:48:17Z\", \"revision\": 6, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \".todo-orchestrator/state.snapshot.json | 62 ++++++++++++++++++++++++++--------\\n todo-status.md                         |  4 +--\\n todos.md                               |  4 +--\\n todos/v200-01.md                       |  8 +++--\\n 4 files changed, 57 insertions(+), 21 deletions(-)\", \"git_head\": \"6c5d035c1eba4149a78709f2618fb9d69ecf79de\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"V200-01 foundation implemented: CPU-first CMake and 2 CPU tests passed; actual source/server/DSO/toolkit hashes and minimal I01-I04 seams recorded; untouched package pair probe compiled against CUDA12.9; controller import bridge delegates to current fail-closed runtime identity and help passed. No application or GPU runtime execution. Root source commit recorded; required V200-01-CPU gate captures CTest.\", \"producer_commit\": \"6c5d035c1eba4149a78709f2618fb9d69ecf79de\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-01\"}",
         "revision": 7,
         "task_id": "V200-01"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T15:17:25Z",
+        "id": "5430ead8-dcc9-45b1-ab37-c65048e64110",
+        "kind": "complete",
+        "note": "B06 bdf88682-63b9-4788-8943-b411c03ee1f1 accepted. One unchanged llama process sees two logical devices, full49layer+embedding residency across4HBMowners, exact2, exit0 and zero pair ledgers. VMM and six interpair stream/copy checks pass. Hostowner released/resources empty. Interpair host-staged blocking copies; graphs off for this two-device profile. No four-GPU speed claim.",
+        "payload_json": "{\"authority_commit\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"changed_owned_paths\": [\"CMakeLists.txt\", \"benchmarks/comparison/run_extended_comparison.py\", \"benchmarks/fixtures/llama-server-multipair.json\", \"docs/v200/multipair-profile.json\", \"docs/v200/operator-profile.json\", \"docs/v200/two-device.md\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145347Z-c580f56988.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145621Z-206724d8bf.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150129Z-193456267c.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150350Z-3b5c5a9998.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stdout.txt\", \"evidence/B06/qualification-r1.controller-evidence.json\", \"evidence/B06/qualification-r1.controller-result.json\", \"evidence/B06/qualification-r1.host-release.json\", \"evidence/B06/qualification-r1.launch.log\", \"evidence/B06/qualification-r2.controller-evidence.json\", \"evidence/B06/qualification-r2.controller-result.json\", \"evidence/B06/qualification-r2.host-release.json\", \"evidence/B06/qualification-r2.launch.log\", \"evidence/B06/qualification-r3.controller-evidence.json\", \"evidence/B06/qualification-r3.controller-result.json\", \"evidence/B06/qualification-r3.host-release.json\", \"evidence/B06/qualification-r3.launch.log\", \"evidence/B06/qualification-r4.controller-evidence.json\", \"evidence/B06/qualification-r4.controller-result.json\", \"evidence/B06/qualification-r4.host-release.json\", \"evidence/B06/qualification-r4.launch.log\", \"evidence/B06/qualification-r5.controller-evidence.json\", \"evidence/B06/qualification-r5.controller-result.json\", \"evidence/B06/qualification-r5.host-release.json\", \"evidence/B06/qualification-r5.launch.log\", \"scripts/v200/serve.py\", \"scripts/v200/serve_multi.py\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/vmm_location.hpp\", \"tests/abi/fake_cuda_library.c\", \"tests/abi/lazy_driver_discovery.cpp\", \"tests/abi/vmm_location_test.cpp\", \"tests/comparison/test_extended_comparison.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/multi_pair/CMakeLists.txt\", \"tests/multi_pair/copy_contract.cpp\", \"tests/multi_pair/copy_probe.cpp\", \"tests/multi_pair/fixtures/native-four-device-info.log\", \"tests/multi_pair/run_multi_consumer.py\", \"tests/multi_pair/test_multi_pair.py\"], \"checkpoints\": [{\"id\": \"V200-11-READY\", \"reached_at\": \"2026-10-17T15:17:25Z\", \"state\": \"reached\"}], \"completion_commit\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"completion_gates\": [{\"evidence_id\": \"afdd4f59-2031-430b-b69e-a746d33dc011\", \"evidence_revision\": 125, \"id\": \"V200-11-B06-INTEGRATED-CPU\", \"input_fingerprint\": \"b21703933977f0aa3f3b9a5f9aed1f0d984f11a51e344a500e4bc5a942fa3224\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\"}, {\"evidence_id\": \"c878ebdf-f97b-451d-bb48-d2b780a46406\", \"evidence_revision\": 127, \"id\": \"V200-11-B06-TWO-LOGICAL-RESIDENT\", \"input_fingerprint\": \"441e8480135428e44f2c049c1649523c02235a8c3a4489c7107d354e4dfd0d16\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\"}], \"completion_revision\": 128, \"finalized_checkpoints\": [\"V200-11-READY\"], \"gates\": [{\"id\": \"V200-11-B06-INTEGRATED-CPU\", \"input_fingerprint\": \"b21703933977f0aa3f3b9a5f9aed1f0d984f11a51e344a500e4bc5a942fa3224\", \"last_run_at\": \"2026-10-17T15:17:25Z\", \"revision\": 125, \"status\": \"passed\", \"valid\": 1}, {\"id\": \"V200-11-B06-TWO-LOGICAL-RESIDENT\", \"input_fingerprint\": \"441e8480135428e44f2c049c1649523c02235a8c3a4489c7107d354e4dfd0d16\", \"last_run_at\": \"2026-10-17T15:17:25Z\", \"revision\": 127, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \".todo-orchestrator/state.snapshot.json | 562 +++++++++++++++++++++++++++++----\\n CMakeLists.txt                         |   3 +-\\n docs/v200/operator-profile.json        |   9 +-\\n scripts/v200/serve.py                  |  37 ++-\\n src/frontdoor/CMakeLists.txt           |  44 +++\\n src/frontdoor/cuda_wrappers.cpp        |  77 ++++-\\n tests/abi/fake_cuda_library.c          |  54 ++++\\n tests/consumer/run_consumer.py         |   4 +\\n tests/consumer/test_consumer.py        |  53 ++++\\n todo-status.md                         |   4 +-\\n todos.md                               |   4 +-\\n todos/v200-11.md                       |   6 +-\\n todos/v200-12.md                       |   2 +-\\n todos/v200-13.md                       |  21 +-\\n todos/v200-14.md                       |   7 +-\\n 15 files changed, 800 insertions(+), 87 deletions(-)\", \"git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"B06 bdf88682-63b9-4788-8943-b411c03ee1f1 accepted. One unchanged llama process sees two logical devices, full49layer+embedding residency across4HBMowners, exact2, exit0 and zero pair ledgers. VMM and six interpair stream/copy checks pass. Hostowner released/resources empty. Interpair host-staged blocking copies; graphs off for this two-device profile. No four-GPU speed claim.\", \"producer_commit\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-11\"}",
+        "revision": 128,
+        "task_id": "V200-11"
       },
       {
         "claim_id": null,
@@ -2912,7 +3226,27 @@
       },
       {
         "mode": "exclusive",
-        "path": "docs/v200/deployment.md",
+        "path": "README.md",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "exclusive",
+        "path": "benchmarks/comparison",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "exclusive",
+        "path": "docs/v200",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B06",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B07",
         "task_id": "V200-13"
       },
       {
@@ -2922,17 +3256,72 @@
       },
       {
         "mode": "exclusive",
+        "path": "scripts/v200",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests/comparison",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests/consumer",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests/multi_pair",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "exclusive",
         "path": "tools/v200",
         "task_id": "V200-13"
       },
       {
         "mode": "read",
-        "path": "docs/v200",
+        "path": "build-support",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B03",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B04",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B05",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/foundation",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "read",
+        "path": "include/v200",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "read",
+        "path": "planning/EXECUTION_PLAN.md",
         "task_id": "V200-13"
       },
       {
         "mode": "read",
         "path": "planning/v200-bootstrap",
+        "task_id": "V200-13"
+      },
+      {
+        "mode": "read",
+        "path": "src",
         "task_id": "V200-13"
       },
       {
@@ -2947,12 +3336,37 @@
       },
       {
         "mode": "read",
+        "path": "README.md",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
         "path": "docs/v200",
         "task_id": "V200-14"
       },
       {
         "mode": "read",
+        "path": "evidence",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "packaging",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
         "path": "planning/v200-bootstrap",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "scripts/v200",
+        "task_id": "V200-14"
+      },
+      {
+        "mode": "read",
+        "path": "tools/v200",
         "task_id": "V200-14"
       },
       {
@@ -3340,6 +3754,32 @@
         "validation_git_head": "2bd3020146cd4378a6bb60a614b361d030a3bc34"
       },
       {
+        "completion_git_head": "7a04b35fbf9ce41963a6133dfe224e5a29a027ed",
+        "completion_revision": 128,
+        "evidence_id": "afdd4f59-2031-430b-b69e-a746d33dc011",
+        "evidence_revision": 125,
+        "gate_id": "V200-11-B06-INTEGRATED-CPU",
+        "input_fingerprint": "b21703933977f0aa3f3b9a5f9aed1f0d984f11a51e344a500e4bc5a942fa3224",
+        "provenance_json": "{\"claim_id\": \"aef1802f-b239-4e5a-a927-353aea2783c4\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"ctest\", \"--test-dir\", \"build-multipair\", \"--output-on-failure\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"b21703933977f0aa3f3b9a5f9aed1f0d984f11a51e344a500e4bc5a942fa3224\", \"inputs\": {\"command_contract\": {\"argv\": [\"ctest\", \"--test-dir\", \"build-multipair\", \"--output-on-failure\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"76d59851494b32b6905f77b0e6eae383baecf966b39ffab5bd99cacc949535e5\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"CMakeLists.txt\", \"benchmarks/comparison/run_extended_comparison.py\", \"benchmarks/fixtures/llama-server-multipair.json\", \"docs/v200/multipair-profile.json\", \"docs/v200/operator-profile.json\", \"docs/v200/two-device.md\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145347Z-c580f56988.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145621Z-206724d8bf.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150129Z-193456267c.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150350Z-3b5c5a9998.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stdout.txt\", \"evidence/B06/qualification-r1.controller-evidence.json\", \"evidence/B06/qualification-r1.controller-result.json\", \"evidence/B06/qualification-r1.host-release.json\", \"evidence/B06/qualification-r1.launch.log\", \"evidence/B06/qualification-r2.controller-evidence.json\", \"evidence/B06/qualification-r2.controller-result.json\", \"evidence/B06/qualification-r2.host-release.json\", \"evidence/B06/qualification-r2.launch.log\", \"evidence/B06/qualification-r3.controller-evidence.json\", \"evidence/B06/qualification-r3.controller-result.json\", \"evidence/B06/qualification-r3.host-release.json\", \"evidence/B06/qualification-r3.launch.log\", \"evidence/B06/qualification-r4.controller-evidence.json\", \"evidence/B06/qualification-r4.controller-result.json\", \"evidence/B06/qualification-r4.host-release.json\", \"evidence/B06/qualification-r4.launch.log\", \"evidence/B06/qualification-r5.controller-evidence.json\", \"evidence/B06/qualification-r5.controller-result.json\", \"evidence/B06/qualification-r5.host-release.json\", \"evidence/B06/qualification-r5.launch.log\", \"planning/delivery.todo-plan.json\", \"scripts/v200/serve.py\", \"scripts/v200/serve_multi.py\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/vmm_location.hpp\", \"tests/abi/fake_cuda_library.c\", \"tests/abi/lazy_driver_discovery.cpp\", \"tests/abi/vmm_location_test.cpp\", \"tests/comparison/test_extended_comparison.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/multi_pair/CMakeLists.txt\", \"tests/multi_pair/copy_contract.cpp\", \"tests/multi_pair/copy_probe.cpp\", \"tests/multi_pair/fixtures/native-four-device-info.log\", \"tests/multi_pair/run_multi_consumer.py\", \"tests/multi_pair/test_multi_pair.py\", \"todo-status.md\", \"todos.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"6c79229872b69759318954fef991a434162148dd7a2cea1e4f7a4133de8f22f9\"}, {\"path\": \"include/v200\", \"sha256\": \"missing\"}, {\"path\": \"src\", \"sha256\": \"missing\"}, {\"path\": \"tests\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 124}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/afdd4f59-2031-430b-b69e-a746d33dc011\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-11",
+        "valid": 1,
+        "validation_git_head": "7a04b35fbf9ce41963a6133dfe224e5a29a027ed"
+      },
+      {
+        "completion_git_head": "7a04b35fbf9ce41963a6133dfe224e5a29a027ed",
+        "completion_revision": 128,
+        "evidence_id": "c878ebdf-f97b-451d-bb48-d2b780a46406",
+        "evidence_revision": 127,
+        "gate_id": "V200-11-B06-TWO-LOGICAL-RESIDENT",
+        "input_fingerprint": "441e8480135428e44f2c049c1649523c02235a8c3a4489c7107d354e4dfd0d16",
+        "provenance_json": "{\"claim_id\": \"aef1802f-b239-4e5a-a927-353aea2783c4\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"-c\", \"import json\\nfrom pathlib import Path\\nroot=Path('.')\\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\\nassert b['copy_probe']['status']=='PASS'\\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\\nfor c in b['controls']:\\n assert c['application_status']=='PASS' and c['response']['exact_match']\\n assert c['server_process']['exit_code']==0\\n assert c['cleanup']['no_live_group_members']\\n assert c['layer_offload_evidence']['full_gpu_offload']\\n assert c['device_count_evidence']['status']=='PASS'\\ns=b['v200_summary']\\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\\nassert h['state']=='released' and h['resources']==[]\\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\\n\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"441e8480135428e44f2c049c1649523c02235a8c3a4489c7107d354e4dfd0d16\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import json\\nfrom pathlib import Path\\nroot=Path('.')\\nb=json.loads((root/'evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json').read_text())\\nassert b['status']=='PASS' and b['qualification']=='PASS_TWO_LOGICAL_V200_RESIDENT_CORRECTNESS'\\nassert b['copy_probe']['status']=='PASS'\\nassert len(b['selected_gpu_uuids'])==4 and len(set(b['selected_gpu_uuids']))==4\\nfor c in b['controls']:\\n assert c['application_status']=='PASS' and c['response']['exact_match']\\n assert c['server_process']['exit_code']==0\\n assert c['cleanup']['no_live_group_members']\\n assert c['layer_offload_evidence']['full_gpu_offload']\\n assert c['device_count_evidence']['status']=='PASS'\\ns=b['v200_summary']\\nassert s['visible_cuda_devices']==[2] and s['cleanup_accounting_zero']\\nassert s['all_model_layers_offloaded'] and s['input_embedding_on_cuda0']\\nassert len(s['four_owner_peak_bytes'])==4 and min(s['four_owner_peak_bytes'].values())>0\\nr=json.loads((root/'evidence/B06/qualification-r5.controller-result.json').read_text())\\nassert r['ok'] and r['returncode']==0 and r['evidence_id']=='bdf88682-63b9-4788-8943-b411c03ee1f1'\\nh=json.loads((root/'evidence/B06/qualification-r5.host-release.json').read_text())\\nassert h['state']=='released' and h['resources']==[]\\nprint('B06 two logical devices, resident payload, correctness, cleanup and release accepted')\\n\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"76d59851494b32b6905f77b0e6eae383baecf966b39ffab5bd99cacc949535e5\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"CMakeLists.txt\", \"benchmarks/comparison/run_extended_comparison.py\", \"benchmarks/fixtures/llama-server-multipair.json\", \"docs/v200/multipair-profile.json\", \"docs/v200/operator-profile.json\", \"docs/v200/two-device.md\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145347Z-c580f56988.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T145621Z-206724d8bf.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150129Z-193456267c.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150350Z-3b5c5a9998.controller.json\", \"evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145347Z-c580f56988/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T145621Z-206724d8bf/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150129Z-193456267c/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150350Z-3b5c5a9998/stdout.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/bundle.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/native_four.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200-copy-probe.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.log\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer/v200_two.profile.jsonl\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/execution.json\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stderr.txt\", \"evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/stdout.txt\", \"evidence/B06/qualification-r1.controller-evidence.json\", \"evidence/B06/qualification-r1.controller-result.json\", \"evidence/B06/qualification-r1.host-release.json\", \"evidence/B06/qualification-r1.launch.log\", \"evidence/B06/qualification-r2.controller-evidence.json\", \"evidence/B06/qualification-r2.controller-result.json\", \"evidence/B06/qualification-r2.host-release.json\", \"evidence/B06/qualification-r2.launch.log\", \"evidence/B06/qualification-r3.controller-evidence.json\", \"evidence/B06/qualification-r3.controller-result.json\", \"evidence/B06/qualification-r3.host-release.json\", \"evidence/B06/qualification-r3.launch.log\", \"evidence/B06/qualification-r4.controller-evidence.json\", \"evidence/B06/qualification-r4.controller-result.json\", \"evidence/B06/qualification-r4.host-release.json\", \"evidence/B06/qualification-r4.launch.log\", \"evidence/B06/qualification-r5.controller-evidence.json\", \"evidence/B06/qualification-r5.controller-result.json\", \"evidence/B06/qualification-r5.host-release.json\", \"evidence/B06/qualification-r5.launch.log\", \"planning/delivery.todo-plan.json\", \"scripts/v200/serve.py\", \"scripts/v200/serve_multi.py\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/vmm_location.hpp\", \"tests/abi/fake_cuda_library.c\", \"tests/abi/lazy_driver_discovery.cpp\", \"tests/abi/vmm_location_test.cpp\", \"tests/comparison/test_extended_comparison.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/multi_pair/CMakeLists.txt\", \"tests/multi_pair/copy_contract.cpp\", \"tests/multi_pair/copy_probe.cpp\", \"tests/multi_pair/fixtures/native-four-device-info.log\", \"tests/multi_pair/run_multi_consumer.py\", \"tests/multi_pair/test_multi_pair.py\", \"todo-status.md\", \"todos.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\"], \"files\": [{\"path\": \"evidence/B06\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"7a04b35fbf9ce41963a6133dfe224e5a29a027ed\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 126}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/c878ebdf-f97b-451d-bb48-d2b780a46406\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-11",
+        "valid": 1,
+        "validation_git_head": "7a04b35fbf9ce41963a6133dfe224e5a29a027ed"
+      },
+      {
         "completion_git_head": "df12371c23801291a08c631527e36f22dd21d66c",
         "completion_revision": 109,
         "evidence_id": "b9e2298a-ea71-48af-aaff-71d912121b64",
@@ -3367,39 +3807,6 @@
       }
     ],
     "task_dependencies": [
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 22,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-11",
-        "task_id": "V200-13",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 23,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-12",
-        "task_id": "V200-13",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 24,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-13",
-        "task_id": "V200-14",
-        "type": "task"
-      },
       {
         "barrier_id": null,
         "checkpoint_id": null,
@@ -3482,10 +3889,43 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 37,
+        "id": 42,
         "interface_id": null,
         "prerequisite_task_id": "V200-12",
         "task_id": "V200-11",
+        "type": "task"
+      },
+      {
+        "barrier_id": null,
+        "checkpoint_id": null,
+        "condition_json": "{}",
+        "decision_id": null,
+        "id": 43,
+        "interface_id": null,
+        "prerequisite_task_id": "V200-11",
+        "task_id": "V200-13",
+        "type": "task"
+      },
+      {
+        "barrier_id": null,
+        "checkpoint_id": null,
+        "condition_json": "{}",
+        "decision_id": null,
+        "id": 44,
+        "interface_id": null,
+        "prerequisite_task_id": "V200-12",
+        "task_id": "V200-13",
+        "type": "task"
+      },
+      {
+        "barrier_id": null,
+        "checkpoint_id": null,
+        "condition_json": "{}",
+        "decision_id": null,
+        "id": 45,
+        "interface_id": null,
+        "prerequisite_task_id": "V200-13",
+        "task_id": "V200-14",
         "type": "task"
       }
     ],
@@ -3744,28 +4184,28 @@
       },
       {
         "attention_reason": null,
-        "completion_commit": null,
-        "completion_git_head": null,
-        "completion_revision": null,
+        "completion_commit": "7a04b35fbf9ce41963a6133dfe224e5a29a027ed",
+        "completion_git_head": "7a04b35fbf9ce41963a6133dfe224e5a29a027ed",
+        "completion_revision": 128,
         "created_at": "2026-10-17T11:40:58Z",
         "id": "V200-11",
         "kind": "task",
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Both logical devices enumerate with stable identity and independent resource accounting.\",\"B06 validates selected inter-pair copy and consumer workload over the recorded/rediscovered topology.\",\"No claim that a generic shim infers model layer/sequence/expert semantics without a contract.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D08\"],\"recommended_start\":\"Implement stable two-device enumeration and logical copies using eligible physical endpoints. Separate general peer-load permission from routable bulk copy. Do not advertise arbitrary cross-pair pointers when some constituent paths are inaccessible. Qualify native consumer layer/pipeline distribution across two logical IDs and any needed collective/NVML handling.\",\"research_refs\":[\"A-R07\",\"A-E20\",\"W-LLAMA-SERVER\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-11.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-11\",\"outputs\":[\"src/multi_pair/\",\"tests/multi_pair/\",\"docs/v200/two-device.md\",\"evidence/B06\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"budget\":\"Four-device admission only after pair readiness; keep session short.\",\"cpu\":[\"Directed endpoint/capability map tests\"],\"gpu\":[\"B06\"]},\"workstream\":\"V200 single-device product\"}\n2026-10-17: 07/08/09/10 hardwareaccepted through2bd3020. Perform a small matched pair performance check using exact qualified binary hashes before broader tuning; this is independent of four-GPU availability. CPU implementation of11 may proceed under root coordination while12 measures pinned unchanged DSOs. Keep build-multipair separate and do not overwrite build qualification artifacts while benchmark runs. Preserve unchangedconsumer, graph-off/nativefallback and exact numerics. 11 must expose TWO logical devices in one process, independent pair accounting and topology-aware copies; separateprocessone-device launchers alone do not complete11. No unsupportedall-to-allpeerclaims.",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Both logical devices enumerate with stable identity and independent resource accounting.\",\"B06 validates selected inter-pair copy and consumer workload over the recorded/rediscovered topology.\",\"No claim that a generic shim infers model layer/sequence/expert semantics without a contract.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D08\"],\"recommended_start\":\"Implement stable two-device enumeration and logical copies using eligible physical endpoints. Separate general peer-load permission from routable bulk copy. Do not advertise arbitrary cross-pair pointers when some constituent paths are inaccessible. Qualify native consumer layer/pipeline distribution across two logical IDs and any needed collective/NVML handling.\",\"research_refs\":[\"A-R07\",\"A-E20\",\"W-LLAMA-SERVER\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-11.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-11\",\"outputs\":[\"src/multi_pair/\",\"tests/multi_pair/\",\"docs/v200/two-device.md\",\"evidence/B06\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"budget\":\"Four-device admission only after pair readiness; keep session short.\",\"cpu\":[\"Directed endpoint/capability map tests\"],\"gpu\":[\"B06\"]},\"workstream\":\"V200 single-device product\"}\n2026-10-17: 07/08/09/10 hardwareaccepted through2bd3020. Perform a small matched pair performance check using exact qualified binary hashes before broader tuning; this is independent of four-GPU availability. CPU implementation of11 may proceed under root coordination while12 measures pinned unchanged DSOs. Keep build-multipair separate and do not overwrite build qualification artifacts while benchmark runs. Preserve unchangedconsumer, graph-off/nativefallback and exact numerics. 11 must expose TWO logical devices in one process, independent pair accounting and topology-aware copies; separateprocessone-device launchers alone do not complete11. No unsupportedall-to-allpeerclaims.\nCorrect B06 gate field to retained server_process.exit_code and preserve the same correctness assertions. No GPU evidence is altered.",
         "objective": "Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
-        "result": null,
+        "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 101,
-        "status": "planned",
+        "revision": 128,
+        "status": "done",
         "tags_json": "[]",
         "title": "Expose and integrate two logical V200 devices",
-        "updated_at": "2026-10-17T14:17:14Z",
-        "version": 2
+        "updated_at": "2026-10-17T15:17:25Z",
+        "version": 6
       },
       {
         "attention_reason": null,
@@ -3785,12 +4225,12 @@
         "priority": 0,
         "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 109,
+        "revision": 123,
         "status": "done",
         "tags_json": "[]",
         "title": "Make the measured performance and product decision",
-        "updated_at": "2026-10-17T14:38:40Z",
-        "version": 6
+        "updated_at": "2026-10-17T15:17:16Z",
+        "version": 8
       },
       {
         "attention_reason": null,
@@ -3803,19 +4243,19 @@
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Deployment is reproducible for the accepted profile and removable without altering unrelated GPU software.\",\"Unsupported APIs, actual transparency tier, capacity reserve and measured performance are plainly documented.\",\"No hidden watcher/model service/GPU resident daemon is installed.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D08\"],\"recommended_start\":\"Package launcher/facade, versioned profiles and source/binary provenance. Keep native CUDA untouched outside the launch scope. Diagnostics show logical-to-physical mapping and failures. Provide installation/uninstallation steps that do not modify system driver state. Never claim system-wide PCI/NVML device unification unless separately authorized and implemented.\",\"research_refs\":[\"A-HOST\",\"P-README\",\"W-OPEN\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-13.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-13\",\"outputs\":[\"packaging/\",\"tools/v200/\",\"docs/v200/deployment.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Package/load-path/rollback tests\"],\"gpu\":\"Reuse accepted B03/B06 evidence; one focused deployment smoke only if binaries or loader paths changed.\"},\"workstream\":\"V200 single-device product\"}",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Deployment is reproducible for the accepted profile and removable without altering unrelated GPU software.\",\"Unsupported APIs, actual transparency tier, capacity reserve and measured performance are plainly documented.\",\"No hidden watcher/model service/GPU resident daemon is installed.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D08\"],\"recommended_start\":\"Package launcher/facade, versioned profiles and source/binary provenance. Keep native CUDA untouched outside the launch scope. Diagnostics show logical-to-physical mapping and failures. Provide installation/uninstallation steps that do not modify system driver state. Never claim system-wide PCI/NVML device unification unless separately authorized and implemented.\",\"research_refs\":[\"A-HOST\",\"P-README\",\"W-OPEN\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-13.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-13\",\"outputs\":[\"packaging/\",\"tools/v200/\",\"docs/v200/deployment.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Package/load-path/rollback tests\"],\"gpu\":\"Reuse accepted B03/B06 evidence; one focused deployment smoke only if binaries or loader paths changed.\"},\"workstream\":\"V200 single-device product\"}\nReuse existing scoped controller launchers. Add finite two-logical HTTP serving and build/diagnostic/provenance entry point. Preserve build/ baseline. One bounded singlepair extended expert comparison may measure the newly usable code; no broad tuning campaign.",
         "objective": "Deliver an opt-in application-scoped deployment with accurate identity, compatibility and rollback information. Read planning/v200-bootstrap/tasks/V200-13.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 2,
-        "status": "planned",
+        "revision": 129,
+        "status": "in_progress",
         "tags_json": "[]",
         "title": "Package a reversible deployment and diagnostic surface",
-        "updated_at": "2026-10-17T11:40:58Z",
-        "version": 1
+        "updated_at": "2026-10-17T15:17:29Z",
+        "version": 4
       },
       {
         "attention_reason": null,
@@ -3835,12 +4275,12 @@
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 2,
+        "revision": 123,
         "status": "planned",
         "tags_json": "[]",
         "title": "Integrate and hand off the accepted V200 release",
-        "updated_at": "2026-10-17T11:40:58Z",
-        "version": 1
+        "updated_at": "2026-10-17T15:17:16Z",
+        "version": 3
       },
       {
         "attention_reason": null,
@@ -3960,6 +4400,74 @@
         "series_key": "",
         "superseded_by": null,
         "task_id": "V200-08",
+        "version": 1
+      },
+      {
+        "content_hash": "1ee0f02cf5fb8a89e6321a550f132293bb1f52be86e589c97176d87df1723fdf",
+        "content_json": "{\"authority\":\"server_enforced_role_and_task_scope\",\"interfaces\":[],\"ordered_tasks\":[\"V200-13\",\"V200-14\"],\"rendezvous\":[],\"role\":\"integrator\",\"workspace_mode\":\"exclusive\"}",
+        "created_at": "2026-10-17T15:16:35Z",
+        "creation_revision": 113,
+        "id": "V200-DELIVERY-1:lane_brief:V200-DELIVERY-1-MAIN:-:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "lane_brief",
+        "lane_id": "V200-DELIVERY-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-DELIVERY-1-MAIN\",\"run_id\":\"V200-DELIVERY-1\"}",
+        "run_id": "V200-DELIVERY-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": null,
+        "version": 1
+      },
+      {
+        "content_hash": "fd9d1289986b852844913f9b6f2a11b26d66bc404ab02585877ca82b75da54d4",
+        "content_json": "{\"boundaries\":[\"No system driver modifications or hidden daemon\",\"Preserve native fallback and exact numeric contract\",\"Finite controller admitted checks only\"],\"invariants\":[\"Two logical devices remain pair based; no ordinary model parallel backend substituted\",\"Performance limits remain explicit; no universal CUDA claim\"],\"objective\":\"Deliver the functioning restricted V200 application profile with reproducible reversible launch and truthful acceptance\"}",
+        "created_at": "2026-10-17T15:16:35Z",
+        "creation_revision": 113,
+        "id": "V200-DELIVERY-1:run_charter:-:-:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "run_charter",
+        "lane_id": null,
+        "owner_scope_json": "{\"run_id\":\"V200-DELIVERY-1\"}",
+        "run_id": "V200-DELIVERY-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": null,
+        "version": 1
+      },
+      {
+        "content_hash": "a60eaa46b12044a777e3c43a2c47e2222b323dbb3b32bc54746017cfe09c4527",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Deliver an opt-in application-scoped deployment with accurate identity, compatibility and rollback information. Read planning/v200-bootstrap/tasks/V200-13.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Deliver an opt-in application-scoped deployment with accurate identity, compatibility and rollback information. Read planning/v200-bootstrap/tasks/V200-13.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"packaging\",\"tools/v200\",\"scripts/v200\",\"tests/consumer\",\"tests/multi_pair\",\"tests/comparison\",\"benchmarks/comparison\",\"docs/v200\",\"README.md\",\"evidence/B07\",\"evidence/B06\"],\"forbidden_paths\":[],\"read_paths\":[\"planning/v200-bootstrap\",\"planning/EXECUTION_PLAN.md\",\"build-support\",\"src\",\"include/v200\",\"evidence/B03\",\"evidence/B04\",\"evidence/B05\",\"evidence/foundation\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T15:16:35Z",
+        "creation_revision": 113,
+        "id": "V200-DELIVERY-1:task_brief:V200-DELIVERY-1-MAIN:V200-13:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "task_brief",
+        "lane_id": "V200-DELIVERY-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-DELIVERY-1-MAIN\",\"run_id\":\"V200-DELIVERY-1\",\"task_id\":\"V200-13\"}",
+        "run_id": "V200-DELIVERY-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": "V200-13",
+        "version": 1
+      },
+      {
+        "content_hash": "20242d03ac5c346853b7ce95be8a89487042e7086843fb33288eda0d40f50d74",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"docs/v200/release.md\",\"tests/release\"],\"forbidden_paths\":[],\"read_paths\":[\"docs/v200\",\"planning/v200-bootstrap/\",\"evidence\",\"packaging\",\"scripts/v200\",\"tools/v200\",\"README.md\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T15:16:35Z",
+        "creation_revision": 113,
+        "id": "V200-DELIVERY-1:task_brief:V200-DELIVERY-1-MAIN:V200-14:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "task_brief",
+        "lane_id": "V200-DELIVERY-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-DELIVERY-1-MAIN\",\"run_id\":\"V200-DELIVERY-1\",\"task_id\":\"V200-14\"}",
+        "run_id": "V200-DELIVERY-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": "V200-14",
         "version": 1
       },
       {
@@ -4802,6 +5310,26 @@
         "task_id": "V200-08"
       },
       {
+        "activated_at": "2026-10-17T15:17:29Z",
+        "completed_at": null,
+        "enqueued_at": "2026-10-17T15:16:35Z",
+        "lane_id": "V200-DELIVERY-1-MAIN",
+        "position": 0,
+        "revision": 129,
+        "state": "active",
+        "task_id": "V200-13"
+      },
+      {
+        "activated_at": null,
+        "completed_at": null,
+        "enqueued_at": "2026-10-17T15:16:35Z",
+        "lane_id": "V200-DELIVERY-1-MAIN",
+        "position": 1,
+        "revision": 123,
+        "state": "queued",
+        "task_id": "V200-14"
+      },
+      {
         "activated_at": "2026-10-17T12:20:30Z",
         "completed_at": "2026-10-17T12:35:11Z",
         "enqueued_at": "2026-10-17T12:14:25Z",
@@ -4842,13 +5370,13 @@
         "task_id": "V200-12"
       },
       {
-        "activated_at": null,
-        "completed_at": null,
+        "activated_at": "2026-10-17T14:38:48Z",
+        "completed_at": "2026-10-17T15:17:25Z",
         "enqueued_at": "2026-10-17T14:17:14Z",
         "lane_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
         "position": 1,
-        "revision": 101,
-        "state": "queued",
+        "revision": 128,
+        "state": "completed",
         "task_id": "V200-11"
       },
       {
@@ -5067,6 +5595,18 @@
       },
       {
         "context_cursor": 0,
+        "created_at": "2026-10-17T15:16:35Z",
+        "id": "V200-DELIVERY-1-MAIN",
+        "parent_lane_id": null,
+        "revision": 129,
+        "role": "integrator",
+        "run_id": "V200-DELIVERY-1",
+        "state": "active",
+        "updated_at": "2026-10-17T15:17:29Z",
+        "workspace_mode": "exclusive"
+      },
+      {
+        "context_cursor": 0,
         "created_at": "2026-10-17T12:14:25Z",
         "id": "V200-INIT-RUN-1-MAIN",
         "parent_lane_id": null,
@@ -5094,11 +5634,11 @@
         "created_at": "2026-10-17T14:17:14Z",
         "id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
         "parent_lane_id": null,
-        "revision": 109,
+        "revision": 128,
         "role": "implementer",
         "run_id": "V200-PAIR-PERF-MULTIPAIR-1",
-        "state": "ready",
-        "updated_at": "2026-10-17T14:38:40Z",
+        "state": "closed",
+        "updated_at": "2026-10-17T15:17:25Z",
         "workspace_mode": "exclusive"
       },
       {
@@ -5218,6 +5758,16 @@
         "version": 1
       },
       {
+        "content_hash": "fd9d1289986b852844913f9b6f2a11b26d66bc404ab02585877ca82b75da54d4",
+        "content_json": "{\"boundaries\":[\"No system driver modifications or hidden daemon\",\"Preserve native fallback and exact numeric contract\",\"Finite controller admitted checks only\"],\"invariants\":[\"Two logical devices remain pair based; no ordinary model parallel backend substituted\",\"Performance limits remain explicit; no universal CUDA claim\"],\"objective\":\"Deliver the functioning restricted V200 application profile with reproducible reversible launch and truthful acceptance\"}",
+        "created_at": "2026-10-17T15:16:35Z",
+        "creation_revision": 113,
+        "run_id": "V200-DELIVERY-1",
+        "superseded_at": null,
+        "superseded_revision": null,
+        "version": 1
+      },
+      {
         "content_hash": "ccc4ca2e9220dab9791241009a5e087d0043c8b27068633ebfe0579e274b2cff",
         "content_json": "{\"boundaries\":[\"No GPU execution before built admitted closure; no full graph or generic kernel redistribution implementation\"],\"invariants\":[\"Use actual native dispatch and the accepted B01 pair identity; constructor must not initialize CUDA\",\"Keep the selected llama workload and disclosed preview limits; no false capacity/speed claims\"],\"objective\":\"Integrate a small opt-in runtime without waiting for final frontdoor CPU closure\"}",
         "created_at": "2026-10-17T12:14:25Z",
@@ -5282,6 +5832,16 @@
       {
         "active_charter_version": 1,
         "completed_at": null,
+        "created_at": "2026-10-17T15:16:35Z",
+        "id": "V200-DELIVERY-1",
+        "revision": 113,
+        "root_task_id": "V200-13",
+        "status": "active",
+        "updated_at": "2026-10-17T15:16:35Z"
+      },
+      {
+        "active_charter_version": 1,
+        "completed_at": null,
         "created_at": "2026-10-17T12:14:25Z",
         "id": "V200-INIT-RUN-1",
         "revision": 62,
@@ -5304,10 +5864,10 @@
         "completed_at": null,
         "created_at": "2026-10-17T14:17:14Z",
         "id": "V200-PAIR-PERF-MULTIPAIR-1",
-        "revision": 101,
+        "revision": 128,
         "root_task_id": "V200-12",
-        "status": "active",
-        "updated_at": "2026-10-17T14:17:14Z"
+        "status": "completed",
+        "updated_at": "2026-10-17T15:17:25Z"
       },
       {
         "active_charter_version": 1,

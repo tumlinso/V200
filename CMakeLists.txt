@@ -52,7 +52,8 @@ foreach(v200_component IN ITEMS
     src/execution
     src/integration
     src/operators
-    tests/consumer)
+    tests/consumer
+    tests/multi_pair)
   if(EXISTS "${PROJECT_SOURCE_DIR}/${v200_component}/CMakeLists.txt")
     add_subdirectory("${v200_component}")
   endif()

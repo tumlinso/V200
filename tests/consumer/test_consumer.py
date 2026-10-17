@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from contextlib import redirect_stderr, redirect_stdout
+import io
 import json
 import os
 import signal
@@ -146,6 +148,7 @@ class FixtureTests(unittest.TestCase):
     def test_child_environment_clears_hidden_fit_and_keeps_controller_selection(self) -> None:
         env = {"PATH": "/bin", "CUDA_VISIBLE_DEVICES": "GPU-a,GPU-b",
                "V200_DEVICE_UUIDS": "GPU-aaaaaaaa,GPU-bbbbbbbb",
+               "V200_EXTENDED_EXPERT_COMPUTE": "1",
                "LLAMA_ARG_N_GPU_LAYERS": "999", "GGML_CUDA_FORCE_CUBLAS": "1",
                "GGML_CUDA_DISABLE_GRAPHS": "0", "V200_B01_EVIDENCE_ID": "untrusted-parent-value",
                "LD_PRELOAD": "/tmp/libv200_frontdoor.so /tmp/libunrelated.so"}
@@ -156,6 +159,7 @@ class FixtureTests(unittest.TestCase):
         self.assertNotIn("V200_MODE", native)
         self.assertNotIn("V200_DEVICE_UUIDS", native)
         self.assertNotIn("V200_B01_EVIDENCE_ID", native)
+        self.assertNotIn("V200_EXTENDED_EXPERT_COMPUTE", native)
         self.assertEqual(native["CUDA_VISIBLE_DEVICES"], "GPU-a,GPU-b")
         self.assertEqual(native["GGML_CUDA_DISABLE_GRAPHS"], "1")
         self.assertEqual(native["LD_PRELOAD"], "/tmp/libunrelated.so")
@@ -173,6 +177,7 @@ class FixtureTests(unittest.TestCase):
             self.assertEqual(facade["GGML_CUDA_DISABLE_GRAPHS"], "1")
             self.assertEqual(facade["V200_B01_EVIDENCE_ID"],
                              self.fixture["controls"]["facade_owner"]["required_b01_evidence_id"])
+            self.assertNotIn("V200_EXTENDED_EXPERT_COMPUTE", facade)
             self.assertEqual(facade["LD_PRELOAD"],
                              f"{preload}:{initializer}:/tmp/libunrelated.so")
 
@@ -180,11 +185,13 @@ class FixtureTests(unittest.TestCase):
         env = {"PATH": "/bin", "CUDA_VISIBLE_DEVICES": "GPU-a,GPU-b",
                "V200_DEVICE_UUIDS": "GPU-aaaaaaaa,GPU-bbbbbbbb",
                "V200_PAIR_COMPUTE": "1", "V200_OPERATOR_VERIFY": "1",
+               "V200_EXTENDED_EXPERT_COMPUTE": "1",
                "LD_PRELOAD": "/tmp/libv200_operators.so"}
         native = consumer._clean_environment("native_pair", self.fixture, None, env,
                                              selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
         self.assertNotIn("V200_PAIR_COMPUTE", native)
         self.assertNotIn("V200_OPERATOR_VERIFY", native)
+        self.assertNotIn("V200_EXTENDED_EXPERT_COMPUTE", native)
         with tempfile.TemporaryDirectory() as directory:
             preload = Path(directory) / "libv200_frontdoor.so"
             initializer = Path(directory) / "libv200_pair_init.so"
@@ -196,6 +203,7 @@ class FixtureTests(unittest.TestCase):
                 facade_mode="pair", selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
             self.assertEqual(facade["V200_PAIR_COMPUTE"], "1")
             self.assertEqual(facade["V200_OPERATOR_VERIFY"], "1")
+            self.assertEqual(facade["V200_EXTENDED_EXPERT_COMPUTE"], "1")
             self.assertEqual(facade["LD_PRELOAD"], f"{preload}:{initializer}:{operators}")
             with self.assertRaisesRegex(consumer.ConsumerError, "operator library preload"):
                 consumer._clean_environment(
@@ -376,6 +384,9 @@ class LauncherPlanTests(unittest.TestCase):
             "build/src/frontdoor/libv200_frontdoor.so",
             "build/src/integration/libv200_pair_init.so",
         ])
+        self.assertEqual(plan["build_directory"], "build")
+        self.assertIn("-u", plan["bounded_child_argv"])
+        self.assertNotIn("V200_EXTENDED_EXPERT_COMPUTE=1", plan["bounded_child_argv"])
         pinned_llama = consumer.load_documents()[1]["binary"]["path"]
         self.assertNotIn(pinned_llama, plan["controller_spec"]["binary_paths"])
         self.assertEqual(plan["controller_spec"]["argv"][1],
@@ -463,6 +474,48 @@ class LauncherPlanTests(unittest.TestCase):
         args = serve_launcher._parse_args(["--pair-compute", "--workload", "resident_capacity"])
         self.assertTrue(args.pair_compute)
         self.assertEqual(args.workload, "resident_capacity")
+
+    def test_extended_expert_opt_in_selects_multipair_build_only_when_requested(self) -> None:
+        with self.assertRaisesRegex(serve_launcher.LaunchError, "requires --pair-compute"):
+            serve_launcher._make_plan("serve", self.uuids, "extended-without-pair",
+                                      extended_expert_compute=True)
+
+        plan = serve_launcher._make_plan(
+            "serve", self.uuids, "extended-expert", duration_seconds=120,
+            workload_name="resident_capacity", pair_compute=True,
+            verify_pair_compute=True, extended_expert_compute=True)
+        self.assertEqual(plan["build_directory"], "build-multipair")
+        self.assertTrue(plan["extended_expert_compute"])
+        self.assertEqual(plan["preload_libraries"], [
+            str(serve_launcher.REPO_ROOT / "build-multipair/src/frontdoor/libv200_frontdoor.so"),
+            str(serve_launcher.REPO_ROOT / "build-multipair/src/integration/libv200_pair_init.so"),
+            str(serve_launcher.REPO_ROOT / "build-multipair/src/operators/libv200_operators.so"),
+        ])
+        self.assertEqual(plan["controller_spec"]["binary_paths"], [
+            "build-multipair/src/frontdoor/libv200_frontdoor.so",
+            "build-multipair/src/integration/libv200_pair_init.so",
+            "build-multipair/src/operators/libv200_operators.so",
+        ])
+        self.assertTrue(all(path.startswith(str(serve_launcher.REPO_ROOT / "build-multipair"))
+                            for path in plan["required_files"]
+                            if "libv200_" in path))
+        self.assertIn("V200_PAIR_COMPUTE=1", plan["bounded_child_argv"])
+        self.assertIn("V200_OPERATOR_VERIFY=1", plan["bounded_child_argv"])
+        self.assertIn("V200_EXTENDED_EXPERT_COMPUTE=1", plan["bounded_child_argv"])
+        printed = io.StringIO()
+        with redirect_stdout(printed):
+            serve_launcher._print_plan(plan, [], execute=False)
+        self.assertIn("Build outputs: build-multipair", printed.getvalue())
+
+        args = serve_launcher._parse_args(["--pair-compute", "--extended-expert-compute"])
+        self.assertTrue(args.pair_compute)
+        self.assertTrue(args.extended_expert_compute)
+
+    def test_extended_expert_cli_requires_pair_compute_before_loading_hardware_profile(self) -> None:
+        with mock.patch.object(serve_launcher, "_load_selected_pair") as load_pair, \
+             redirect_stderr(io.StringIO()):
+            self.assertEqual(serve_launcher.main(["--extended-expert-compute"]), 2)
+        load_pair.assert_not_called()
 
     def test_cuda_graph_opt_in_is_explicit_and_keeps_default_graph_off(self) -> None:
         default = serve_launcher._make_plan("preview", self.uuids, "graph-default")

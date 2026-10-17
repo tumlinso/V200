@@ -1,0 +1,2 @@
+{"duration_seconds": 10, "endpoint": "http://127.0.0.1:8090", "event": "V200_SERVER_READY"}
+{"duration_seconds": 10, "endpoint": "http://127.0.0.1:8090", "result": "/home/tumlinson/V200/evidence/B06/serving/runs/multipair-20261017T151911Z-e871dbfdf1/consumer/service.json", "status": "PASS"}

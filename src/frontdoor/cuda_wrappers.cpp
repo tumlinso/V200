@@ -5,6 +5,7 @@
 #include "v200/memory/api.h"
 #include "v200/operators/graph_rewrite.hpp"
 #include "v200/operators/launch.hpp"
+#include "vmm_location.hpp"
 
 #include <cuda_runtime_api.h>
 
@@ -359,6 +360,16 @@ int pair_index_for_native_device(CUdevice device) {
         }
     }
     return -1;
+}
+
+bool map_external_vmm_device(CUdevice requested,
+                             v200::frontdoor::detail::NativePairLocation *mapped) {
+    if (mapped == nullptr || !ensure_device_selection()) return false;
+    std::array<int, 4> selected{};
+    for (int i = 0; i < selection.count; ++i)
+        selected[static_cast<size_t>(i)] = static_cast<int>(selection.device[i]);
+    return v200::frontdoor::detail::map_external_vmm_device(
+        static_cast<int>(requested), selected.data(), selection.count, mapped);
 }
 
 CUresult pair_index_for_context(CUcontext context, uint32_t *pair_index) {
@@ -1281,6 +1292,25 @@ cudaError_t CUDARTAPI cudaGetDeviceCount(int *count) {
     auto real = next_fn<Fn>("cudaGetDeviceCount");
     if (internal_call() || !presentation_enabled()) return real ? real(count) : cudaErrorNotSupported;
     if (count == nullptr) return cudaErrorInvalidValue;
+    if (real == nullptr) return cudaErrorNotSupported;
+    bool selection_ready = false;
+    {
+        std::lock_guard<std::mutex> lock(selection_mutex);
+        selection_ready = selection.valid;
+    }
+    if (!selection_ready) {
+        // A directly linked CUDA Runtime may defer loading libcuda until its
+        // first runtime query. Prime that native path before asking the Driver
+        // API resolver to enumerate UUIDs; otherwise it sees no loaded
+        // libcuda and reports NOT_SUPPORTED on a cold process.
+        int native_count = 0;
+        cudaError_t native_status;
+        {
+            InternalCallScope bypass;
+            native_status = real(&native_count);
+        }
+        if (native_status != cudaSuccess) return native_status;
+    }
     if (!ensure_device_selection()) return cuda_error_for(selection.driver_error);
     *count = static_cast<int>(visible_logical_device_count());
     return cudaSuccess;
@@ -2620,10 +2650,24 @@ extern "C" CUresult CUDAAPI cuMemCreate(CUmemGenericAllocationHandle *handle, si
         InternalCallScope bypass;
         return real(handle, size, prop, flags);
     }
+    CUmemAllocationProp native_prop{};
+    const CUmemAllocationProp *effective_prop = prop;
+    uint32_t target_pair = current_pair();
+    if (prop != nullptr && prop->location.type == CU_MEM_LOCATION_TYPE_DEVICE) {
+        v200::frontdoor::detail::NativePairLocation mapped;
+        if (!map_external_vmm_device(static_cast<CUdevice>(prop->location.id), &mapped))
+            return CUDA_ERROR_INVALID_DEVICE;
+        target_pair = static_cast<uint32_t>(mapped.pair);
+        native_prop = *prop;
+        native_prop.location.id = mapped.device;
+        effective_prop = &native_prop;
+    }
+    ExplicitPairScope pair_scope(target_pair);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     if (!pair_memory_ready()) return ensure_pair_profile();
     auto fn = memory_fn<MemVmmCreate>("v200_memory_vmm_create");
     InternalCallScope bypass;
-    return fn ? fn(handle, size, prop, flags) : CUDA_ERROR_NOT_SUPPORTED;
+    return fn ? fn(handle, size, effective_prop, flags) : CUDA_ERROR_NOT_SUPPORTED;
 }
 
 extern "C" CUresult CUDAAPI cuMemGetAllocationGranularity(size_t *granularity,
@@ -2639,10 +2683,24 @@ extern "C" CUresult CUDAAPI cuMemGetAllocationGranularity(size_t *granularity,
         InternalCallScope bypass;
         return real(granularity, prop, option);
     }
+    CUmemAllocationProp native_prop{};
+    const CUmemAllocationProp *effective_prop = prop;
+    uint32_t target_pair = current_pair();
+    if (prop != nullptr && prop->location.type == CU_MEM_LOCATION_TYPE_DEVICE) {
+        v200::frontdoor::detail::NativePairLocation mapped;
+        if (!map_external_vmm_device(static_cast<CUdevice>(prop->location.id), &mapped))
+            return CUDA_ERROR_INVALID_DEVICE;
+        target_pair = static_cast<uint32_t>(mapped.pair);
+        native_prop = *prop;
+        native_prop.location.id = mapped.device;
+        effective_prop = &native_prop;
+    }
+    ExplicitPairScope pair_scope(target_pair);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     if (!pair_memory_ready()) return ensure_pair_profile();
     auto fn = memory_fn<MemVmmGranularity>("v200_memory_vmm_get_granularity");
     InternalCallScope bypass;
-    return fn ? fn(granularity, prop, option) : CUDA_ERROR_NOT_SUPPORTED;
+    return fn ? fn(granularity, effective_prop, option) : CUDA_ERROR_NOT_SUPPORTED;
 }
 
 extern "C" CUresult CUDAAPI cuMemMap(CUdeviceptr ptr, size_t size, size_t offset,
@@ -2687,9 +2745,22 @@ extern "C" CUresult CUDAAPI cuMemSetAccess(CUdeviceptr ptr, size_t size,
     ExplicitPairScope pair_scope(target_pair);
     if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     if (!pair_memory_ready()) return ensure_pair_profile();
+    if (desc == nullptr || count == 0 || count > 2) return CUDA_ERROR_INVALID_VALUE;
+    std::array<CUmemAccessDesc, 2> native_desc{};
+    for (size_t i = 0; i < count; ++i) {
+        if (desc[i].location.type != CU_MEM_LOCATION_TYPE_DEVICE)
+            return CUDA_ERROR_NOT_SUPPORTED;
+        v200::frontdoor::detail::NativePairLocation mapped;
+        if (!map_external_vmm_device(
+                static_cast<CUdevice>(desc[i].location.id), &mapped) ||
+            mapped.pair != static_cast<int>(target_pair))
+            return CUDA_ERROR_INVALID_DEVICE;
+        native_desc[i] = desc[i];
+        native_desc[i].location.id = mapped.device;
+    }
     auto fn = memory_fn<MemVmmSetAccess>("v200_memory_vmm_set_access");
     InternalCallScope bypass;
-    return fn ? fn(ptr, size, desc, count) : CUDA_ERROR_NOT_SUPPORTED;
+    return fn ? fn(ptr, size, native_desc.data(), count) : CUDA_ERROR_NOT_SUPPORTED;
 }
 
 extern "C" CUresult CUDAAPI cuMemUnmap(CUdeviceptr ptr, size_t size) {

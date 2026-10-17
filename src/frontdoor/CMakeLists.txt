@@ -100,5 +100,49 @@ if(NOT TARGET v200_frontdoor)
     add_test(NAME v200_rtld_local_native_dispatch
       COMMAND v200_rtld_local_closure_test
         "$<TARGET_FILE:v200_fake_cuda_driver>" "$<TARGET_FILE:v200_fake_cudart>")
+
+    add_library(v200_fake_lazy_cuda_driver SHARED
+      "${V200_FRONTDOOR_ROOT}/tests/abi/fake_cuda_library.c")
+    target_compile_definitions(v200_fake_lazy_cuda_driver PRIVATE
+      V200_FAKE_DRIVER=1 V200_FAKE_LAZY_DRIVER=1)
+    target_include_directories(v200_fake_lazy_cuda_driver PRIVATE
+      "${V200_CUDA_INCLUDE_DIR}" "${V200_CUDART_INCLUDE_DIR}")
+    set_target_properties(v200_fake_lazy_cuda_driver PROPERTIES
+      OUTPUT_NAME cuda VERSION 1.0 SOVERSION 1
+      LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lazy-driver")
+
+    add_library(v200_fake_lazy_cudart SHARED
+      "${V200_FRONTDOOR_ROOT}/tests/abi/fake_cuda_library.c")
+    target_compile_definitions(v200_fake_lazy_cudart PRIVATE V200_FAKE_LAZY_RUNTIME=1)
+    target_include_directories(v200_fake_lazy_cudart PRIVATE
+      "${V200_CUDA_INCLUDE_DIR}" "${V200_CUDART_INCLUDE_DIR}")
+    target_link_libraries(v200_fake_lazy_cudart PRIVATE ${CMAKE_DL_LIBS})
+    set_target_properties(v200_fake_lazy_cudart PROPERTIES
+      OUTPUT_NAME cudart VERSION 12.0 SOVERSION 12
+      LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lazy-runtime")
+
+    add_executable(v200_lazy_driver_discovery_test
+      "${V200_FRONTDOOR_ROOT}/tests/abi/lazy_driver_discovery.cpp")
+    target_include_directories(v200_lazy_driver_discovery_test PRIVATE
+      "${V200_FRONTDOOR_ROOT}/include" "${V200_CUDA_INCLUDE_DIR}"
+      "${V200_CUDART_INCLUDE_DIR}")
+    target_link_libraries(v200_lazy_driver_discovery_test PRIVATE
+      v200_frontdoor ${CMAKE_DL_LIBS})
+    target_compile_features(v200_lazy_driver_discovery_test PRIVATE cxx_std_17)
+    add_test(NAME v200_lazy_runtime_driver_discovery
+      COMMAND v200_lazy_driver_discovery_test
+        "$<TARGET_FILE:v200_fake_lazy_cudart>"
+        "$<TARGET_FILE:v200_fake_lazy_cuda_driver>")
+
+    add_executable(v200_vmm_location_test
+      "${V200_FRONTDOOR_ROOT}/tests/abi/vmm_location_test.cpp")
+    target_include_directories(v200_vmm_location_test PRIVATE .)
+    target_compile_features(v200_vmm_location_test PRIVATE cxx_std_17)
+    if(TARGET v200::build_options)
+      target_link_libraries(v200_vmm_location_test PRIVATE v200::build_options)
+    else()
+      target_compile_options(v200_vmm_location_test PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+    add_test(NAME v200_vmm_device_location_mapping COMMAND v200_vmm_location_test)
   endif()
 endif()

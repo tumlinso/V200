@@ -1,0 +1,6 @@
+COPY_OK src_device=0 dst_device=1 bytes=65536 mode=source_stream_event_wait
+COPY_OK src_device=1 dst_device=0 bytes=65536 mode=source_stream_event_wait
+COPY_OK src_device=0 dst_device=1 bytes=65536 mode=destination_stream
+COPY_OK src_device=1 dst_device=0 bytes=65536 mode=destination_stream
+COPY_OK src_device=0 dst_device=1 bytes=65536 mode=default_stream
+COPY_OK src_device=1 dst_device=0 bytes=65536 mode=default_stream

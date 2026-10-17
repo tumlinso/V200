@@ -1,0 +1,70 @@
+Build step: ["cmake", "-S", "/home/tumlinson/V200", "-B", "/home/tumlinson/V200/build-multipair", "-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9", "-DV200_CUDA_TOOLKIT_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9", "-DCMAKE_CXX_COMPILER=/usr/bin/g++", "-DBUILD_TESTING=ON", "-DV200_BUILD_BOOTSTRAP_EXAMPLES=OFF"]
+-- Configuring done (1.2s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/tumlinson/V200/build-multipair
+Build step: ["cmake", "--build", "/home/tumlinson/V200/build-multipair", "--parallel", "2", "--target", "v200_frontdoor", "v200_pair_init", "v200_operators", "v200_multi_pair_copy_probe", "v200_multi_pair_copy_contract"]
+[ 25%] Building CXX object src/frontdoor/CMakeFiles/v200_frontdoor.dir/cuda_wrappers.cpp.o
+/home/tumlinson/V200/src/frontdoor/cuda_wrappers.cpp:1211:5: warning: ‘int {anonymous}::map_runtime_device(int, int&)’ defined but not used [-Wunused-function]
+ 1211 | int map_runtime_device(int logical, int &physical) {
+      |     ^~~~~~~~~~~~~~~~~~
+/home/tumlinson/V200/src/frontdoor/cuda_wrappers.cpp:342:5: warning: ‘int {anonymous}::logical_ordinal_for_physical(int)’ defined but not used [-Wunused-function]
+  342 | int logical_ordinal_for_physical(int physical) {
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/tumlinson/V200/src/frontdoor/cuda_wrappers.cpp:337:6: warning: ‘bool {anonymous}::map_device_id(CUdevice, CUdevice&)’ defined but not used [-Wunused-function]
+  337 | bool map_device_id(CUdevice logical, CUdevice &physical) {
+      |      ^~~~~~~~~~~~~
+/home/tumlinson/V200/src/frontdoor/cuda_wrappers.cpp:315:10: warning: ‘CUresult {anonymous}::device_map_error()’ defined but not used [-Wunused-function]
+  315 | CUresult device_map_error() {
+      |          ^~~~~~~~~~~~~~~~
+[ 50%] Linking CXX shared library libv200_frontdoor.so
+[100%] Built target v200_frontdoor
+[ 25%] Built target v200_execution
+[ 58%] Built target v200_frontdoor
+[ 83%] Built target v200_memory
+[ 91%] Linking CXX shared library libv200_pair_init.so
+[100%] Built target v200_pair_init
+[ 16%] Built target v200_execution
+[ 38%] Built target v200_frontdoor
+[ 55%] Built target v200_memory
+[ 66%] Built target v200_pair_init
+[ 72%] Linking CXX shared library libv200_operators.so
+[100%] Built target v200_operators
+[ 50%] Building CXX object tests/multi_pair/CMakeFiles/v200_multi_pair_copy_probe.dir/copy_probe.cpp.o
+[100%] Linking CXX executable v200_multi_pair_copy_probe
+[100%] Built target v200_multi_pair_copy_probe
+[100%] Built target v200_multi_pair_copy_contract
+Build step: ["ctest", "--test-dir", "/home/tumlinson/V200/build-multipair", "--output-on-failure", "-R", "^v200_multi_pair_(copy_contract|host)$"]
+Internal ctest changing into directory: /home/tumlinson/V200/build-multipair
+Test project /home/tumlinson/V200/build-multipair
+    Start 12: v200_multi_pair_copy_contract
+1/2 Test #12: v200_multi_pair_copy_contract ....   Passed    0.07 sec
+    Start 13: v200_multi_pair_host
+2/2 Test #13: v200_multi_pair_host .............   Passed    0.15 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.22 sec
+V200 multi-pair finite workload: native four-GPU control, then two logical V200 devices
+Ordered physical UUIDs: GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206,GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505,GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a
+Pair qualification receipts: 8426eab5-278d-4687-ab7d-f5ec937e46ec,1c97d504-468e-434c-81ea-112a4bb83e74
+llama device arguments: {"native_four": ["--device", "CUDA0,CUDA1,CUDA2,CUDA3", "--split-mode", "layer", "--tensor-split", "1,1,1,1"], "v200_two": ["--device", "CUDA0,CUDA1", "--split-mode", "layer", "--tensor-split", "1,1"]}
+Pinned model: {"path": "/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf", "sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad", "tensor_bytes": 18550716425}
+Owner budgets per V200 pair: [4096, 12288] MiB; maximum owner cap: 12288 MiB
+Static descriptor preflight: {"basis": "GGUF tensor descriptors, f16 KV formula, equal logical tensor split, and a per-owner workspace reserve; live NVML headroom is checked before each process.", "kv_cache_bytes": 805306368, "native_four_owner_estimated_bytes_each": 6020320259, "resident_tensor_bytes": 18550716425, "status": "PASS_STATIC_ESTIMATE", "v200_pair_estimated_bytes_each": 12040640517, "v200_pair_estimated_owner_bytes": [4294967296, 7745673221], "v200_pair_owner_budget_bytes": [4294967296, 12884901888]}
+Build directory/toolkit: /home/tumlinson/V200/build-multipair / /opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9
+Finite controller limit: 300 seconds, 4 GPUs, 4 CPU threads
+Controller spec: /home/tumlinson/V200/evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json
+Controller spec preview: {"argv": ["/usr/bin/python3", "/home/tumlinson/V200/scripts/v200/bounded_runner.py", "--project-root", "/home/tumlinson/V200", "--seconds", "300", "--allocation-cap-mib", "12288", "--evidence-dir", "/home/tumlinson/V200/evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3", "--bundle", "B06", "--expected-uuid", "GPU-21131915-1488-23af-38dd-1743ae1f5cc8", "--expected-uuid", "GPU-d745da9c-7649-8334-41f1-483afa6f3206", "--expected-uuid", "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505", "--expected-uuid", "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a", "--", "/usr/bin/env", "-u", "V200_MODE", "-u", "V200_DEVICE_UUIDS", "-u", "V200_B01_EVIDENCE_ID", "-u", "V200_B01_EVIDENCE_IDS", "-u", "V200_OWNER0_BUDGET_MIB", "-u", "V200_OWNER1_BUDGET_MIB", "-u", "V200_PAIR_COMPUTE", "-u", "V200_PROFILE_LOG", "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206,GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505,GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a", "V200_B01_EVIDENCE_IDS=8426eab5-278d-4687-ab7d-f5ec937e46ec,1c97d504-468e-434c-81ea-112a4bb83e74", "V200_OWNER0_BUDGET_MIB=4096", "V200_OWNER1_BUDGET_MIB=12288", "/usr/bin/python3", "/home/tumlinson/V200/tests/multi_pair/run_multi_consumer.py", "--fixture", "/home/tumlinson/V200/benchmarks/fixtures/llama-server-multipair.json", "--profile", "/home/tumlinson/V200/docs/v200/multipair-profile.json", "--output-dir", "/home/tumlinson/V200/evidence/B06/multipair-runs/multipair-20261017T150959Z-75b105fcd3/consumer", "--copy-probe", "/home/tumlinson/V200/build-multipair/tests/multi_pair/v200_multi_pair_copy_probe", "--preload-library", "/home/tumlinson/V200/build-multipair/src/frontdoor/libv200_frontdoor.so", "--preload-library", "/home/tumlinson/V200/build-multipair/src/integration/libv200_pair_init.so", "--preload-library", "/home/tumlinson/V200/build-multipair/src/operators/libv200_operators.so", "--execute"], "binary_paths": ["build-multipair/src/frontdoor/libv200_frontdoor.so", "build-multipair/src/integration/libv200_pair_init.so", "build-multipair/src/operators/libv200_operators.so", "build-multipair/tests/multi_pair/v200_multi_pair_copy_probe"], "command_cwd": "/home/tumlinson/V200", "paths": ["scripts/v200/serve_multi.py", "scripts/v200/bounded_runner.py", "tests/multi_pair/run_multi_consumer.py", "tests/multi_pair/copy_probe.cpp", "tests/multi_pair/copy_contract.cpp", "tests/multi_pair/test_multi_pair.py", "tests/multi_pair/CMakeLists.txt", "benchmarks/fixtures/llama-server-multipair.json", "docs/v200/multipair-profile.json", "docs/v200/consumer-profile.json", "src/frontdoor/cuda_wrappers.cpp", "src/frontdoor/runtime_state.cpp", "src/integration/runtime_init.cpp", "src/memory/manager.cpp", "src/multi_pair/copy.cpp", "src/operators/launch.cpp", "src/operators/pair_runtime.cpp", "include/v200/multi_pair/copy.hpp", "include/v200/core/runtime_init.hpp", "include/v200/memory/api.h", "planning/v200-bootstrap/tools/run_bounded.py", "CMakeLists.txt"], "project_root": "/home/tumlinson/V200", "recipe": "baseline", "resources": {"cpu_threads": 4, "gpu_uuids": ["GPU-21131915-1488-23af-38dd-1743ae1f5cc8", "GPU-d745da9c-7649-8334-41f1-483afa6f3206", "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505", "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a"], "gpus": 4, "isolate_nvlink_domain": true, "isolate_pcie_root": false, "ram_bytes": 34359738368}, "schema_version": 1, "timeout": 315, "toolchain": {"require_sanitizer": false, "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9"}}
+Admitting through the configured CUDA controller; no direct llama-server launch follows.
+Executing: ["/home/tumlinson/project-control/scripts/pc-dev", "python", "/home/tumlinson/V200/build-support/run_controller.py", "/home/tumlinson/.agents/skills/cuda/scripts/cuda_controller.py", "run", "--spec", "/home/tumlinson/V200/evidence/B06/multipair-launch-specs/multipair-20261017T150959Z-75b105fcd3.controller.json", "--json"]
+{
+  "classification": "decision-result",
+  "evidence_id": "bdf88682-63b9-4788-8943-b411c03ee1f1",
+  "lease_receipt": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/fe9cf2bb-c89c-4de5-abbc-122e3fd20f16/lease.json",
+  "message": "No action-worthy result; evidence stored.",
+  "ok": true,
+  "returncode": 0,
+  "status": "succeeded",
+  "stderr_path": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/fe9cf2bb-c89c-4de5-abbc-122e3fd20f16/foreground.stderr.txt",
+  "stdout_path": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/fe9cf2bb-c89c-4de5-abbc-122e3fd20f16/foreground.stdout.txt"
+}

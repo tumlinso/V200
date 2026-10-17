@@ -1,30 +1,25 @@
 # V200
 
-V200's first restricted preview runs the existing llama-server through a process-scoped CUDA facade presenting the qualified NVLink V100 pair as one logical device.
+V200 is an experimental, application-scoped CUDA facade for NVLink-connected V100 pairs. The unchanged pinned llama-server can now load an **18.55 GB GPU tensor payload through one logical device**, execute selected Q4_K/Q6_K expert operations on the peer V100, and capture/replay qualified CUDA graphs. Four physical V100s also enumerate as **two logical devices in one process**, with real model residency on all four owners and correct inference.
 
-Start the foreground server on this host:
-
-```sh
-python3 /home/tumlinson/V200/scripts/v200/serve.py --execute
-```
-
-It serves `http://127.0.0.1:8080` for 30 minutes after its startup check. Use another terminal for clients; `GET /health` reports readiness. Omit `--execute` to inspect the plan. `--duration-seconds` and `--port` configure the finite session; Ctrl-C requests cleanup. The launcher uses GPU-controller admission and the HPC SDK CUDA **12.9** toolkit.
-
-The default foreground service remains a restricted correctness preview: **28 GPU layers, a 2,048-token context, CUDA graphs disabled, and one compute anchor**. Native and V200 completion checks returned the expected answer; a client also passed the live server's health and chat endpoints.
-
-V200-07 now has a bounded full-resident capacity workload. It loads the pinned Qwen3-Coder-30B Q4_K_M model with all 49 llama layers and its input embedding on one logical `CUDA0`. The 18.55 GB model tensor payload was backed across both 16 GiB V100s; the deterministic completion returned `2`, and allocation accounting returned to zero. To run the matched native-pair and V200 capacity cases through the CUDA controller:
+Run the full-resident single-V200 server on this host:
 
 ```sh
-python3 /home/tumlinson/V200/scripts/v200/serve.py --mode preview --workload resident_capacity --execute
+python3 scripts/v200/serve.py --mode serve --workload resident_capacity --pair-compute --extended-expert-compute --cuda-graphs --duration-seconds 300 --execute
 ```
 
-V200-08 also executes eligible Q4_K matrix-vector operations on the physical owner of their weights: the full-resident consumer completed with 68 anchor-local and 174 peer-owner calls. Owner-local fused expert computation also passed: 71 expert calls ran on the peer, with the first 6,144 outputs bitwise equal to the original kernel. Managed allocation accounting returned to zero. CUDA graphs are available with `--cuda-graphs`: the full-resident consumer captured and replayed 34 peer-context expert nodes correctly. Graphs stay off by default; single-matrix splitting is CPU-checked only, and speedup is not established. See [operator evidence](docs/v200/operator-profile.json), [capacity](docs/v200/capacity.md), and [consumer usage](docs/v200/first-consumer.md). No model download or llama.cpp source patch is required.
-
-Run a finite full-resident server with pair compute (omit `--pair-compute` for the capacity-only fallback):
+Run the two-V200 server (CUDA graphs off for this qualified profile):
 
 ```sh
-python3 scripts/v200/serve.py --mode serve --workload resident_capacity --pair-compute --duration-seconds 300 --execute
+python3 scripts/v200/serve_multi.py --mode serve --duration-seconds 300 --execute
 ```
 
+Both bind to `http://127.0.0.1:8080`; use `/health` to check readiness. They stay in the foreground, use CUDA-controller admission, and release their owned processes and resources when the finite session ends. Omit `--execute` to inspect a plan; `--port` changes the port. Builds use the HPC SDK CUDA **12.9** toolkit. No model download, llama.cpp source patch, system driver change or background daemon is required.
+
+The first implementation is deliberately restricted. Peer compute matches exact kernel families in the pinned llama CUDA backend; it is not arbitrary-kernel distribution or universal CUDA compatibility. Inter-pair copies currently use blocking pinned-host staging. A pair uses qualified HBM budgets rather than advertising all nominal memory as available. The original restricted preview and native CUDA remain reversible fallbacks.
+
+The earlier matched comparison measured 63.5 tokens/s for V200 Q4 pair compute versus 54.2 for V200 anchor compute and 124.0 for native two-GPU layer splitting. This is real capacity and peer execution, with substantial performance work remaining; the newer extended expert path is measured separately. See [performance](docs/v200/performance.md), [two-device behavior](docs/v200/two-device.md), [capacity](docs/v200/capacity.md), and [consumer details](docs/v200/first-consumer.md).
+
+The original restricted preview remains available with `python3 scripts/v200/serve.py --execute` (28 GPU layers, 2,048-token context, graphs off). [Deployment and diagnostics](docs/v200/deployment.md) describe the supported profiles and rollback.
 
 Git remote: <https://github.com/tumlinso/V200.git>.

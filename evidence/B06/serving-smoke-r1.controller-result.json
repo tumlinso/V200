@@ -1,0 +1,11 @@
+{
+  "classification": "decision-result",
+  "evidence_id": "d34961d6-ac1d-4998-81e8-24195639c9f6",
+  "lease_receipt": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/0fe9e310-3512-4c78-bd2d-bd93c54823da/lease.json",
+  "message": "No action-worthy result; evidence stored.",
+  "ok": true,
+  "returncode": 0,
+  "status": "succeeded",
+  "stderr_path": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/0fe9e310-3512-4c78-bd2d-bd93c54823da/foreground.stderr.txt",
+  "stdout_path": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/0fe9e310-3512-4c78-bd2d-bd93c54823da/foreground.stdout.txt"
+}

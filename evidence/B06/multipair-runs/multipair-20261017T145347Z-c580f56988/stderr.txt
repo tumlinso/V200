@@ -1,0 +1,1 @@
+multi-pair run refused: MultiPairError: CUDA_VISIBLE_DEVICES must be the exact controller-admitted ordered four-UUID list
