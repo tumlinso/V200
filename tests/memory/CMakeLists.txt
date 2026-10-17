@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.18)
+project(V200MemoryTests LANGUAGES CXX)
+include(CTest)
+find_package(CUDAToolkit 12 REQUIRED)
+add_subdirectory("../../src/memory" "memory-library")
