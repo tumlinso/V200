@@ -63,7 +63,7 @@ two-device service above keeps graphs disabled.
 
 The B07 comparison measured median decode at 64.095 tokens/s for the
 single-pair extended V200 path and 124.951 tokens/s for the matched native
-four-GPU control. These are three-request samples for one prompt and model;
+two-GPU control. These are three-request samples for one prompt and model;
 V200 was slower in this case and is not currently a speed replacement. See
 `docs/v200/performance.md` and `evidence/B07/extended-r1/` for sample details.
 

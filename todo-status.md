@@ -3,7 +3,7 @@
 <!-- todo-orchestrator:v2-managed:start -->
 # Todo Status v2 Projection
 
-Project revision: `130`
+Project revision: `131`
 
 ## Workstreams
 - `V200-Q01` | status: done | execution: closed | next: Run the package existing B01 pair-memory probe on the approved V100 pair as soon as V200-01 is complete; record actual feasibility before consumer implementation concludes.
@@ -20,6 +20,6 @@ Project revision: `130`
 - `V200-11` | status: done | execution: closed | next: Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-12` | status: done | execution: closed | next: Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-13` | status: done | execution: closed | next: Deliver an opt-in application-scoped deployment with accurate identity, compatibility and rollback information. Read planning/v200-bootstrap/tasks/V200-13.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
-- `V200-14` | status: planned | execution: ready | next: Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-14` | status: in_progress | execution: claimed | next: Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-I01` | status: done | execution: closed | next: Wire accepted pair memory, completion and frontdoor ABI into a lazy native-context initializer and controller-mediated opt-in llama-server launch surface. Finish this setup while frontdoor closure completes; real consumer acceptance remains V200-06.
 <!-- todo-orchestrator:v2-managed:end -->

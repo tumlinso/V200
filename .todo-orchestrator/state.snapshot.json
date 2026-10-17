@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T15:24:53Z",
+  "generated_at": "2026-10-17T15:25:03Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 130,
+  "project_revision": 131,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 130,
+    "project_revision": 131,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -1498,6 +1498,16 @@
         "revision": 130,
         "seq": 130,
         "timestamp": "2026-10-17T15:24:53Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-DELIVERY-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-DELIVERY-1-MAIN\", \"run_id\": \"V200-DELIVERY-1\", \"status\": \"claimed\", \"task_id\": \"V200-14\"}",
+        "revision": 131,
+        "seq": 131,
+        "timestamp": "2026-10-17T15:25:03Z"
       }
     ],
     "evidence": [
@@ -4295,12 +4305,12 @@
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 123,
-        "status": "planned",
+        "revision": 131,
+        "status": "in_progress",
         "tags_json": "[]",
         "title": "Integrate and hand off the accepted V200 release",
-        "updated_at": "2026-10-17T15:17:16Z",
-        "version": 3
+        "updated_at": "2026-10-17T15:25:03Z",
+        "version": 4
       },
       {
         "attention_reason": null,
@@ -5340,13 +5350,13 @@
         "task_id": "V200-13"
       },
       {
-        "activated_at": null,
+        "activated_at": "2026-10-17T15:25:03Z",
         "completed_at": null,
         "enqueued_at": "2026-10-17T15:16:35Z",
         "lane_id": "V200-DELIVERY-1-MAIN",
         "position": 1,
-        "revision": 123,
-        "state": "queued",
+        "revision": 131,
+        "state": "active",
         "task_id": "V200-14"
       },
       {
@@ -5618,11 +5628,11 @@
         "created_at": "2026-10-17T15:16:35Z",
         "id": "V200-DELIVERY-1-MAIN",
         "parent_lane_id": null,
-        "revision": 130,
+        "revision": 131,
         "role": "integrator",
         "run_id": "V200-DELIVERY-1",
-        "state": "ready",
-        "updated_at": "2026-10-17T15:24:53Z",
+        "state": "active",
+        "updated_at": "2026-10-17T15:25:03Z",
         "workspace_mode": "exclusive"
       },
       {
