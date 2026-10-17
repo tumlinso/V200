@@ -1,0 +1,73 @@
+{
+  "schema": "v200-abi-profile/v1",
+  "consumer": {
+    "name": "llama-server",
+    "source_commit": "f280b26983ad0fdb705a0d9ebf0503e76f2899b0",
+    "cuda_backend": "libggml-cuda.so.0.21.0",
+    "binary_sha256": "df90ec2ea474f130cc253a6c0776ff0e2d7fdd4d821bcc6be4bcc940b59767a9",
+    "evidence": "ELF dynamic import inventory and pinned source inspection only; no runtime call trace or GPU execution"
+  },
+  "source_of_truth": "src/frontdoor/abi_profile.cpp",
+  "presentation": {
+    "native": "Transparent native forwarding.",
+    "anchor": "Expose one selected CUDA 7.0 device. Device properties and memory queries report that physical anchor's native values; no pair capacity or SM count is synthesized.",
+    "pair": "Expose one logical CUDA device backed by one compute anchor. Direct VMM allocation gateways may use the configured peer-backed canonical VA. Generic native kernels are forwarded only to the registered anchor and retain all managed allocations through a completion prefix; no kernel splitting or peer compute claim is made."
+  },
+  "interception": {
+    "driver_resolver": "cuGetProcAddress_v2 returns frontdoor function pointers for qualified wrapped entries while preserving driver version and legacy/PTDS selection. Unknown Driver entries fail closed in pair mode.",
+    "runtime_resolver": "cudaGetDriverEntryPoint and cudaGetDriverEntryPointByVersion apply the same wrapper mapping to successfully resolved qualified Driver entries.",
+    "native_lookup": "Wrappers try RTLD_NEXT, then resolve from the exact already-loaded libcudart/libcuda ELF object via its load path and RTLD_NOLOAD. Resolved native handles remain pinned for process lifetime.",
+    "atomic_async": "Forwarded async transfers, opaque kernel launches, stream waits and event records run through v200_execution_forward_native. Pair-mode forwards hold a memory submission lease until the resulting stream prefix is retained."
+  },
+  "observed_driver_imports": {
+    "wrapped": [
+      "cuDeviceGet", "cuDeviceGetCount", "cuMemAddressReserve", "cuMemAddressFree",
+      "cuMemCreate", "cuMemGetAllocationGranularity", "cuMemMap", "cuMemRelease",
+      "cuMemSetAccess", "cuMemUnmap"
+    ],
+    "qualified_entrypoints_additionally_wrapped": [
+      "cuMemcpyHtoDAsync_v2", "cuMemcpyDtoHAsync_v2", "cuMemcpyDtoDAsync_v2",
+      "cuLaunchKernel", "cuStreamSynchronize", "cuStreamWaitEvent"
+    ],
+    "native_anchor_passthrough": [
+      "cuDeviceGetAttribute", "cuDeviceGetUuid_v2", "cuGetErrorString"
+    ]
+  },
+  "observed_runtime_imports": {
+    "wrapped": [
+      "cudaDeviceCanAccessPeer", "cudaDeviceEnablePeerAccess", "cudaDeviceGetAttribute",
+      "cudaDeviceGetPCIBusId", "cudaDeviceSynchronize", "cudaGetDevice",
+      "cudaGetDeviceCount", "cudaGetDeviceProperties_v2", "cudaSetDevice",
+      "cudaMalloc", "cudaFree", "cudaMemGetInfo", "cudaMemset",
+      "cudaMemcpy2DAsync", "cudaMemcpyAsync", "cudaMemcpyPeerAsync", "cudaMemsetAsync",
+      "cudaStreamCreateWithFlags", "cudaStreamDestroy", "cudaStreamSynchronize",
+      "cudaStreamWaitEvent", "cudaEventRecord", "cudaEventSynchronize",
+      "cudaLaunchKernel", "cudaLaunchKernelExC", "cudaLaunchCooperativeKernel"
+    ],
+    "unsupported_in_pair_mode": [
+      "cudaMallocManaged", "cudaGraphInstantiate", "cudaGraphLaunch",
+      "cudaGraphExecUpdate", "cudaStreamBeginCapture", "cudaStreamEndCapture",
+      "cudaStreamIsCapturing"
+    ],
+    "anchor_native_passthrough": [
+      "cudaEventCreateWithFlags", "cudaEventDestroy", "cudaGraphDestroy",
+      "cudaGraphExecDestroy", "cudaHostAlloc", "cudaMallocHost", "cudaFreeHost",
+      "cudaHostRegister", "cudaHostUnregister", "cudaHostGetDevicePointer",
+      "cudaFuncGetAttributes", "cudaFuncSetAttribute",
+      "cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags", "cudaSetDeviceFlags",
+      "cudaGetErrorString", "cudaGetLastError", "cudaPeekAtLastError"
+    ]
+  },
+  "unqualified_native_libraries": [
+    "cublasCreate_v2", "cublasDestroy_v2", "cublasGemmEx", "cublasGemmBatchedEx",
+    "cublasGemmStridedBatchedEx", "cublasSgemm_v2", "cublasSgemmBatched",
+    "cublasSgemmStridedBatched", "cublasStrsmBatched", "cublasSetMathMode",
+    "cublasSetStream_v2", "cublasSetWorkspace_v2", "cublasGetStatusString",
+    "nccl*"
+  ],
+  "semantic_limits": [
+    "Pair-mode graph capture, instantiate, update and replay are not qualified and return unsupported where intercepted.",
+    "No split arbitrary kernel, cross-owner global/atomic coordination, module-global routing, or NCCL collective is claimed.",
+    "The profile is a static import inventory; runtime call frequency and selected llama execution paths remain unproven until controller-backed evidence is recorded."
+  ]
+}
