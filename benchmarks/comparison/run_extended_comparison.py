@@ -32,6 +32,7 @@ FIXTURE_PATH = REPO_ROOT / "benchmarks/fixtures/llama-server-v200.json"
 PROFILE_PATH = REPO_ROOT / "docs/v200/consumer-profile.json"
 MULTIPAIR_PROFILE_PATH = REPO_ROOT / "docs/v200/multipair-profile.json"
 BUILD_DIR = REPO_ROOT / "build-multipair"
+ALLOWED_BUILD_DIRS = (BUILD_DIR, REPO_ROOT / "build-perf")
 HARNESS_PATH = REPO_ROOT / "tests/consumer/run_consumer.py"
 HELPER_PATH = REPO_ROOT / "benchmarks/comparison/run_pair_comparison.py"
 
@@ -49,6 +50,7 @@ MEASURED_REQUESTS = 3
 SERVICE_SECONDS = 15
 MAX_BUNDLE_SECONDS = 90
 EXTENDED_ENV = "V200_EXTENDED_EXPERT_COMPUTE"
+PREFER_LOCAL_HBM_ENV = "V200_PREFER_LOCAL_HBM"
 
 CASES = (
     {
@@ -110,20 +112,50 @@ def _artifact(role: str, path: Path, expected_sha256: str | None = None) -> dict
     }
 
 
-def capture_current_inputs() -> dict[str, Any]:
+def _selected_build_dir(value: Path | str = BUILD_DIR) -> Path:
+    path = Path(value)
+    if not path.is_absolute():
+        path = REPO_ROOT / path
+    resolved = path.resolve()
+    allowed = tuple(item.resolve() for item in ALLOWED_BUILD_DIRS)
+    if resolved not in allowed:
+        raise ExtendedComparisonError(
+            "V200 build directory must be the frozen build-multipair or candidate build-perf"
+        )
+    return resolved
+
+
+def _selected_dso_paths(build_dir: Path) -> dict[str, Path]:
+    return {
+        "v200_frontdoor": build_dir / "src/frontdoor/libv200_frontdoor.so",
+        "v200_pair_initializer": build_dir / "src/integration/libv200_pair_init.so",
+        "v200_operators": build_dir / "src/operators/libv200_operators.so",
+    }
+
+
+def capture_current_inputs(v200_build_dir: Path | str = BUILD_DIR) -> dict[str, Any]:
     """Hash pinned consumer artifacts and capture, without qualifying, current DSOs."""
     consumer = pair.consumer
     fixture, profile = consumer.load_documents(FIXTURE_PATH, PROFILE_PATH)
+    build_dir = _selected_build_dir(v200_build_dir)
     multipair_profile = _read_object(MULTIPAIR_PROFILE_PATH)
     if multipair_profile.get("schema") != "v200-multi-pair-profile/v1":
         raise ExtendedComparisonError("unsupported multipair build profile")
-    configured_dsos = [str((REPO_ROOT / item).resolve())
-                       for item in multipair_profile.get("runtime_libraries", [])]
-    expected_dsos = [str(path.resolve()) for path in DSO_PATHS.values()]
-    if configured_dsos != expected_dsos:
+    profile_paths = [Path(item) for item in multipair_profile.get("runtime_libraries", [])]
+    profile_relative: list[Path] = []
+    try:
+        profile_relative = [path.relative_to(BUILD_DIR.relative_to(REPO_ROOT))
+                            for path in profile_paths]
+    except ValueError as exc:
         raise ExtendedComparisonError(
-            f"multipair profile DSO order/paths differ from this runner: {configured_dsos}"
+            "multipair profile runtime library paths no longer match the source profile"
+        ) from exc
+    expected_relative = [path.relative_to(BUILD_DIR) for path in DSO_PATHS.values()]
+    if profile_relative != expected_relative:
+        raise ExtendedComparisonError(
+            f"multipair profile DSO order/paths differ from this runner: {profile_paths}"
         )
+    dso_paths = _selected_dso_paths(build_dir)
 
     artifacts: list[dict[str, Any]] = []
     binary = profile["binary"]
@@ -144,9 +176,9 @@ def capture_current_inputs() -> dict[str, Any]:
         _artifact("consumer_profile", PROFILE_PATH),
         _artifact("multipair_build_profile", MULTIPAIR_PROFILE_PATH),
     ])
-    for role, path in DSO_PATHS.items():
+    for role, path in dso_paths.items():
         artifacts.append(_artifact(role, path))
-    build_cache = _artifact("multipair_cmake_cache", BUILD_CACHE_PATH)
+    build_cache = _artifact("selected_v200_cmake_cache", build_dir / "CMakeCache.txt")
     artifacts.append(build_cache)
 
     model = fixture["model"]
@@ -203,7 +235,8 @@ def capture_current_inputs() -> dict[str, Any]:
             "workload": WORKLOAD,
         },
         "build": {
-            "directory": str(BUILD_DIR),
+            "directory": str(build_dir),
+            "variant": build_dir.name,
             "toolkit_root": multipair_profile.get("build", {}).get("cuda_toolkit_root"),
             "cmake_cache_sha256": build_cache["sha256"],
         },
@@ -212,8 +245,9 @@ def capture_current_inputs() -> dict[str, Any]:
     }
 
 
-def _assert_inputs_unchanged(initial: dict[str, Any]) -> None:
-    current = capture_current_inputs()
+def _assert_inputs_unchanged(initial: dict[str, Any],
+                             v200_build_dir: Path | str = BUILD_DIR) -> None:
+    current = capture_current_inputs(v200_build_dir)
     prior_hashes = [(row["role"], row["sha256"]) for row in initial["artifacts"]]
     current_hashes = [(row["role"], row["sha256"]) for row in current["artifacts"]]
     if current_hashes != prior_hashes:
@@ -383,8 +417,27 @@ def _extended_environment(enabled: bool) -> Iterator[None]:
             os.environ[EXTENDED_ENV] = previous
 
 
-def run_comparison(output_dir: Path) -> dict[str, Any]:
-    provenance = capture_current_inputs()
+@contextlib.contextmanager
+def _local_hbm_environment(preference: bool | None) -> Iterator[None]:
+    previous = os.environ.get(PREFER_LOCAL_HBM_ENV)
+    if preference is not None:
+        os.environ[PREFER_LOCAL_HBM_ENV] = "1" if preference else "0"
+    try:
+        yield
+    finally:
+        if previous is None:
+            os.environ.pop(PREFER_LOCAL_HBM_ENV, None)
+        else:
+            os.environ[PREFER_LOCAL_HBM_ENV] = previous
+
+
+def run_comparison(output_dir: Path, *, v200_build_dir: Path | str = BUILD_DIR,
+                   case_definitions: tuple[dict[str, Any], ...] = CASES,
+                   repetitions: int = MEASURED_REQUESTS,
+                   service_seconds: int = SERVICE_SECONDS,
+                   max_bundle_seconds: int = MAX_BUNDLE_SECONDS,
+                   prefer_local_hbm: bool | None = None) -> dict[str, Any]:
+    provenance = capture_current_inputs(v200_build_dir)
     if not provenance["live_run_eligible"]:
         raise ExtendedComparisonError(
             "live comparison requires a committed, clean tracked V200 checkout and the pinned clean llama source"
@@ -395,22 +448,23 @@ def run_comparison(output_dir: Path) -> dict[str, Any]:
         raise ExtendedComparisonError(f"output directory must be empty: {output_dir}")
 
     started = time.monotonic()
-    deadline = started + MAX_BUNDLE_SECONDS
+    deadline = started + max_bundle_seconds
     cases: list[dict[str, Any]] = []
     failure: str | None = None
     reference: str | None = None
     helper_manifest = _helper_manifest(provenance)
-    for definition in CASES:
-        _assert_inputs_unchanged(provenance)
-        if deadline - time.monotonic() < SERVICE_SECONDS + 10:
+    for definition in case_definitions:
+        _assert_inputs_unchanged(provenance, v200_build_dir)
+        if deadline - time.monotonic() < service_seconds + 10:
             failure = "insufficient remaining bundle budget to start the next server"
             break
         case_deadline = deadline
         with _extended_environment(bool(definition["extended_expert_compute"])):
-            record = pair._serve_case(
-                dict(definition), helper_manifest, output_dir,
-                MEASURED_REQUESTS, SERVICE_SECONDS, case_deadline, reference,
-            )
+            with _local_hbm_environment(prefer_local_hbm):
+                record = pair._serve_case(
+                    dict(definition), helper_manifest, output_dir,
+                    repetitions, service_seconds, case_deadline, reference,
+                )
         record["extended_expert_compute_enabled"] = bool(definition["extended_expert_compute"])
         if definition["id"] == "native_pair" and record.get("requests"):
             try:
@@ -426,18 +480,32 @@ def run_comparison(output_dir: Path) -> dict[str, Any]:
             failure = failure or record.get("failure") or f"{definition['id']} failed"
             break
         if time.monotonic() > deadline:
-            failure = "comparison exceeded its 90-second bundle ceiling"
+            failure = f"comparison exceeded its {max_bundle_seconds}-second bundle ceiling"
             break
 
-    reference, divergences = compare_case_outputs(cases)
+    paired_comparison = {case["id"] for case in case_definitions} >= {
+        "native_pair", "v200_extended"}
+    if paired_comparison:
+        reference, divergences = compare_case_outputs(cases)
+    else:
+        reference, divergences = None, []
+        for record in cases:
+            responses = [request.get("response", {}).get("content")
+                         for request in record.get("requests", [])]
+            stable = bool(responses) and all(
+                isinstance(content, str) and content == responses[0]
+                for content in responses)
+            record["within_case_response_stability"] = "MATCH" if stable else "DIVERGED"
+            if not stable:
+                failure = failure or f"{record['id']} response changed between warmup and measurement"
     if divergences:
         failure = failure or "one or more raw response outputs differ from the native-pair reference"
-    if reference is None:
+    if paired_comparison and reference is None:
         failure = failure or "native-pair case produced no output reference"
 
-    _assert_inputs_unchanged(provenance)
+    _assert_inputs_unchanged(provenance, v200_build_dir)
     elapsed = time.monotonic() - started
-    status = "PASS" if failure is None and len(cases) == len(CASES) else "FAIL"
+    status = "PASS" if failure is None and len(cases) == len(case_definitions) else "FAIL"
     result = {
         "schema": SCHEMA,
         "status": status,
@@ -446,21 +514,25 @@ def run_comparison(output_dir: Path) -> dict[str, Any]:
         "workload": WORKLOAD,
         "gpu_scope": "one controller-admitted NVLink V100 pair",
         "cases": cases,
-        "response_equivalence": "MATCH" if not divergences else "DIVERGED",
+        "response_equivalence": ("MATCH" if not divergences else "DIVERGED")
+            if paired_comparison else "NOT_CHECKED_CROSS_CASE",
         "response_divergences": divergences,
         "measurement_contract": {
             "warmup_requests_per_server": WARMUP_REQUESTS,
-            "measured_requests_per_server": MEASURED_REQUESTS,
+            "measured_requests_per_server": repetitions,
             "fixed_generated_tokens": pair.GENERATION_TOKENS,
-            "server_service_seconds_per_case": SERVICE_SECONDS,
-            "bundle_ceiling_seconds": MAX_BUNDLE_SECONDS,
-            "graphs": "enabled in native and V200 cases",
+            "server_service_seconds_per_case": service_seconds,
+            "bundle_ceiling_seconds": max_bundle_seconds,
+            "graphs": "enabled in all selected cases",
             "extended_v200_environment": f"{EXTENDED_ENV}=1 only for V200_extended",
+            "v200_prefer_local_hbm": ("inherited" if prefer_local_hbm is None else
+                                      "1" if prefer_local_hbm else "0"),
             "pair_compute": "enabled only for V200_extended",
-            "output_equivalence": "all warmup and measured response content is compared exactly to the native-pair measured response",
+            "output_equivalence": ("all warmup and measured response content is compared exactly to the native-pair measured response"
+                                    if paired_comparison else "cross-case output equivalence not checked; within-case warmup/measured response stability is checked"),
             "server_exit": "normal exit or deliberate SIGTERM with no SIGKILL escalation and no surviving process-group members",
             "v200_cleanup": "pair ledger must close with zero allocations, reservations, cleanup-pending entries and owner usage",
-            "interpretation": "three measured requests for one resident model and prompt; descriptive only",
+            "interpretation": f"{repetitions} measured request(s) for one resident model and prompt; descriptive only",
         },
         "request": pair.generation_request(),
         "elapsed_seconds": elapsed,
@@ -483,6 +555,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="required acknowledgement for live GPU work")
     parser.add_argument("--output-dir", type=Path,
                         help="new or empty directory for comparison evidence")
+    parser.add_argument("--v200-build-dir", type=Path, default=BUILD_DIR,
+                        help="V200 build artifact root (build-multipair or build-perf; no rebuild)")
+    parser.add_argument("--prefer-local-hbm", choices=("0", "1"),
+                        help="set V200_PREFER_LOCAL_HBM for each selected server; omit to inherit")
     return parser.parse_args(argv)
 
 
@@ -490,7 +566,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
         if args.verify_binaries:
-            current = capture_current_inputs()
+            current = capture_current_inputs(args.v200_build_dir)
             print(json.dumps(current, indent=2, sort_keys=True))
             return 0 if current["live_run_eligible"] else 2
         if not args.run or not args.execute:
@@ -499,7 +575,10 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.output_dir is None:
             raise ExtendedComparisonError("live mode requires --output-dir")
-        result = run_comparison(args.output_dir)
+        result = run_comparison(
+            args.output_dir, v200_build_dir=args.v200_build_dir,
+            prefer_local_hbm=(None if args.prefer_local_hbm is None
+                              else args.prefer_local_hbm == "1"))
         print(json.dumps({"status": result["status"], "failure": result["failure"],
                           "result": str(args.output_dir.resolve() / "comparison.json"),
                           "elapsed_seconds": result["elapsed_seconds"]}, sort_keys=True))
