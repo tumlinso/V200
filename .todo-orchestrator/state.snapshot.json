@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T15:17:29Z",
+  "generated_at": "2026-10-17T15:24:53Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 129,
+  "project_revision": 130,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 129,
+    "project_revision": 130,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -159,10 +159,10 @@
       {
         "id": "V200-13-READY",
         "metadata_json": "{}",
-        "reached_at": null,
-        "revision": 123,
+        "reached_at": "2026-10-17T15:24:53Z",
+        "revision": 130,
         "revoked_at": null,
-        "state": "pending",
+        "state": "reached",
         "task_id": "V200-13",
         "title": "V200-13-READY"
       },
@@ -1488,6 +1488,16 @@
         "revision": 129,
         "seq": 129,
         "timestamp": "2026-10-17T15:17:29Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-13",
+        "entity_type": "task",
+        "event_type": "task.completed",
+        "payload_json": "{\"completion_revision\": 130, \"disposition\": \"implemented\", \"reached_checkpoints\": [\"V200-13-READY\"]}",
+        "revision": 130,
+        "seq": 130,
+        "timestamp": "2026-10-17T15:24:53Z"
       }
     ],
     "evidence": [
@@ -2310,6 +2320,16 @@
         "payload_json": "{\"authority_commit\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"changed_owned_paths\": [\"CMakeLists.txt\", \"include/v200/operators/mmvq_plan.hpp\", \"include/v200/operators/pair_runtime.hpp\", \"src/operators/CMakeLists.txt\", \"src/operators/launch.cpp\", \"src/operators/mmvq_plan.cpp\", \"src/operators/pair_runtime.cpp\", \"tests/operators/test_mmvq_plan.cpp\"], \"checkpoints\": [{\"id\": \"V200-07-READY\", \"reached_at\": \"2026-10-17T13:42:51Z\", \"state\": \"reached\"}], \"completion_commit\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"completion_gates\": [{\"evidence_id\": \"d5feccdc-825e-40cd-865d-d863b91d6e37\", \"evidence_revision\": 75, \"id\": \"V200-07-CAPACITY\", \"input_fingerprint\": \"45afe340f425d27e8426ca88685b46e84ad5cfcc0d87a00970e556b274ca9135\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\"}, {\"evidence_id\": \"4c3d9b85-d129-413a-a2a9-c1c862ab4aad\", \"evidence_revision\": 77, \"id\": \"V200-07-CPU\", \"input_fingerprint\": \"46f89bd8292334fb05adc2f9d2d04963eef914f3c9346eb67b7a9cbc2f9a2618\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\"}], \"completion_revision\": 78, \"finalized_checkpoints\": [\"V200-07-READY\"], \"gates\": [{\"id\": \"V200-07-CPU\", \"input_fingerprint\": \"46f89bd8292334fb05adc2f9d2d04963eef914f3c9346eb67b7a9cbc2f9a2618\", \"last_run_at\": \"2026-10-17T13:42:51Z\", \"revision\": 77, \"status\": \"passed\", \"valid\": 1}, {\"id\": \"V200-07-CAPACITY\", \"input_fingerprint\": \"45afe340f425d27e8426ca88685b46e84ad5cfcc0d87a00970e556b274ca9135\", \"last_run_at\": \"2026-10-17T13:42:47Z\", \"revision\": 75, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \"CMakeLists.txt | 1 +\\n 1 file changed, 1 insertion(+)\", \"git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Commit d0a81e8: real unchanged llama full GPU residency (49/49 layers plus embedding), 18,550,716,425B tensor payload exceeds either 17,179,869,184B physical V100. Pair backing peaked [6,551,502,848,12,884,901,888]B; exact answer2; native pair control passed; ledger finalzero, ownedprocessclean, hostreservationreleased. Controller B04 evidence 8b4250ac-792d-4c75-8359-292150ef800e; evidence/B04/capacity-r1.*. Coherent live-headroom pair memory contract; async memset/lifetime/native-library drain/context/stream rollback repairs. Graphs remainoff; no dualcompute/speedup claim. Proceed08.\", \"producer_commit\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-07\"}",
         "revision": 78,
         "task_id": "V200-07"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T15:24:53Z",
+        "id": "ffcf7dd5-10c5-495f-bf9e-a928ceeebb4b",
+        "kind": "complete",
+        "note": "Opt-in application-scoped deployment implemented: reproducible HPC CUDA12.9 build-multipair build (13CPU CTests pass), read-only diagnostic (8native closure+3V200 DSOs match pins/B06), fourfocused packagingchecks, unchanged frozen build fallback, finite one/two logicaldevice HTTP launchers, scoped removal and explicit compatibility/reserve/performance limits. B06 finite2logical service smoke d34961d6-ac1d-4998-81e8-24195639c9f6 PASS10s/exact2/exit0/zeroledgers/released. B07 d5c28e95-2772-474c-86c8-318bc533fc9a PASS unchangedoutputs/graphs/actual Q4low+Q6peer,64.095vs124.951native decodeTPS, allreleased. No systeminstall/driverchange/backgrounddaemon; no native-speed or universalCUDAclaim.",
+        "payload_json": "{\"authority_commit\": \"56dad356323eda4f0c29ee94411f9c49c92c4d4f\", \"changed_owned_paths\": [\"README.md\", \"docs/v200/deployment.md\", \"docs/v200/first-consumer.md\", \"docs/v200/performance.md\", \"docs/v200/two-device.md\", \"evidence/B07/extended-r1.controller-evidence.json\", \"evidence/B07/extended-r1.controller-result.json\", \"evidence/B07/extended-r1.controller.json\", \"evidence/B07/extended-r1.host-release.json\", \"evidence/B07/extended-r1.preflight.json\", \"evidence/B07/extended-r1/comparison/comparison.json\", \"evidence/B07/extended-r1/comparison/native_pair/consumer/resident_capacity-native_pair-1792250427058796798.json\", \"evidence/B07/extended-r1/comparison/native_pair/consumer/resident_capacity-native_pair-1792250427058796798.log\", \"evidence/B07/extended-r1/comparison/native_pair/worker.log\", \"evidence/B07/extended-r1/comparison/v200_extended/consumer/resident_capacity-facade_owner-1792250448935438562.json\", \"evidence/B07/extended-r1/comparison/v200_extended/consumer/resident_capacity-facade_owner-1792250448935438562.log\", \"evidence/B07/extended-r1/comparison/v200_extended/consumer/resident_capacity-facade_owner-1792250448935438562.v200-profile.jsonl\", \"evidence/B07/extended-r1/comparison/v200_extended/worker.log\", \"evidence/B07/extended-r1/execution.json\", \"evidence/B07/extended-r1/stderr.txt\", \"evidence/B07/extended-r1/stdout.txt\", \"packaging/build.sh\", \"packaging/test_deployment.py\", \"tools/v200/diagnose.py\"], \"checkpoints\": [{\"id\": \"V200-13-READY\", \"reached_at\": \"2026-10-17T15:24:53Z\", \"state\": \"reached\"}], \"completion_commit\": \"56dad356323eda4f0c29ee94411f9c49c92c4d4f\", \"completion_gates\": [], \"completion_revision\": 130, \"finalized_checkpoints\": [\"V200-13-READY\"], \"gates\": [], \"git_diffstat\": \"README.md                   |  2 +-\\n docs/v200/first-consumer.md |  2 ++\\n docs/v200/performance.md    | 21 ++++++++++++++++++++-\\n docs/v200/two-device.md     |  4 ++++\\n 4 files changed, 27 insertions(+), 2 deletions(-)\", \"git_head\": \"56dad356323eda4f0c29ee94411f9c49c92c4d4f\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Opt-in application-scoped deployment implemented: reproducible HPC CUDA12.9 build-multipair build (13CPU CTests pass), read-only diagnostic (8native closure+3V200 DSOs match pins/B06), fourfocused packagingchecks, unchanged frozen build fallback, finite one/two logicaldevice HTTP launchers, scoped removal and explicit compatibility/reserve/performance limits. B06 finite2logical service smoke d34961d6-ac1d-4998-81e8-24195639c9f6 PASS10s/exact2/exit0/zeroledgers/released. B07 d5c28e95-2772-474c-86c8-318bc533fc9a PASS unchangedoutputs/graphs/actual Q4low+Q6peer,64.095vs124.951native decodeTPS, allreleased. No systeminstall/driverchange/backgrounddaemon; no native-speed or universalCUDAclaim.\", \"producer_commit\": \"56dad356323eda4f0c29ee94411f9c49c92c4d4f\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-13\"}",
+        "revision": 130,
+        "task_id": "V200-13"
       }
     ],
     "interface_consumers": [],
@@ -4234,9 +4254,9 @@
       },
       {
         "attention_reason": null,
-        "completion_commit": null,
-        "completion_git_head": null,
-        "completion_revision": null,
+        "completion_commit": "56dad356323eda4f0c29ee94411f9c49c92c4d4f",
+        "completion_git_head": "56dad356323eda4f0c29ee94411f9c49c92c4d4f",
+        "completion_revision": 130,
         "created_at": "2026-10-17T11:40:58Z",
         "id": "V200-13",
         "kind": "task",
@@ -4248,14 +4268,14 @@
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
-        "result": null,
+        "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 129,
-        "status": "in_progress",
+        "revision": 130,
+        "status": "done",
         "tags_json": "[]",
         "title": "Package a reversible deployment and diagnostic surface",
-        "updated_at": "2026-10-17T15:17:29Z",
-        "version": 4
+        "updated_at": "2026-10-17T15:24:53Z",
+        "version": 5
       },
       {
         "attention_reason": null,
@@ -5311,12 +5331,12 @@
       },
       {
         "activated_at": "2026-10-17T15:17:29Z",
-        "completed_at": null,
+        "completed_at": "2026-10-17T15:24:53Z",
         "enqueued_at": "2026-10-17T15:16:35Z",
         "lane_id": "V200-DELIVERY-1-MAIN",
         "position": 0,
-        "revision": 129,
-        "state": "active",
+        "revision": 130,
+        "state": "completed",
         "task_id": "V200-13"
       },
       {
@@ -5598,11 +5618,11 @@
         "created_at": "2026-10-17T15:16:35Z",
         "id": "V200-DELIVERY-1-MAIN",
         "parent_lane_id": null,
-        "revision": 129,
+        "revision": 130,
         "role": "integrator",
         "run_id": "V200-DELIVERY-1",
-        "state": "active",
-        "updated_at": "2026-10-17T15:17:29Z",
+        "state": "ready",
+        "updated_at": "2026-10-17T15:24:53Z",
         "workspace_mode": "exclusive"
       },
       {

@@ -18,7 +18,7 @@ Both bind to `http://127.0.0.1:8080`; use `/health` to check readiness. They sta
 
 The first implementation is deliberately restricted. Peer compute matches exact kernel families in the pinned llama CUDA backend; it is not arbitrary-kernel distribution or universal CUDA compatibility. Inter-pair copies currently use blocking pinned-host staging. A pair uses qualified HBM budgets rather than advertising all nominal memory as available. The original restricted preview and native CUDA remain reversible fallbacks.
 
-The earlier matched comparison measured 63.5 tokens/s for V200 Q4 pair compute versus 54.2 for V200 anchor compute and 124.0 for native two-GPU layer splitting. This is real capacity and peer execution, with substantial performance work remaining; the newer extended expert path is measured separately. See [performance](docs/v200/performance.md), [two-device behavior](docs/v200/two-device.md), [capacity](docs/v200/capacity.md), and [consumer details](docs/v200/first-consumer.md).
+The latest matched comparison measured **64.1 tokens/s for extended V200 pair compute versus 125.0 for native two-GPU layer splitting**. The earlier Q4-only comparison measured 63.5 versus 54.2 for V200 anchor compute. This is real capacity and peer execution, with substantial performance work remaining. See [performance](docs/v200/performance.md), [two-device behavior](docs/v200/two-device.md), [capacity](docs/v200/capacity.md), and [consumer details](docs/v200/first-consumer.md).
 
 The original restricted preview remains available with `python3 scripts/v200/serve.py --execute` (28 GPU layers, 2,048-token context, graphs off). [Deployment and diagnostics](docs/v200/deployment.md) describe the supported profiles and rollback.
 

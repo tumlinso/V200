@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "project_root": "/home/tumlinson/V200",
+  "command_cwd": "/home/tumlinson/V200",
+  "recipe": "baseline",
+  "toolchain": {
+    "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9",
+    "require_sanitizer": false
+  },
+  "resources": {
+    "gpu_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ],
+    "gpus": 2,
+    "cpu_threads": 4,
+    "ram_bytes": 34359738368,
+    "isolate_nvlink_domain": true,
+    "isolate_pcie_root": false
+  },
+  "argv": [
+    "python3",
+    "/home/tumlinson/V200/scripts/v200/bounded_runner.py",
+    "--project-root",
+    "/home/tumlinson/V200",
+    "--seconds",
+    "100",
+    "--allocation-cap-mib",
+    "12288",
+    "--evidence-dir",
+    "/home/tumlinson/V200/evidence/B07/extended-r1",
+    "--bundle",
+    "B07",
+    "--expected-uuid",
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "--expected-uuid",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "--",
+    "env",
+    "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "python3",
+    "/home/tumlinson/V200/benchmarks/comparison/run_extended_comparison.py",
+    "--run",
+    "--execute",
+    "--output-dir",
+    "/home/tumlinson/V200/evidence/B07/extended-r1/comparison"
+  ],
+  "timeout": 125,
+  "build_timeout": 900,
+  "paths": [
+    "benchmarks/comparison",
+    "tests/comparison",
+    "tests/consumer/run_consumer.py",
+    "benchmarks/fixtures/llama-server-v200.json",
+    "docs/v200/consumer-profile.json",
+    "docs/v200/multipair-profile.json",
+    "scripts/v200/bounded_runner.py",
+    "planning/v200-bootstrap/tools/run_bounded.py",
+    "src/operators",
+    "src/frontdoor",
+    "src/integration",
+    "src/memory",
+    "src/multi_pair",
+    "include/v200"
+  ],
+  "binary_paths": [
+    "build-multipair/src/frontdoor/libv200_frontdoor.so",
+    "build-multipair/src/integration/libv200_pair_init.so",
+    "build-multipair/src/operators/libv200_operators.so"
+  ],
+  "benchmark": {
+    "build_argv": [
+      "python3",
+      "/home/tumlinson/V200/benchmarks/comparison/run_extended_comparison.py",
+      "--verify-binaries"
+    ]
+  }
+}

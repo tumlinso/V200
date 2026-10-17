@@ -1,4 +1,23 @@
-# Matched llama-server comparison (B05)
+# Performance records
+
+## Extended expert path (B07, 17 October 2026)
+
+The newer Q4_K small-K and Q6_K expert paths execute useful peer work correctly, but do not close the native-pair performance gap. This remains an opt-in capacity/compute preview, not a native-speed replacement.
+
+| Matched case | Median decode tokens/s | Median server prefill | Median client wall |
+| --- | ---: | ---: | ---: |
+| Native two-V100 layer split | 124.951 | 58.522 ms | 564.902 ms |
+| One logical V200, extended Q4/Q6 peer experts | 64.095 | 131.696 ms | 1,117.452 ms |
+
+Both cases used the same unchanged pinned model, full GPU residency, graphs enabled, fixed prompt and 64-token request, one warmup and three measured requests. All warmup/measured outputs matched exactly. The V200 profile observed 90 low-column Q4 peer calls and 86 Q6 peer calls; graph capture/replay passed. These are ordinary-dispatch call counts, not a count of every graph replay. Kernel verification was disabled during timing; prior B03 extended-r2 separately established bitwise equality for 16,384 outputs per observed new family. The V200 ledger returned to zero and both servers exited normally.
+
+The raw server decode samples were 124.935, 125.143, 124.951 tokens/s for native and 63.889, 64.095, 64.220 for V200. Client wall samples were 767.390, 564.902, 564.829 ms and 2,629.852, 1,117.452, 1,117.324 ms respectively. The first measured client request remains an outlier despite warmup. Three samples for one prompt are descriptive; they do not establish sustained throughput, latency distributions, or a causal bottleneck. The older B05 Q4-only case is a separate run, so the small difference between its 63.503 tokens/s and this 64.095 is not evidence of an extended-path speedup.
+
+Source was committed and clean at `56dad356323eda4f0c29ee94411f9c49c92c4d4f`; current `build-multipair` DSOs, native closure, fixture, helper and harness hashes were captured and rechecked. The controller admitted only the first NVLink pair for 44.213 seconds of comparison, with 15 seconds of service per case and a 90-second comparison ceiling. Evidence: `d5c28e95-2772-474c-86c8-318bc533fc9a`; [raw comparison](../../evidence/B07/extended-r1/comparison/comparison.json), [source/artifact preflight](../../evidence/B07/extended-r1.preflight.json), and [canonical release](../../evidence/B07/extended-r1.host-release.json). Resources were released. This is a single-pair comparison; B06 establishes two-device correctness separately and makes no four-GPU performance claim.
+
+The next optimization should target the measured decode/prefill gap while retaining the transparent pair interface. Native layer splitting stays available as the faster fallback; it does not replace the V200 architecture. No placement threshold or speculative mechanism is promoted on the basis of these samples.
+
+## Earlier qualified Q4 comparison (B05)
 
 The bounded B05 comparison passed on 17 October 2026. It confirms that the current V200 preview can run the unchanged llama-server with a model payload spread across both V100s and can route useful Q4_K matrix-vector work to the peer GPU. It does **not** show native-pair throughput parity or establish a broad performance result. Keep pair-compute opt-in while implementation and measurement continue.
 

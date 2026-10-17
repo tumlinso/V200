@@ -1,5 +1,7 @@
 # First llama-server preview
 
+Current extension: `--extended-expert-compute` (with `--pair-compute`) selects the isolated `build-multipair` implementation and adds qualified small-K Q4_K and Q6_K expert down projections. B03 extended-r2 verified 16,384 outputs per observed family bit-for-bit, with up to 68 peer graph nodes; B07 confirmed unchanged generated output at about 64.1 decode tokens/s against 125.0 for native layer splitting. [Two logical V200s and finite HTTP serving](two-device.md) now work in one process, with graphs disabled for that two-device profile. See [deployment](deployment.md) and [performance](performance.md) for commands and exact limits. Earlier qualification counts below refer to their recorded versions.
+
 Validated on 17 October 2026 against this host's qualified V100 pair and existing llama.cpp installation. This remains a **T1 restricted preview** under the package's compatibility definitions: the installed executable is unchanged, but supported workloads and CUDA routes are bounded. The full-resident B04 workload now demonstrates usable pair-backed model capacity; pair-compute is an explicit opt-in qualified for the pinned Q4_K single-column matrix-vector path. The full-resident consumer ran 68 eligible calls on the anchor and 174 on the peer; the first peer result matched the original kernel bit-for-bit over 4,096 outputs (B03 evidence `522cf904-7936-47fd-951f-c9da82306355`). Single-matrix splitting remains CPU-checked only and speedup is not established. T2 remains the product target.
 
 ## Start and use it
