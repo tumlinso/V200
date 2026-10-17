@@ -1,0 +1,71 @@
+{
+  "schema": "v200-consumer-profile/v1",
+  "consumer": "llama-server",
+  "compatibility_target": "T2 unchanged existing executable; first smoke is an explicitly partial-offload workload",
+  "source": {
+    "repository": "/home/tumlinson/Software/llama.cpp",
+    "commit": "f280b26983ad0fdb705a0d9ebf0503e76f2899b0",
+    "worktree_at_inventory": "clean",
+    "binary_source_binding": "CMake cache points to this tree; executable has no embedded source identity. The runner verifies source HEAD and tracked cleanliness before a live session."
+  },
+  "binary": {
+    "path": "/home/tumlinson/Software/llama.cpp/build/bin/llama-server",
+    "sha256": "b42facfb93d85e1a581862c872615834223dc479871701c0b797aeee1fa11e9d",
+    "build_id": "8f8a089510c6eb0d5306d0c49de90c4f55931323",
+    "format": "ELF64-x86_64"
+  },
+  "runtime_closure": [
+    {
+      "role": "server_implementation",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-server-impl.so",
+      "sha256": "a176f2a62eeab92491cd112a09b12799961249be7c5341c59c415694cca0eaa0"
+    },
+    {
+      "role": "common",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-common.so.0.2.0",
+      "sha256": "628a832efc253d1da29ff09a225f74e98c3d0a7bda72ac0bd4f074c19f764e7b"
+    },
+    {
+      "role": "multimodal",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libmtmd.so.0.2.0",
+      "sha256": "4c980a736b41e0fbb7929c8bbe2dfbd188bba8ee3d9f5c716f1ac65f619d5bd1"
+    },
+    {
+      "role": "llama",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama.so.0.2.0",
+      "sha256": "d56c7c416032867451483a0b5b8a4563f3caeed725b39d924924fe11fcf7feb4"
+    },
+    {
+      "role": "ggml_loader",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml.so.0.21.0",
+      "sha256": "d76b41c497feced8853cc2c9d55352a382ab429e3de84ef94983dd914ebeb566"
+    },
+    {
+      "role": "cpu_backend",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cpu.so.0.21.0",
+      "sha256": "d2e3a5c6e3fb838f2c94ed3cb2d4b940c34838518f3f0233198aee22aee5c71c"
+    },
+    {
+      "role": "cuda_backend",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cuda.so.0.21.0",
+      "sha256": "df90ec2ea474f130cc253a6c0776ff0e2d7fdd4d821bcc6be4bcc940b59767a9"
+    },
+    {
+      "role": "ggml_base",
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-base.so.0.21.0",
+      "sha256": "3836344472b5092b77eaea16b3584f13028107ae44fa750d27183ba22628d345"
+    }
+  ],
+  "build_stack_caveat": "CUDA objects were compiled by HPC SDK CUDA 12.9 while CMake FindCUDAToolkit and recorded link inputs resolve CUDA 12.0-era libraries. This is an unresolved runtime qualification item, not a compatibility verdict.",
+  "fixture": "../../benchmarks/fixtures/llama-server-v200.json",
+  "fixture_sha256": "computed by runner from exact fixture bytes",
+  "runner": "tests/consumer/run_consumer.py",
+  "runner_contract": {
+    "default_build_and_ctest": "CPU-only fixture, schema, oracle, and fake-server/process-lifetime checks",
+    "live_gpu_execution": "Never registered with CTest. Root must invoke the finite matrix through the existing CUDA controller, after build and controller admission.",
+    "process_ownership": "Each llama-server is a directly spawned child in a new session/process group; cleanup signals only that recorded owned group and records remaining group members.",
+    "artifacts": "Per-control JSON result, stdout/stderr log, identity hashes, request/response, timing, process group, UUID-scoped nvidia-smi memory samples, cleanup receipt, and (pair facade only) validated V200_PROFILE_LOG owner-usage/budget JSONL plus its SHA-256.",
+    "preload_libraries": "Repeat --preload-library in order: facade DSO, then root pair-initializer DSO for pair mode. One facade DSO remains supported for anchor diagnostics.",
+    "gpu_claim": "Runner records application outcome; GPU_PASS requires the separate controller receipt and V200 allocation-owner evidence."
+  }
+}

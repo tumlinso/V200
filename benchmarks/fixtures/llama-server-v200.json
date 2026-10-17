@@ -1,0 +1,188 @@
+{
+  "schema": "v200-llama-server-fixture/v1",
+  "fixture_id": "llama-server-qwen3-coder-30b-q4km-v1",
+  "model": {
+    "name": "qwen3-coder-30b-a3b-instruct-q4-k-m",
+    "path": "/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf",
+    "sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad",
+    "tokenizer": {
+      "source": "embedded GGUF tokenizer metadata and token table; no separate tokenizer artifact was found",
+      "sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad",
+      "identity_scope": "whole GGUF hash pins model tensors and embedded tokenizer together"
+    },
+    "size_bytes": 18556689568,
+    "format": "GGUF v3",
+    "architecture": "qwen3moe",
+    "quantization": "Q4_K_M",
+    "block_count": 48,
+    "kv_heads": 4,
+    "key_length": 128,
+    "value_length": 128,
+    "tensor_layout": {
+      "data_start_bytes": 5973143,
+      "total_tensor_bytes": 18550716425,
+      "non_block_tensor_bytes": 430290944,
+      "block_tensor_bytes": 18120425481,
+      "last_24_block_tensor_bytes": 9060212745,
+      "last_28_block_tensor_bytes": 10570248201,
+      "last_36_block_tensor_bytes": 13485969417,
+      "all_block_tensor_bytes": 18120425481,
+      "method": "GGUF v3 header and tensor descriptor offsets; tensor data was not read"
+    },
+    "selection": "Smallest existing inference GGUF found locally; no download or model copy. The Q4 model is larger than one V100's 16 GiB physical memory, so smoke uses explicit partial CPU offload and capacity uses all layers across the selected pair."
+  },
+  "deferred_larger_candidate": {
+    "name": "qwen3.6-35b-a3b-q4-k-m",
+    "path": "/home/tumlinson/.local/share/core4/models/qwen3.6-35b-a3b-q4-k-m/671e47e0ec53c665d048b98c3ecbfd5236b5ca9c3e02ed19fc8f81f7b85140c7/model.gguf",
+    "size_bytes": 20419565568,
+    "selected": false,
+    "sha256_verified": false
+  },
+  "server": {
+    "bind_host": "127.0.0.1",
+    "port": "ephemeral-loopback-port",
+    "fixed_arguments": [
+      "--model", "{model}",
+      "--host", "127.0.0.1",
+      "--port", "{port}",
+      "--ctx-size", "{ctx_size}",
+      "--batch-size", "64",
+      "--ubatch-size", "64",
+      "--parallel", "1",
+      "--threads", "4",
+      "--threads-batch", "4",
+      "--n-gpu-layers", "{n_gpu_layers}",
+      "--fit", "off",
+      "--flash-attn", "off",
+      "--cache-type-k", "f16",
+      "--cache-type-v", "f16",
+      "--alias", "v200-qwen3-coder-30b"
+    ],
+    "fit_policy": "off; no automatic context, batch, offload or precision changes",
+    "precision_policy": "Q4_K_M model weights; f16 K/V cache; no runtime quantization override",
+    "boundaries": {
+      "api": "POST /completion",
+      "readiness": "GET /health",
+      "loopback_only": true,
+      "streaming": false,
+      "api_key": null
+    },
+    "timeouts_seconds": {
+      "startup": 90,
+      "request": 45,
+      "shutdown": 10
+    }
+  },
+  "controls": {
+    "native_single": {
+      "backend": "native",
+      "arguments": ["--device", "CUDA0", "--split-mode", "none"],
+      "role": "matched one-physical-device smoke baseline"
+    },
+    "native_pair": {
+      "backend": "native",
+      "arguments": [
+        "--device", "CUDA0,CUDA1",
+        "--split-mode", "layer",
+        "--tensor-split", "1,1"
+      ],
+      "role": "matched two-physical-device capacity baseline"
+    },
+    "facade_owner": {
+      "backend": "v200-preload",
+      "arguments": ["--device", "CUDA0", "--split-mode", "none"],
+      "v200_mode": "pair",
+      "supported_modes": ["anchor", "pair"],
+      "role": "one application-visible V200 device backed by the admitted physical pair",
+      "requires_preload_library": true
+    }
+  },
+  "workloads": {
+    "smoke": {
+      "purpose": "Fitting correctness preview with an explicit partial CPU offload; not a pair-capacity or throughput claim.",
+      "ctx_size": 2048,
+      "n_gpu_layers": 28,
+      "controls": ["native_single", "facade_owner"],
+      "request": {
+        "method": "POST",
+        "path": "/completion",
+        "body": {
+          "prompt": "Answer with exactly one digit and no words. What is 1 + 1?\nAnswer:",
+          "temperature": 0.0,
+          "top_k": 1,
+          "top_p": 1.0,
+          "seed": 42,
+          "n_predict": 8,
+          "stop": ["\n"],
+          "repeat_penalty": 1.0,
+          "presence_penalty": 0.0,
+          "frequency_penalty": 0.0,
+          "stream": false,
+          "cache_prompt": false
+        }
+      },
+      "oracle": {
+        "response_field": "content",
+        "normalization": "strip surrounding Unicode whitespace only",
+        "expected_exact": "2",
+        "tokens_predicted_min": 1,
+        "tokens_predicted_max": 8
+      },
+      "gpu_layer_tensor_bytes": 10570248201
+    },
+    "resident_capacity": {
+      "purpose": "Full-resident pair-capacity candidate; this is not run until the root authorizes it after the fitting smoke and allocator integration.",
+      "ctx_size": 8192,
+      "n_gpu_layers": 999,
+      "controls": ["native_pair", "facade_owner"],
+      "request": {
+        "method": "POST",
+        "path": "/completion",
+        "body": {
+          "prompt": "Answer with exactly one digit and no words. What is 1 + 1?\nAnswer:",
+          "temperature": 0.0,
+          "top_k": 1,
+          "top_p": 1.0,
+          "seed": 42,
+          "n_predict": 8,
+          "stop": ["\n"],
+          "repeat_penalty": 1.0,
+          "presence_penalty": 0.0,
+          "frequency_penalty": 0.0,
+          "stream": false,
+          "cache_prompt": false
+        }
+      },
+      "oracle": {
+        "response_field": "content",
+        "normalization": "strip surrounding Unicode whitespace only",
+        "expected_exact": "2",
+        "tokens_predicted_min": 1,
+        "tokens_predicted_max": 8
+      },
+      "gpu_layer_tensor_bytes": 18120425481
+    }
+  },
+  "memory_guard": {
+    "per_physical_gpu_application_limit_mib": 12288,
+    "context_overhead_is_separately_budgeted": true,
+    "workspace_reserve_bytes_per_gpu": 1073741824,
+    "kv_cache_formula": "ctx_size * gpu_layers_on_owner * kv_heads * (key_length + value_length) * 2 bytes for f16",
+    "facade_runtime_enforcement": "V200 allocation ledger owner budgets enforce 12,288 MiB application allocations per physical owner; a missing or over-budget result is a facade failure",
+    "native_control_enforcement": "Explicit flags and descriptor-based preflight refuse estimates over 12,288 MiB per physical GPU; this is a candidate bound, not an allocator ledger",
+    "physical_process_used_memory_guard_mib": 14336,
+    "physical_guard_scope": "Owned llama-server process usage only; 14,336 MiB includes an explicit context-overhead allowance and is a physical safety stop, not the 12,288 MiB application-allocation cap",
+    "runtime_enforcement": "V200 owner ledger for facade application allocations plus fail-closed process-scoped nvidia-smi physical guard; a missing or over-budget result stops the owned server process group",
+    "nvidia_smi_poll_seconds": 1.0
+  },
+  "qualification": {
+    "consumer_runtime": "NOT_RUN",
+    "gpu": "NOT_RUN",
+    "performance": "NOT_MEASURED",
+    "notes": [
+      "Static source and ELF inspection do not prove that the selected run takes a conditional CUDA path.",
+      "Smoke output correctness is an exact arithmetic oracle; a passing smoke alone does not qualify full-resident capacity or speedup.",
+      "Performance numbers from the short smoke are diagnostic only and cannot support throughput claims."
+    ]
+  }
+}
