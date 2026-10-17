@@ -39,6 +39,7 @@ CUDA_CONTROLLER = Path("/home/tumlinson/.agents/skills/cuda/scripts/cuda_control
 PROJECT_CONTROL_PY = Path("/home/tumlinson/project-control/scripts/pc-dev")
 FRONTDOOR_DSO = REPO_ROOT / "build/src/frontdoor/libv200_frontdoor.so"
 PAIR_INIT_DSO = REPO_ROOT / "build/src/integration/libv200_pair_init.so"
+PAIR_OPERATORS_DSO = REPO_ROOT / "build/src/operators/libv200_operators.so"
 CUDA_TOOLCHAIN_ROOT = "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9"
 
 APP_LIMIT_MIB = 12288
@@ -103,8 +104,6 @@ def _parse_gpu_option(value: str | None, authorized_pair: list[str]) -> list[str
 def _server_args(mode: str, duration_seconds: int | None, port: int | None,
                  workload_name: str) -> tuple[list[str], str, int]:
     if mode == "serve":
-        if workload_name != "smoke":
-            raise LaunchError("finite foreground service currently uses the smoke workload")
         duration = SERVE_DEFAULT_SECONDS if duration_seconds is None else duration_seconds
         if isinstance(duration, bool) or not 1 <= duration <= SERVE_MAX_SECONDS:
             raise LaunchError(f"serve duration must be between 1 and {SERVE_MAX_SECONDS} seconds")
@@ -127,11 +126,15 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
                duration_seconds: int | None = None,
                port: int | None = None,
                python_executable: str | None = None,
-               workload_name: str = "smoke") -> dict[str, Any]:
+               workload_name: str = "smoke",
+               pair_compute: bool = False,
+               verify_pair_compute: bool = False) -> dict[str, Any]:
     fixture = _read_json(FIXTURE_PATH)
     selected_port = DEFAULT_SERVER_PORT if mode == "serve" and port is None else port
     controls, bundle, duration = _server_args(
         mode, duration_seconds, selected_port, workload_name)
+    if verify_pair_compute and not pair_compute:
+        raise LaunchError("operator verification requires --pair-compute")
     if len(uuids) != 2 or len(set(uuids)) != 2 or any(UUID_RE.fullmatch(item) is None for item in uuids):
         raise LaunchError("launch requires the exact two UUIDs from the B01 pair profile")
     python = python_executable or sys.executable
@@ -167,7 +170,10 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
     inner = [python, str(CONSUMER_RUNNER), "--workload", workload_name]
     for control in controls:
         inner.extend(["--control", control])
-    for library in (FRONTDOOR_DSO, PAIR_INIT_DSO):
+    preload_libraries = [FRONTDOOR_DSO, PAIR_INIT_DSO]
+    if pair_compute:
+        preload_libraries.append(PAIR_OPERATORS_DSO)
+    for library in preload_libraries:
         inner.extend(["--preload-library", str(library)])
     inner.extend(["--facade-mode", "pair", "--output-dir", str(output_dir), "--execute"])
     if duration:
@@ -183,7 +189,16 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
     ]
     for gpu_uuid in uuids:
         bounded_argv.extend(["--expected-uuid", gpu_uuid])
-    bounded_argv.extend(["--", "/usr/bin/env", f"V200_DEVICE_UUIDS={','.join(uuids)}", *inner])
+    child_env = [
+        "-u", "V200_PAIR_COMPUTE",
+        "-u", "V200_OPERATOR_VERIFY",
+        f"V200_DEVICE_UUIDS={','.join(uuids)}",
+    ]
+    if pair_compute:
+        child_env.append("V200_PAIR_COMPUTE=1")
+        if verify_pair_compute:
+            child_env.append("V200_OPERATOR_VERIFY=1")
+    bounded_argv.extend(["--", "/usr/bin/env", *child_env, *inner])
 
     paths = [
         "scripts/v200/serve.py",
@@ -195,6 +210,16 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         "evidence/foundation/pair-profile.json",
         "planning/v200-bootstrap/tools/run_bounded.py",
     ]
+    if pair_compute:
+        paths.extend([
+            "src/operators/launch.cpp",
+            "src/operators/mmvq_plan.cpp",
+            "src/operators/pair_runtime.cpp",
+            "include/v200/operators/launch.hpp",
+            "include/v200/operators/mmvq_plan.hpp",
+            "include/v200/operators/pair_runtime.hpp",
+            "src/operators/CMakeLists.txt",
+        ])
     spec: dict[str, Any] = {
         "schema_version": 1,
         "project_root": str(REPO_ROOT),
@@ -217,7 +242,7 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         "binary_paths": [
             str(FRONTDOOR_DSO.relative_to(REPO_ROOT)),
             str(PAIR_INIT_DSO.relative_to(REPO_ROOT)),
-        ],
+        ] + ([str(PAIR_OPERATORS_DSO.relative_to(REPO_ROOT))] if pair_compute else []),
         "paths": paths,
     }
     return {
@@ -238,7 +263,9 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
                           "gpu_layers": workload["n_gpu_layers"],
                           "request": workload["request"],
                           "oracle": workload["oracle"]},
-        "preload_libraries": [str(FRONTDOOR_DSO), str(PAIR_INIT_DSO)],
+        "preload_libraries": [str(path) for path in preload_libraries],
+        "pair_compute": pair_compute,
+        "operator_verification": verify_pair_compute,
         "static_memory_preflight": preflights,
         "app_allocation_cap_mib_per_gpu": APP_LIMIT_MIB,
         "bounded_seconds": bounded_seconds,
@@ -256,7 +283,7 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
             str(PAIR_PROFILE_PATH), str(fixture["model"]["path"]),
             str(REPO_ROOT / "docs/v200/source-profile.json"),
             str(FRONTDOOR_DSO), str(PAIR_INIT_DSO),
-        ],
+        ] + ([str(PAIR_OPERATORS_DSO)] if pair_compute else []),
     }
 
 
@@ -353,6 +380,9 @@ def _print_plan(plan: dict[str, Any], missing: list[str], execute: bool) -> None
     print(f"Pinned consumer: {json.dumps(plan['consumer_binary'], sort_keys=True)}")
     print(f"Workload configuration: {json.dumps(plan['workload_config'], sort_keys=True)}")
     print(f"Pair facade preloads: {json.dumps(plan['preload_libraries'])}")
+    if plan["pair_compute"]:
+        verification = " with operator verification" if plan["operator_verification"] else ""
+        print(f"Pair compute: enabled{verification}")
     print(f"Static smoke memory preflight: {json.dumps(plan['static_memory_preflight'], sort_keys=True)}")
     print(f"Per-GPU application allocation budget: {plan['app_allocation_cap_mib_per_gpu']} MiB")
     if "pair_profile_identity" in plan:
@@ -409,7 +439,9 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--port", type=int, default=None,
                         help=f"loopback server port in serve mode (default {DEFAULT_SERVER_PORT})")
     parser.add_argument("--workload", choices=("smoke", "resident_capacity"), default="smoke",
-                        help="preview workload; resident_capacity runs the bounded B04 full-resident pair case")
+                        help="llama workload; resident_capacity uses the full-resident pair fixture")
+    parser.add_argument("--pair-compute", action="store_true",
+                        help="opt in to the pair operator library for supported operations")
     parser.add_argument("--execute", action="store_true",
                         help="explicitly enter the CUDA controller; without this flag, print a dry-run plan")
     return parser.parse_args(argv)
@@ -423,7 +455,10 @@ def main(argv: list[str] | None = None) -> int:
         run_id = f"{args.mode}-{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}-{uuid.uuid4().hex[:12]}"
         plan = _make_plan(args.mode, selected, run_id,
                           duration_seconds=args.duration_seconds, port=args.port,
-                          workload_name=args.workload)
+                          workload_name=args.workload,
+                          pair_compute=args.pair_compute,
+                          verify_pair_compute=(args.pair_compute
+                                               and os.environ.get("V200_OPERATOR_VERIFY") == "1"))
         plan["pair_profile_identity"] = pair_identity
     except (LaunchError, OSError, KeyError, TypeError, ValueError) as exc:
         print(f"V200 serve refused: {exc}", file=sys.stderr)

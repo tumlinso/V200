@@ -163,6 +163,32 @@ class FixtureTests(unittest.TestCase):
             self.assertEqual(facade["LD_PRELOAD"],
                              f"{preload}:{initializer}:/tmp/libunrelated.so")
 
+    def test_pair_compute_flags_are_facade_only_and_require_operator_library(self) -> None:
+        env = {"PATH": "/bin", "CUDA_VISIBLE_DEVICES": "GPU-a,GPU-b",
+               "V200_DEVICE_UUIDS": "GPU-aaaaaaaa,GPU-bbbbbbbb",
+               "V200_PAIR_COMPUTE": "1", "V200_OPERATOR_VERIFY": "1",
+               "LD_PRELOAD": "/tmp/libv200_operators.so"}
+        native = consumer._clean_environment("native_pair", self.fixture, None, env,
+                                             selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
+        self.assertNotIn("V200_PAIR_COMPUTE", native)
+        self.assertNotIn("V200_OPERATOR_VERIFY", native)
+        with tempfile.TemporaryDirectory() as directory:
+            preload = Path(directory) / "libv200_frontdoor.so"
+            initializer = Path(directory) / "libv200_pair_init.so"
+            operators = Path(directory) / "libv200_operators.so"
+            for path in (preload, initializer, operators):
+                path.touch()
+            facade = consumer._clean_environment(
+                "facade_owner", self.fixture, [preload, initializer, operators], env,
+                facade_mode="pair", selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
+            self.assertEqual(facade["V200_PAIR_COMPUTE"], "1")
+            self.assertEqual(facade["V200_OPERATOR_VERIFY"], "1")
+            self.assertEqual(facade["LD_PRELOAD"], f"{preload}:{initializer}:{operators}")
+            with self.assertRaisesRegex(consumer.ConsumerError, "operator library preload"):
+                consumer._clean_environment(
+                    "facade_owner", self.fixture, [preload, initializer], env,
+                    facade_mode="pair", selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
+
     def test_cli_preserves_single_preload_and_accepts_initializer_as_second(self) -> None:
         args = consumer._parse_args([
             "--workload", "smoke", "--control", "facade_owner",
@@ -231,6 +257,35 @@ class FixtureTests(unittest.TestCase):
                 path, ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget,
                 minimum_resident_bytes=16 * 1024)
             self.assertEqual(insufficient["status"], "INSUFFICIENT_RESIDENT_PAYLOAD")
+
+    def test_profile_log_ignores_only_well_formed_operator_records_for_memory_accounting(self) -> None:
+        budget = 12 * 1024 * 1024 * 1024
+        frontdoor = {"schema": "v200-frontdoor-ledger/v1", "event": "snapshot",
+                     "mode": "pair", "anchor_uuid": "GPU-aaaaaaaa",
+                     "peer_uuid": "GPU-bbbbbbbb", "qualification_id": "q-1",
+                     "owner_budget_bytes": [budget, budget], "owner_used_bytes": [100, 200],
+                     "live_allocation_count": 1, "live_reservation_count": 0,
+                     "cleanup_pending_count": 0}
+        operator = {"schema": "v200-operator-ledger/v1", "event": "q4k_mmvq_route",
+                    "operation": "q4k_mmvq", "route": "peer-owner",
+                    "matched_calls": 1, "anchor_local_calls": 0, "peer_owner_calls": 1,
+                    "split_calls": 0, "anchor_rows": 0, "peer_rows": 16,
+                    "verified_rows": 0, "max_abs_error": 0.0, "status": 0}
+        cleanup = dict(frontdoor, event="cuda_free", owner_used_bytes=[0, 0],
+                       live_allocation_count=0)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "profile.jsonl"
+            path.write_text("\n".join(json.dumps(value)
+                                      for value in (frontdoor, operator, cleanup)) + "\n")
+            result = consumer._read_profile_log(path, ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget)
+            self.assertEqual(result["status"], "PASS")
+            self.assertEqual(result["records"], [frontdoor, cleanup])
+            self.assertEqual(result["operator_records"], [operator])
+            self.assertEqual(result["peak_total_owner_used_bytes"], 300)
+            operator.pop("route")
+            path.write_text(json.dumps(frontdoor) + "\n" + json.dumps(operator) + "\n")
+            malformed = consumer._read_profile_log(path, ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget)
+            self.assertEqual(malformed["status"], "INVALID")
 
 
 class LauncherPlanTests(unittest.TestCase):
@@ -309,6 +364,44 @@ class LauncherPlanTests(unittest.TestCase):
         self.assertIn("resident_capacity", plan["bounded_child_argv"])
         self.assertTrue(all(item["fits_static_preflight"]
                             for item in plan["static_memory_preflight"]))
+
+    def test_full_resident_workload_runs_as_bounded_foreground_service(self) -> None:
+        plan = serve_launcher._make_plan(
+            "serve", self.uuids, "resident-serve", duration_seconds=120, port=8124,
+            workload_name="resident_capacity")
+        self.assertEqual(plan["controls"], ["facade_owner"])
+        self.assertEqual(plan["bundle"], "V200-SERVE")
+        self.assertEqual(plan["workload"], "resident_capacity")
+        self.assertEqual(plan["endpoint"], "http://127.0.0.1:8124")
+        self.assertEqual(plan["duration_seconds"], 120)
+        self.assertTrue(plan["static_memory_preflight"][0]["fits_static_preflight"])
+        self.assertIn("resident_capacity", plan["bounded_child_argv"])
+
+    def test_pair_compute_is_explicit_and_preloads_operators_only_when_enabled(self) -> None:
+        default = serve_launcher._make_plan("preview", self.uuids, "native-default")
+        self.assertFalse(default["pair_compute"])
+        self.assertNotIn(str(serve_launcher.PAIR_OPERATORS_DSO), default["preload_libraries"])
+        self.assertNotIn("V200_PAIR_COMPUTE=1", default["bounded_child_argv"])
+        enabled = serve_launcher._make_plan(
+            "preview", self.uuids, "pair-compute", workload_name="resident_capacity",
+            pair_compute=True, verify_pair_compute=True)
+        self.assertTrue(enabled["pair_compute"])
+        self.assertTrue(enabled["operator_verification"])
+        self.assertEqual(enabled["preload_libraries"][-1], str(serve_launcher.PAIR_OPERATORS_DSO))
+        self.assertIn("build/src/operators/libv200_operators.so",
+                      enabled["controller_spec"]["binary_paths"])
+        self.assertIn(str(serve_launcher.PAIR_OPERATORS_DSO), enabled["required_files"])
+        self.assertIn("V200_PAIR_COMPUTE=1", enabled["bounded_child_argv"])
+        self.assertIn("V200_OPERATOR_VERIFY=1", enabled["bounded_child_argv"])
+        self.assertIn("-u", enabled["bounded_child_argv"])
+        with self.assertRaisesRegex(serve_launcher.LaunchError, "requires --pair-compute"):
+            serve_launcher._make_plan("preview", self.uuids, "invalid-verify",
+                                      verify_pair_compute=True)
+
+    def test_cli_exposes_pair_compute_opt_in(self) -> None:
+        args = serve_launcher._parse_args(["--pair-compute", "--workload", "resident_capacity"])
+        self.assertTrue(args.pair_compute)
+        self.assertEqual(args.workload, "resident_capacity")
 
     def test_service_duration_and_pair_overrides_fail_closed(self) -> None:
         with self.assertRaisesRegex(serve_launcher.LaunchError, "between 1 and 3000"):

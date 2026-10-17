@@ -1,0 +1,613 @@
+{
+  "allocation_evidence": {
+    "application_limit_bytes_per_owner": 12884901888,
+    "facade_limit_enforcer": "V200 per-owner allocation ledger",
+    "fixture_v200_owner_budget_caps": [
+      {
+        "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+        "maximum_budget_bytes": 12884901888,
+        "startup_policy": "min(cap, native free bytes minus 1 GiB reserve)"
+      },
+      {
+        "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+        "maximum_budget_bytes": 12884901888,
+        "startup_policy": "min(cap, native free bytes minus 1 GiB reserve)"
+      }
+    ],
+    "measured_peak_pair_backing_bytes": null,
+    "minimum_real_gpu_payload_bytes": 18550716425,
+    "native_limit_enforcement": "descriptor-based preflight only; no native allocator ledger",
+    "v200_memory_api_receipt": "INVALID"
+  },
+  "application_status": "FAIL",
+  "argv": [
+    "/home/tumlinson/Software/llama.cpp/build/bin/llama-server",
+    "--model",
+    "/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "46357",
+    "--ctx-size",
+    "8192",
+    "--batch-size",
+    "64",
+    "--ubatch-size",
+    "64",
+    "--parallel",
+    "1",
+    "--threads",
+    "4",
+    "--threads-batch",
+    "4",
+    "--n-gpu-layers",
+    "999",
+    "--fit",
+    "off",
+    "--flash-attn",
+    "off",
+    "--cache-type-k",
+    "f16",
+    "--cache-type-v",
+    "f16",
+    "--alias",
+    "v200-qwen3-coder-30b",
+    "--device",
+    "CUDA0",
+    "--split-mode",
+    "none",
+    "--override-tensor",
+    "^token_embd\\.weight$=CUDA0",
+    "--verbosity",
+    "5"
+  ],
+  "backend": "v200-preload",
+  "capacity_claim": "PENDING: requires full layer-offload and live pair-residency evidence",
+  "cleanup": {
+    "no_live_group_members": true,
+    "owned_process_group": 380494,
+    "owned_session": 380494,
+    "remaining_members": [],
+    "sigkill_escalation": false,
+    "signaled_owned_group": true,
+    "zombie_members_only": false
+  },
+  "control": "facade_owner",
+  "cuda_visible_devices": "0,2",
+  "elapsed_seconds": 7.820592658999885,
+  "expected_oracle": {
+    "expected_exact": "2",
+    "normalization": "strip surrounding Unicode whitespace only",
+    "response_field": "content",
+    "tokens_predicted_max": 8,
+    "tokens_predicted_min": 1
+  },
+  "failure": "RemoteDisconnected: Remote end closed connection without response",
+  "finished_unix_time": 1792244641.985564,
+  "fixture_id": "llama-server-qwen3-coder-30b-q4km-v1",
+  "gpu_qualification": "NOT_CLAIMED",
+  "identities": {
+    "binary": {
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/llama-server",
+      "sha256": "b42facfb93d85e1a581862c872615834223dc479871701c0b797aeee1fa11e9d"
+    },
+    "fixture_sha256": "4bbc9324556131939e2a23478ffc2feb7a523eefd32a3a7fe2191d91a7f90c8b",
+    "model": {
+      "path": "/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf",
+      "sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad"
+    },
+    "preloads": [
+      {
+        "ordinal": 0,
+        "path": "/home/tumlinson/V200/build/src/frontdoor/libv200_frontdoor.so",
+        "sha256": "68d36e7c221ed23556969d81ab3d9a19c6e248ed0ad1087ebe50443c06bae0eb"
+      },
+      {
+        "ordinal": 1,
+        "path": "/home/tumlinson/V200/build/src/integration/libv200_pair_init.so",
+        "sha256": "bce18b49a5352b9c14cbc42596455bfefb45aa276985ef0c5cb80bc98d396c1c"
+      },
+      {
+        "ordinal": 2,
+        "path": "/home/tumlinson/V200/build/src/operators/libv200_operators.so",
+        "sha256": "709772e992498dad6ab0b9ef889e9ad669a6fe32d8818c7026f682b80886155d"
+      }
+    ],
+    "profile_sha256": "f6bb541df61c98d613cbd07e4519bf32b2300ef2a042ed6f844b0d00d2a14d65",
+    "runtime_closure": [
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-server-impl.so",
+        "sha256": "a176f2a62eeab92491cd112a09b12799961249be7c5341c59c415694cca0eaa0"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-common.so.0.2.0",
+        "sha256": "628a832efc253d1da29ff09a225f74e98c3d0a7bda72ac0bd4f074c19f764e7b"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libmtmd.so.0.2.0",
+        "sha256": "4c980a736b41e0fbb7929c8bbe2dfbd188bba8ee3d9f5c716f1ac65f619d5bd1"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama.so.0.2.0",
+        "sha256": "d56c7c416032867451483a0b5b8a4563f3caeed725b39d924924fe11fcf7feb4"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml.so.0.21.0",
+        "sha256": "d76b41c497feced8853cc2c9d55352a382ab429e3de84ef94983dd914ebeb566"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cpu.so.0.21.0",
+        "sha256": "d2e3a5c6e3fb838f2c94ed3cb2d4b940c34838518f3f0233198aee22aee5c71c"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cuda.so.0.21.0",
+        "sha256": "df90ec2ea474f130cc253a6c0776ff0e2d7fdd4d821bcc6be4bcc940b59767a9"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-base.so.0.21.0",
+        "sha256": "3836344472b5092b77eaea16b3584f13028107ae44fa750d27183ba22628d345"
+      }
+    ],
+    "source": {
+      "commit": "f280b26983ad0fdb705a0d9ebf0503e76f2899b0",
+      "repository": "/home/tumlinson/Software/llama.cpp",
+      "tracked_worktree_clean": true
+    }
+  },
+  "input_embedding_evidence": {
+    "buffer_type": "CUDA0",
+    "path": "/home/tumlinson/V200/evidence/B03/operator-r1/consumer/resident_capacity-facade_owner-1792244634164970634.log",
+    "required_buffer_type": "CUDA0",
+    "status": "PASS",
+    "tensor": "token_embd.weight"
+  },
+  "layer_offload_evidence": {
+    "available_layers": 49,
+    "full_gpu_offload": true,
+    "offloaded_layers": 49,
+    "path": "/home/tumlinson/V200/evidence/B03/operator-r1/consumer/resident_capacity-facade_owner-1792244634164970634.log",
+    "required_layers": 49,
+    "status": "PASS"
+  },
+  "log_path": "/home/tumlinson/V200/evidence/B03/operator-r1/consumer/resident_capacity-facade_owner-1792244634164970634.log",
+  "memory_guard": {
+    "application_allocation_limit_mib": 12288,
+    "error": null,
+    "nvidia_smi_path": "/usr/bin/nvidia-smi",
+    "nvidia_smi_visible_gpu_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+      "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a"
+    ],
+    "over_limit": null,
+    "peak_owned_used_memory_bytes_by_uuid": {
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 6924795904,
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 13209960448
+    },
+    "physical_process_used_memory_guard_mib": 14336,
+    "samples": [
+      {
+        "owned_pids": [
+          380494
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 0,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 0
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 0,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 0
+        },
+        "rows": [],
+        "sampled_unix_time": 1792244634.2489457
+      },
+      {
+        "owned_pids": [
+          380494
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 322961408,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 13207863296
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 308,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 12596
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 308
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 12596
+          }
+        ],
+        "sampled_unix_time": 1792244635.7916248
+      },
+      {
+        "owned_pids": [
+          380494
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 5989466112,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 13207863296
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 5712,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 12596
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 5712
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 12596
+          }
+        ],
+        "sampled_unix_time": 1792244636.908625
+      },
+      {
+        "owned_pids": [
+          380494
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 5989466112,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 13207863296
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 5712,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 12596
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 5712
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 12596
+          }
+        ],
+        "sampled_unix_time": 1792244638.0314937
+      },
+      {
+        "owned_pids": [
+          380494
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 5989466112,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 13207863296
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 5712,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 12596
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 5712
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 12596
+          }
+        ],
+        "sampled_unix_time": 1792244639.1483355
+      },
+      {
+        "owned_pids": [
+          380494,
+          380731
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 6924795904,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 13209960448
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 6604,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 12598
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 6604
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 12598
+          }
+        ],
+        "sampled_unix_time": 1792244640.2666066
+      },
+      {
+        "owned_pids": [
+          380494
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 6924795904,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 13209960448
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 6604,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 12598
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 6604
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 380494,
+            "used_memory_mib": 12598
+          }
+        ],
+        "sampled_unix_time": 1792244641.3968263
+      }
+    ],
+    "telemetry_status": "PASS"
+  },
+  "partial_offload_preview": false,
+  "physical_gpu_memory_before_launch": {
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": {
+      "free_bytes": 16929259520,
+      "free_mib": 16145,
+      "total_bytes": 17179869184,
+      "total_mib": 16384
+    },
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206": {
+      "free_bytes": 16929259520,
+      "free_mib": 16145,
+      "total_bytes": 17179869184,
+      "total_mib": 16384
+    }
+  },
+  "physical_headroom_preflight": {
+    "maximum_selected_physical_capacity_bytes": 17179869184,
+    "payload_exceeds_each_physical_gpu_capacity": true,
+    "physical_reserve_bytes_per_owner": 1073741824,
+    "qualified_application_bytes_by_uuid": {
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 12884901888,
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 12884901888
+    },
+    "required_application_bytes_by_uuid": {
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 12884901888,
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 8618604553
+    },
+    "resident_payload_bytes": 18550716425,
+    "status": "PASS"
+  },
+  "preflight": {
+    "application_limit_bytes_per_owner": 12884901888,
+    "basis": "GGUF tensor descriptors + explicit f16 KV formula + workspace reserve, placed according to native split or V200 preferred-owner allocation with peer spill",
+    "control": "facade_owner",
+    "effective_gpu_layers": 48,
+    "estimated_allocation_bytes_total": 21503506441,
+    "estimated_bytes_by_owner": [
+      12884901888,
+      8618604553
+    ],
+    "estimated_bytes_per_owner": 12884901888,
+    "estimated_mib_per_owner": 12288.0,
+    "fits_static_preflight": true,
+    "gpu_layer_tensor_bytes_total": 18120425481,
+    "kv_bytes_total": 805306368,
+    "non_block_tensor_bytes_total_assumed": 430290944,
+    "owner_count_assumed": 2,
+    "placement_policy": "preferred_owner_with_peer_spill",
+    "requested_gpu_layers": 999,
+    "workload": "resident_capacity",
+    "workspace_reserve_bytes_per_owner": 1073741824
+  },
+  "preview_environment": {
+    "GGML_CUDA_DISABLE_GRAPHS": "1",
+    "policy": "CUDA graphs are disabled for both matched controls; this is a correctness/ownership preview, not a graph-enabled performance baseline."
+  },
+  "readiness_seconds": 5.3856542379999155,
+  "request": {
+    "body": {
+      "cache_prompt": false,
+      "frequency_penalty": 0.0,
+      "n_predict": 8,
+      "presence_penalty": 0.0,
+      "prompt": "Answer with exactly one digit and no words. What is 1 + 1?\nAnswer:",
+      "repeat_penalty": 1.0,
+      "seed": 42,
+      "stop": [
+        "\n"
+      ],
+      "stream": false,
+      "temperature": 0.0,
+      "top_k": 1,
+      "top_p": 1.0
+    },
+    "method": "POST",
+    "path": "/completion"
+  },
+  "request_seconds": null,
+  "response": null,
+  "result_path": "/home/tumlinson/V200/evidence/B03/operator-r1/consumer/resident_capacity-facade_owner-1792244634164970634.json",
+  "run_id": "resident_capacity-facade_owner-1792244634164970634",
+  "schema": "v200-consumer-result/v1",
+  "selected_gpu_uuids": [
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+  ],
+  "server_process": {
+    "exit_code": -6,
+    "pid": 380494,
+    "process_group": 380494,
+    "session": 380494
+  },
+  "service": null,
+  "started_monotonic": 14770.967840604,
+  "started_unix_time": 1792244634.1649692,
+  "v200_b01_evidence_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec",
+  "v200_mode": "pair",
+  "v200_profile_telemetry": {
+    "error": "ValueError: line 7 missing fields ['mode', 'anchor_uuid', 'peer_uuid', 'qualification_id', 'owner_budget_bytes', 'owner_used_bytes', 'live_allocation_count', 'live_reservation_count', 'cleanup_pending_count']",
+    "path": "/home/tumlinson/V200/evidence/B03/operator-r1/consumer/resident_capacity-facade_owner-1792244634164970634.v200-profile.jsonl",
+    "records": [
+      {
+        "anchor_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+        "cleanup_pending_count": 0,
+        "event": "profile_initialized",
+        "live_allocation_count": 0,
+        "live_reservation_count": 0,
+        "mode": "pair",
+        "owner_budget_bytes": [
+          12884901888,
+          12884901888
+        ],
+        "owner_used_bytes": [
+          0,
+          0
+        ],
+        "peer_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+        "qualification_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec",
+        "schema": "v200-frontdoor-ledger/v1"
+      },
+      {
+        "anchor_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+        "cleanup_pending_count": 0,
+        "event": "cuda_malloc",
+        "live_allocation_count": 1,
+        "live_reservation_count": 1,
+        "mode": "pair",
+        "owner_budget_bytes": [
+          12884901888,
+          12884901888
+        ],
+        "owner_used_bytes": [
+          5666504704,
+          12884901888
+        ],
+        "peer_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+        "qualification_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec",
+        "schema": "v200-frontdoor-ledger/v1"
+      },
+      {
+        "anchor_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+        "cleanup_pending_count": 0,
+        "event": "cuda_malloc",
+        "live_allocation_count": 2,
+        "live_reservation_count": 2,
+        "mode": "pair",
+        "owner_budget_bytes": [
+          12884901888,
+          12884901888
+        ],
+        "owner_used_bytes": [
+          6471811072,
+          12884901888
+        ],
+        "peer_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+        "qualification_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec",
+        "schema": "v200-frontdoor-ledger/v1"
+      },
+      {
+        "anchor_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+        "cleanup_pending_count": 0,
+        "event": "cuda_malloc",
+        "live_allocation_count": 3,
+        "live_reservation_count": 3,
+        "mode": "pair",
+        "owner_budget_bytes": [
+          12884901888,
+          12884901888
+        ],
+        "owner_used_bytes": [
+          6545211392,
+          12884901888
+        ],
+        "peer_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+        "qualification_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec",
+        "schema": "v200-frontdoor-ledger/v1"
+      },
+      {
+        "anchor_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+        "cleanup_pending_count": 0,
+        "event": "cu_mem_map",
+        "live_allocation_count": 4,
+        "live_reservation_count": 4,
+        "mode": "pair",
+        "owner_budget_bytes": [
+          12884901888,
+          12884901888
+        ],
+        "owner_used_bytes": [
+          6547308544,
+          12884901888
+        ],
+        "peer_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+        "qualification_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec",
+        "schema": "v200-frontdoor-ledger/v1"
+      },
+      {
+        "anchor_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+        "cleanup_pending_count": 0,
+        "event": "cuda_malloc",
+        "live_allocation_count": 5,
+        "live_reservation_count": 5,
+        "mode": "pair",
+        "owner_budget_bytes": [
+          12884901888,
+          12884901888
+        ],
+        "owner_used_bytes": [
+          6551502848,
+          12884901888
+        ],
+        "peer_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+        "qualification_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec",
+        "schema": "v200-frontdoor-ledger/v1"
+      },
+      {
+        "anchor_local_calls": 1,
+        "anchor_rows": 4096,
+        "event": "q4k_mmvq_anchor_local",
+        "matched_calls": 1,
+        "max_abs_error": -1,
+        "operation": "q4k_mmvq",
+        "peer_owner_calls": 0,
+        "peer_rows": 0,
+        "route": "anchor-local",
+        "schema": "v200-operator-ledger/v1",
+        "split_calls": 0,
+        "status": 0,
+        "verified_rows": 0
+      }
+    ],
+    "sha256": "e95f9b2f67e18a7c1d18c16f421efee9e84ababdb7f4be052c73d829c3875c05",
+    "status": "INVALID"
+  },
+  "workload": "resident_capacity",
+  "workload_purpose": "Full-resident pair-capacity candidate; this is not run until the root authorizes it after the fitting smoke and allocator integration."
+}

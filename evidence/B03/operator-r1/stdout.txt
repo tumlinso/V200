@@ -1,0 +1,1 @@
+{"application_status": "FAIL", "control": "facade_owner", "gpu_qualification": "NOT_CLAIMED", "log_path": "/home/tumlinson/V200/evidence/B03/operator-r1/consumer/resident_capacity-facade_owner-1792244634164970634.log", "result_path": "/home/tumlinson/V200/evidence/B03/operator-r1/consumer/resident_capacity-facade_owner-1792244634164970634.json", "workload": "resident_capacity"}

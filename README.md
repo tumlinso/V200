@@ -18,6 +18,13 @@ V200-07 now has a bounded full-resident capacity workload. It loads the pinned Q
 python3 /home/tumlinson/V200/scripts/v200/serve.py --mode preview --workload resident_capacity --execute
 ```
 
-This establishes pair-backed application memory capacity. It does **not** demonstrate dual-GPU computation or speedup; the preview remains graph-off and computes on the anchor. See [the capacity evidence and current limits](docs/v200/capacity.md), [consumer usage](docs/v200/first-consumer.md), [planning](planning/README.md), and the [execution plan](planning/EXECUTION_PLAN.md). The original bootstrap remains intact under `planning/v200-bootstrap/`; Todo authority tracks progress. No model download or llama.cpp source patch is required.
+V200-08 also executes eligible Q4_K matrix-vector operations on the physical owner of their weights: the full-resident consumer completed with 68 anchor-local and 174 peer-owner calls. The first peer operation matched the original kernel bit-for-bit across 4,096 outputs; managed allocation accounting returned to zero. Graphs remain disabled; single-matrix splitting is CPU-checked only, and speedup is not established. See [operator evidence](docs/v200/operator-profile.json), [capacity](docs/v200/capacity.md), and [consumer usage](docs/v200/first-consumer.md). No model download or llama.cpp source patch is required.
+
+Run a finite full-resident server with pair compute (omit `--pair-compute` for the capacity-only fallback):
+
+```sh
+python3 scripts/v200/serve.py --mode serve --workload resident_capacity --pair-compute --duration-seconds 300 --execute
+```
+
 
 Git remote: <https://github.com/tumlinso/V200.git>.

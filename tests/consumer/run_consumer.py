@@ -273,6 +273,8 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
     source = dict(os.environ if environ is None else environ)
     child = {key: value for key, value in source.items()
              if not key.startswith("LLAMA_ARG_") and not key.startswith("GGML_CUDA_")}
+    pair_compute_requested = child.pop("V200_PAIR_COMPUTE", None) == "1"
+    operator_verify_requested = child.pop("V200_OPERATOR_VERIFY", None) == "1"
     inherited = [part for part in child.pop("LD_PRELOAD", "").split()
                  if "libv200" not in Path(part).name.lower()]
     child.pop("V200_MODE", None)
@@ -291,6 +293,12 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
             raise ConsumerError("facade fixture must define a mode and inherit controller UUIDs")
         if mode == "pair" and len(preloads) < 2:
             raise ConsumerError("facade pair mode requires frontdoor and root pair-initializer libraries")
+        if pair_compute_requested and mode == "pair":
+            if not any(Path(path).name == "libv200_operators.so" for path in preloads):
+                raise ConsumerError("pair compute requires the pair operator library preload")
+            child["V200_PAIR_COMPUTE"] = "1"
+            if operator_verify_requested:
+                child["V200_OPERATOR_VERIFY"] = "1"
         child["V200_MODE"] = mode
         child["V200_DEVICE_UUIDS"] = selected
         child["LD_PRELOAD"] = ":".join([*(str(path) for path in preloads), *inherited])
@@ -728,6 +736,7 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
     try:
         raw = path.read_bytes()
         records = []
+        operator_records = []
         accepted_budgets: list[int] | None = None
         peak_used = [0, 0]
         peak_total = 0
@@ -738,6 +747,29 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
             value = json.loads(line.decode("utf-8"))
             if not isinstance(value, dict):
                 raise ValueError(f"line {line_number} is not a JSON object")
+            if value.get("schema") == "v200-operator-ledger/v1":
+                operator_required = (
+                    "event", "operation", "route", "matched_calls",
+                    "anchor_local_calls", "peer_owner_calls", "split_calls",
+                    "anchor_rows", "peer_rows", "verified_rows",
+                    "max_abs_error", "status",
+                )
+                missing = [field for field in operator_required if field not in value]
+                if missing:
+                    raise ValueError(f"line {line_number} operator record missing fields {missing}")
+                if any(not isinstance(value[field], str)
+                       for field in ("event", "operation", "route")):
+                    raise ValueError(f"line {line_number} operator event fields are malformed")
+                if any(isinstance(value[field], bool) or not isinstance(value[field], int)
+                       for field in (*operator_required[3:10], "status")):
+                    raise ValueError(f"line {line_number} operator counters are malformed")
+                if (isinstance(value["max_abs_error"], bool)
+                        or not isinstance(value["max_abs_error"], (int, float))):
+                    raise ValueError(f"line {line_number} operator error is malformed")
+                operator_records.append(value)
+                continue
+            if value.get("schema") != "v200-frontdoor-ledger/v1":
+                raise ValueError(f"line {line_number} has unexpected ledger schema")
             records.append(value)
             required = ("schema", "event", "mode", "anchor_uuid", "peer_uuid",
                         "qualification_id", "owner_budget_bytes", "owner_used_bytes",
@@ -745,8 +777,8 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
             missing = [field for field in required if field not in value]
             if missing:
                 raise ValueError(f"line {line_number} missing fields {missing}")
-            if value["schema"] != "v200-frontdoor-ledger/v1" or value["mode"] != "pair":
-                raise ValueError(f"line {line_number} has unexpected ledger schema or mode")
+            if value["mode"] != "pair":
+                raise ValueError(f"line {line_number} has unexpected ledger mode")
             if value["anchor_uuid"] != selected_uuids[0] or value["peer_uuid"] != selected_uuids[1]:
                 raise ValueError(f"line {line_number} UUID ordering differs from controller selection")
             if (expected_qualification_id is not None
@@ -791,6 +823,7 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
             status = "PASS"
         return {"status": status, "path": str(path),
                 "sha256": hashlib.sha256(raw).hexdigest(), "records": records,
+                "operator_records": operator_records,
                 "owner_budget_bytes": accepted_budgets,
                 "peak_owner_used_bytes": peak_used,
                 "peak_total_owner_used_bytes": peak_total,
@@ -800,11 +833,14 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
     except OverflowError as exc:
         return {"status": "OVER_BUDGET", "path": str(path),
                 "sha256": hashlib.sha256(raw).hexdigest() if "raw" in locals() else None,
-                "records": records if "records" in locals() else [], "error": str(exc)}
+                "records": records if "records" in locals() else [],
+                "operator_records": operator_records if "operator_records" in locals() else [],
+                "error": str(exc)}
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
         return {"status": "INVALID", "path": str(path),
                 "sha256": hashlib.sha256(raw).hexdigest() if "raw" in locals() else None,
                 "records": records if "records" in locals() else [],
+                "operator_records": operator_records if "operator_records" in locals() else [],
                 "error": f"{type(exc).__name__}: {exc}"}
 
 

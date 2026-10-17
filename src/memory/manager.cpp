@@ -737,9 +737,10 @@ CUresult MemoryManager::allocate(CUdevice preferred, size_t bytes, size_t alignm
             access[0].location.id = preferred;
             access[0].flags = CU_MEM_ACCESS_FLAGS_PROT_READWRITE;
             size_t access_count = 1;
-            if (stored.extents.size() > 1 && impl_->profile.pair_access_qualified != 0) {
+            if (impl_->profile.pair_access_qualified != 0) {
+                access[0].location.id = impl_->profile.owner_device[0];
                 access[1].location.type = CU_MEM_LOCATION_TYPE_DEVICE;
-                access[1].location.id = impl_->profile.owner_device[1u - static_cast<size_t>(preferred_index)];
+                access[1].location.id = impl_->profile.owner_device[1];
                 access[1].flags = CU_MEM_ACCESS_FLAGS_PROT_READWRITE;
                 access_count = 2;
             }
@@ -1115,6 +1116,17 @@ CUresult MemoryManager::vmm_set_access(CUdeviceptr ptr, size_t size,
                 }
             }
         }
+    }
+    // One logical-device permission applies to both compute domains, including
+    // revocation; a peer launch must never bypass a logical PROT_NONE.
+    if (impl_->profile.pair_access_qualified != 0 && count == 1) {
+        CUmemAccessDesc pair_access[2]{};
+        pair_access[0] = desc[0];
+        pair_access[1] = desc[0];
+        pair_access[0].location.id = impl_->profile.owner_device[0];
+        pair_access[1].location.id = impl_->profile.owner_device[1];
+        return impl_->driver.mem_set_access(impl_->driver.user_data, ptr, size,
+                                            pair_access, 2);
     }
     return impl_->driver.mem_set_access(impl_->driver.user_data, ptr, size, desc, count);
 }

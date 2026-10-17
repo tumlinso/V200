@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T13:42:19Z",
+  "generated_at": "2026-10-17T13:49:17Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 73,
+  "project_revision": 80,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 73,
+    "project_revision": 80,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -99,10 +99,10 @@
       {
         "id": "V200-07-READY",
         "metadata_json": "{}",
-        "reached_at": null,
-        "revision": 71,
+        "reached_at": "2026-10-17T13:42:51Z",
+        "revision": 78,
         "revoked_at": null,
-        "state": "pending",
+        "state": "reached",
         "task_id": "V200-07",
         "title": "V200-07-READY"
       },
@@ -928,6 +928,76 @@
         "revision": 73,
         "seq": 73,
         "timestamp": "2026-10-17T13:42:19Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-07-CAPACITY",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-07-CAPACITY\"}",
+        "revision": 74,
+        "seq": 74,
+        "timestamp": "2026-10-17T13:42:47Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-07-CAPACITY",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"d5feccdc-825e-40cd-865d-d863b91d6e37\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 75,
+        "seq": 75,
+        "timestamp": "2026-10-17T13:42:47Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-07-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-07-CPU\"}",
+        "revision": 76,
+        "seq": 76,
+        "timestamp": "2026-10-17T13:42:47Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-07-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"4c3d9b85-d129-413a-a2a9-c1c862ab4aad\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 77,
+        "seq": 77,
+        "timestamp": "2026-10-17T13:42:51Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-07",
+        "entity_type": "task",
+        "event_type": "task.completed",
+        "payload_json": "{\"completion_revision\": 78, \"disposition\": \"implemented\", \"reached_checkpoints\": [\"V200-07-READY\"]}",
+        "revision": 78,
+        "seq": 78,
+        "timestamp": "2026-10-17T13:42:51Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-CAPACITY-COMPUTE-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-CAPACITY-COMPUTE-1-MAIN\", \"run_id\": \"V200-CAPACITY-COMPUTE-1\", \"status\": \"claimed\", \"task_id\": \"V200-08\"}",
+        "revision": 79,
+        "seq": 79,
+        "timestamp": "2026-10-17T13:42:57Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "ec3f0257-3427-4afb-b9fc-85cfb12ac7b3",
+        "entity_type": "gate_binding",
+        "event_type": "workflow.gates.bound",
+        "payload_json": "{\"gate_count\": 2}",
+        "revision": 80,
+        "seq": 80,
+        "timestamp": "2026-10-17T13:49:17Z"
       }
     ],
     "evidence": [
@@ -981,6 +1051,19 @@
         "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"86fda0f9d9728384c63f3ffcceb4cd05c39f5426a0fd2798b4abe7b6f577a481\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"c4ca5296b7776e45e653d19be7a89dc4b32169f526b1ab9bd83c2d3c625d88f1\"}, {\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"include/v200\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/integration\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/execution\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration\", \"sha256\": \"missing\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 66}",
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/47e9a99e-9228-45fc-a557-9a76af7e9de7",
         "revision": 67,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T13:42:51Z",
+        "gate_id": "V200-07-CPU",
+        "id": "4c3d9b85-d129-413a-a2a9-c1c862ab4aad",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_runtime_init_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','v200_rtld_local_closure_test','v200_fake_cuda_driver','v200_fake_cudart','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|rtld_local_native_dispatch|memory_tests|runtime_init_host|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"46f89bd8292334fb05adc2f9d2d04963eef914f3c9346eb67b7a9cbc2f9a2618\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_runtime_init_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','v200_rtld_local_closure_test','v200_fake_cuda_driver','v200_fake_cudart','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|rtld_local_native_dispatch|memory_tests|runtime_init_host|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"timeout\": 180}, \"diff_fingerprint\": \"18a32c3884bd9cb66b645408d56e9b5f7a2b587ea3115afaa8fd9c42ad139e8f\", \"dirty_paths\": [\"CMakeLists.txt\", \"docs/v200/operator-profile.json\", \"include/v200/operators/mmvq_plan.hpp\", \"include/v200/operators/pair_runtime.hpp\", \"src/operators/CMakeLists.txt\", \"src/operators/launch.cpp\", \"src/operators/mmvq_plan.cpp\", \"src/operators/pair_runtime.cpp\", \"tests/operators/test_mmvq_plan.cpp\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"5598a4fab1eb1ee9d2cdeffbfb22ebbe2a816098732126dfe3cb022c023b4675\"}, {\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/core\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/execution\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/operators/launch.hpp\", \"sha256\": \"a16854bd5203a6b41150045d3810bd3df8c81ffe9989a9793981021f9e16e32c\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/integration\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration/runtime_init_test.cpp\", \"sha256\": \"00132374a3386877addfff5a4874fed9d953a957bbea0e8543cb49c0269336e8\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 76}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/4c3d9b85-d129-413a-a2a9-c1c862ab4aad",
+        "revision": 77,
         "status": "passed"
       },
       {
@@ -1085,6 +1168,19 @@
         "metadata_json": "{\"argv\": [\"ctest\", \"--test-dir\", \"build\", \"--output-on-failure\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"5304559533162be313b7e11585d81b35c6daf8743036c68c2a6fc4586dab1222\", \"inputs\": {\"command_contract\": {\"argv\": [\"ctest\", \"--test-dir\", \"build\", \"--output-on-failure\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"96d955b77aec44fbc5150c4935a1301c39cb09acb6264b6bef64b02dbaa231ce\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"todo-status.md\", \"todos.md\", \"todos/v200-01.md\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"4bdb2fc91c16d7b93b6dc7af516d0f725aa42c3e7eaa7fc3f59170ba9d4b63ac\"}, {\"path\": \"build-support\", \"sha256\": \"missing\"}, {\"path\": \"docs/v200\", \"sha256\": \"missing\"}, {\"path\": \"tests/host\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"6c5d035c1eba4149a78709f2618fb9d69ecf79de\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 5}",
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/c5f92509-9d35-4d91-9aa9-707c44e6bb39",
         "revision": 6,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T13:42:47Z",
+        "gate_id": "V200-07-CAPACITY",
+        "id": "d5feccdc-825e-40cd-865d-d863b91d6e37",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"tests/capacity/verify_capacity.py\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"45afe340f425d27e8426ca88685b46e84ad5cfcc0d87a00970e556b274ca9135\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/capacity/verify_capacity.py\"], \"cwd\": \".\", \"timeout\": 30}, \"diff_fingerprint\": \"18a32c3884bd9cb66b645408d56e9b5f7a2b587ea3115afaa8fd9c42ad139e8f\", \"dirty_paths\": [\"CMakeLists.txt\", \"docs/v200/operator-profile.json\", \"include/v200/operators/mmvq_plan.hpp\", \"include/v200/operators/pair_runtime.hpp\", \"src/operators/CMakeLists.txt\", \"src/operators/launch.cpp\", \"src/operators/mmvq_plan.cpp\", \"src/operators/pair_runtime.cpp\", \"tests/operators/test_mmvq_plan.cpp\"], \"files\": [{\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B04\", \"sha256\": \"missing\"}, {\"path\": \"tests/capacity\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 74}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/d5feccdc-825e-40cd-865d-d863b91d6e37",
+        "revision": 75,
         "status": "passed"
       },
       {
@@ -1262,25 +1358,51 @@
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"tests/capacity/verify_capacity.py\"], \"cwd\": \".\", \"input_paths\": [\"tests/capacity\", \"tests/consumer\", \"evidence/B04\", \"benchmarks/fixtures\"], \"timeout\": 30}",
         "id": "V200-07-CAPACITY",
-        "input_fingerprint": null,
-        "last_run_at": null,
+        "input_fingerprint": "45afe340f425d27e8426ca88685b46e84ad5cfcc0d87a00970e556b274ca9135",
+        "last_run_at": "2026-10-17T13:42:47Z",
         "required": 1,
-        "revision": 73,
-        "status": "pending",
+        "revision": 75,
+        "status": "passed",
         "task_id": "V200-07",
         "type": "command",
-        "valid": 0
+        "valid": 1
       },
       {
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_runtime_init_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','v200_rtld_local_closure_test','v200_fake_cuda_driver','v200_fake_cudart','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|rtld_local_native_dispatch|memory_tests|runtime_init_host|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"CMakeLists.txt\", \"include/v200/core\", \"include/v200/frontdoor\", \"include/v200/memory\", \"include/v200/execution\", \"include/v200/operators/launch.hpp\", \"src/frontdoor\", \"src/memory\", \"src/execution\", \"src/integration\", \"tests/abi\", \"tests/memory\", \"tests/integration/runtime_init_test.cpp\", \"tests/consumer\", \"scripts/v200\", \"benchmarks/fixtures\"], \"timeout\": 180}",
         "id": "V200-07-CPU",
+        "input_fingerprint": "46f89bd8292334fb05adc2f9d2d04963eef914f3c9346eb67b7a9cbc2f9a2618",
+        "last_run_at": "2026-10-17T13:42:51Z",
+        "required": 1,
+        "revision": 77,
+        "status": "passed",
+        "task_id": "V200-07",
+        "type": "command",
+        "valid": 1
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\"], \"cwd\": \".\", \"input_paths\": [\"tests/operators/verify_consumer.py\", \"tests/capacity\", \"tests/consumer\", \"benchmarks/fixtures\", \"evidence/B03/operator-r2\", \"evidence/B03/operator-r2.controller-result.json\", \"evidence/B03/operator-r2.controller-evidence.json\", \"evidence/B03/operator-r2.host-release.json\"], \"timeout\": 30}",
+        "id": "V200-08-CONSUMER",
         "input_fingerprint": null,
         "last_run_at": null,
         "required": 1,
-        "revision": 73,
+        "revision": 80,
         "status": "pending",
-        "task_id": "V200-07",
+        "task_id": "V200-08",
+        "type": "command",
+        "valid": 0
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"CMakeLists.txt\", \"src/operators/CMakeLists.txt\", \"src/operators/launch.cpp\", \"src/operators/mmvq_plan.cpp\", \"src/operators/pair_runtime.cpp\", \"include/v200/operators/launch.hpp\", \"include/v200/operators/mmvq_plan.hpp\", \"include/v200/operators/pair_runtime.hpp\", \"src/memory\", \"tests/memory\", \"tests/consumer\", \"tests/operators/test_mmvq_plan.cpp\", \"scripts/v200\"], \"timeout\": 180}",
+        "id": "V200-08-CPU",
+        "input_fingerprint": null,
+        "last_run_at": null,
+        "required": 1,
+        "revision": 80,
+        "status": "pending",
+        "task_id": "V200-08",
         "type": "command",
         "valid": 0
       },
@@ -1378,6 +1500,16 @@
         "payload_json": "{\"authority_commit\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-I01-READY\", \"reached_at\": \"2026-10-17T12:35:11Z\", \"state\": \"reached\"}], \"completion_commit\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"completion_gates\": [{\"evidence_id\": \"9b617037-45f4-411a-b988-7bdeabac6912\", \"evidence_revision\": 61, \"id\": \"V200-I01-INTEGRATED-CPU\", \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\"}], \"completion_revision\": 62, \"finalized_checkpoints\": [\"V200-I01-READY\"], \"gates\": [{\"id\": \"V200-I01-INTEGRATED-CPU\", \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"last_run_at\": \"2026-10-17T12:35:11Z\", \"revision\": 61, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \"\", \"git_head\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Integrated lazy pair initializer + controller-mediated foreground/preview launcher, reviewed rollback fail-stop fix. CPU gate passes all9CTest groups (consumer23 tests). B02 frontdoor evidence2c6cad1b-d526-4c1f-837b-a1a66b8d13ba; production96MiB both-owner full-range/zero-ledger evidence63a510fd-21c4-4960-84ca-572232fea914; owner completionf9e1d6eb-599e-41f0-ab7e-54ce164b9c05. Native llama baselinef2b89fd2-0a43-4dc4-82e8-56fade091835 only; facade app acceptance remains06. Failed attempts retained. All leasesreleased.\", \"producer_commit\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-I01\"}",
         "revision": 62,
         "task_id": "V200-I01"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T13:42:51Z",
+        "id": "dd4f39d6-ac3d-4309-aa09-617e10e5d383",
+        "kind": "complete",
+        "note": "Commit d0a81e8: real unchanged llama full GPU residency (49/49 layers plus embedding), 18,550,716,425B tensor payload exceeds either 17,179,869,184B physical V100. Pair backing peaked [6,551,502,848,12,884,901,888]B; exact answer2; native pair control passed; ledger finalzero, ownedprocessclean, hostreservationreleased. Controller B04 evidence 8b4250ac-792d-4c75-8359-292150ef800e; evidence/B04/capacity-r1.*. Coherent live-headroom pair memory contract; async memset/lifetime/native-library drain/context/stream rollback repairs. Graphs remainoff; no dualcompute/speedup claim. Proceed08.",
+        "payload_json": "{\"authority_commit\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"changed_owned_paths\": [\"CMakeLists.txt\", \"include/v200/operators/mmvq_plan.hpp\", \"include/v200/operators/pair_runtime.hpp\", \"src/operators/CMakeLists.txt\", \"src/operators/launch.cpp\", \"src/operators/mmvq_plan.cpp\", \"src/operators/pair_runtime.cpp\", \"tests/operators/test_mmvq_plan.cpp\"], \"checkpoints\": [{\"id\": \"V200-07-READY\", \"reached_at\": \"2026-10-17T13:42:51Z\", \"state\": \"reached\"}], \"completion_commit\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"completion_gates\": [{\"evidence_id\": \"d5feccdc-825e-40cd-865d-d863b91d6e37\", \"evidence_revision\": 75, \"id\": \"V200-07-CAPACITY\", \"input_fingerprint\": \"45afe340f425d27e8426ca88685b46e84ad5cfcc0d87a00970e556b274ca9135\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\"}, {\"evidence_id\": \"4c3d9b85-d129-413a-a2a9-c1c862ab4aad\", \"evidence_revision\": 77, \"id\": \"V200-07-CPU\", \"input_fingerprint\": \"46f89bd8292334fb05adc2f9d2d04963eef914f3c9346eb67b7a9cbc2f9a2618\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\"}], \"completion_revision\": 78, \"finalized_checkpoints\": [\"V200-07-READY\"], \"gates\": [{\"id\": \"V200-07-CPU\", \"input_fingerprint\": \"46f89bd8292334fb05adc2f9d2d04963eef914f3c9346eb67b7a9cbc2f9a2618\", \"last_run_at\": \"2026-10-17T13:42:51Z\", \"revision\": 77, \"status\": \"passed\", \"valid\": 1}, {\"id\": \"V200-07-CAPACITY\", \"input_fingerprint\": \"45afe340f425d27e8426ca88685b46e84ad5cfcc0d87a00970e556b274ca9135\", \"last_run_at\": \"2026-10-17T13:42:47Z\", \"revision\": 75, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \"CMakeLists.txt | 1 +\\n 1 file changed, 1 insertion(+)\", \"git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Commit d0a81e8: real unchanged llama full GPU residency (49/49 layers plus embedding), 18,550,716,425B tensor payload exceeds either 17,179,869,184B physical V100. Pair backing peaked [6,551,502,848,12,884,901,888]B; exact answer2; native pair control passed; ledger finalzero, ownedprocessclean, hostreservationreleased. Controller B04 evidence 8b4250ac-792d-4c75-8359-292150ef800e; evidence/B04/capacity-r1.*. Coherent live-headroom pair memory contract; async memset/lifetime/native-library drain/context/stream rollback repairs. Graphs remainoff; no dualcompute/speedup claim. Proceed08.\", \"producer_commit\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-07\"}",
+        "revision": 78,
+        "task_id": "V200-07"
       }
     ],
     "interface_consumers": [],
@@ -2378,6 +2510,32 @@
         "validation_git_head": "02d58dc016e8acae8aedee025f7cc6c5ce9144fa"
       },
       {
+        "completion_git_head": "d0a81e83969488c73cc8c21b0286501eb7de5383",
+        "completion_revision": 78,
+        "evidence_id": "d5feccdc-825e-40cd-865d-d863b91d6e37",
+        "evidence_revision": 75,
+        "gate_id": "V200-07-CAPACITY",
+        "input_fingerprint": "45afe340f425d27e8426ca88685b46e84ad5cfcc0d87a00970e556b274ca9135",
+        "provenance_json": "{\"claim_id\": \"6a74eee1-4b52-4014-b4f2-d3f443462b8c\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"tests/capacity/verify_capacity.py\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"45afe340f425d27e8426ca88685b46e84ad5cfcc0d87a00970e556b274ca9135\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/capacity/verify_capacity.py\"], \"cwd\": \".\", \"timeout\": 30}, \"diff_fingerprint\": \"18a32c3884bd9cb66b645408d56e9b5f7a2b587ea3115afaa8fd9c42ad139e8f\", \"dirty_paths\": [\"CMakeLists.txt\", \"docs/v200/operator-profile.json\", \"include/v200/operators/mmvq_plan.hpp\", \"include/v200/operators/pair_runtime.hpp\", \"src/operators/CMakeLists.txt\", \"src/operators/launch.cpp\", \"src/operators/mmvq_plan.cpp\", \"src/operators/pair_runtime.cpp\", \"tests/operators/test_mmvq_plan.cpp\"], \"files\": [{\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B04\", \"sha256\": \"missing\"}, {\"path\": \"tests/capacity\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 74}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/d5feccdc-825e-40cd-865d-d863b91d6e37\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-07",
+        "valid": 1,
+        "validation_git_head": "d0a81e83969488c73cc8c21b0286501eb7de5383"
+      },
+      {
+        "completion_git_head": "d0a81e83969488c73cc8c21b0286501eb7de5383",
+        "completion_revision": 78,
+        "evidence_id": "4c3d9b85-d129-413a-a2a9-c1c862ab4aad",
+        "evidence_revision": 77,
+        "gate_id": "V200-07-CPU",
+        "input_fingerprint": "46f89bd8292334fb05adc2f9d2d04963eef914f3c9346eb67b7a9cbc2f9a2618",
+        "provenance_json": "{\"claim_id\": \"6a74eee1-4b52-4014-b4f2-d3f443462b8c\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_runtime_init_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','v200_rtld_local_closure_test','v200_fake_cuda_driver','v200_fake_cudart','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|rtld_local_native_dispatch|memory_tests|runtime_init_host|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"46f89bd8292334fb05adc2f9d2d04963eef914f3c9346eb67b7a9cbc2f9a2618\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_runtime_init_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','v200_rtld_local_closure_test','v200_fake_cuda_driver','v200_fake_cudart','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|rtld_local_native_dispatch|memory_tests|runtime_init_host|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"timeout\": 180}, \"diff_fingerprint\": \"18a32c3884bd9cb66b645408d56e9b5f7a2b587ea3115afaa8fd9c42ad139e8f\", \"dirty_paths\": [\"CMakeLists.txt\", \"docs/v200/operator-profile.json\", \"include/v200/operators/mmvq_plan.hpp\", \"include/v200/operators/pair_runtime.hpp\", \"src/operators/CMakeLists.txt\", \"src/operators/launch.cpp\", \"src/operators/mmvq_plan.cpp\", \"src/operators/pair_runtime.cpp\", \"tests/operators/test_mmvq_plan.cpp\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"5598a4fab1eb1ee9d2cdeffbfb22ebbe2a816098732126dfe3cb022c023b4675\"}, {\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/core\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/execution\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/operators/launch.hpp\", \"sha256\": \"a16854bd5203a6b41150045d3810bd3df8c81ffe9989a9793981021f9e16e32c\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/integration\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration/runtime_init_test.cpp\", \"sha256\": \"00132374a3386877addfff5a4874fed9d953a957bbea0e8543cb49c0269336e8\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"d0a81e83969488c73cc8c21b0286501eb7de5383\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 76}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/4c3d9b85-d129-413a-a2a9-c1c862ab4aad\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-07",
+        "valid": 1,
+        "validation_git_head": "d0a81e83969488c73cc8c21b0286501eb7de5383"
+      },
+      {
         "completion_git_head": "8b6b9a80bcea6edc2eace40e87198b49184bad59",
         "completion_revision": 62,
         "evidence_id": "9b617037-45f4-411a-b988-7bdeabac6912",
@@ -2768,9 +2926,9 @@
       },
       {
         "attention_reason": null,
-        "completion_commit": null,
-        "completion_git_head": null,
-        "completion_revision": null,
+        "completion_commit": "d0a81e83969488c73cc8c21b0286501eb7de5383",
+        "completion_git_head": "d0a81e83969488c73cc8c21b0286501eb7de5383",
+        "completion_revision": 78,
         "created_at": "2026-10-17T11:40:58Z",
         "id": "V200-07",
         "kind": "task",
@@ -2782,14 +2940,14 @@
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
-        "result": null,
+        "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 72,
-        "status": "in_progress",
+        "revision": 78,
+        "status": "done",
         "tags_json": "[]",
         "title": "Qualify useful capacity beyond one physical V100",
-        "updated_at": "2026-10-17T13:23:04Z",
-        "version": 3
+        "updated_at": "2026-10-17T13:42:51Z",
+        "version": 4
       },
       {
         "attention_reason": null,
@@ -2809,12 +2967,12 @@
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 71,
-        "status": "planned",
+        "revision": 79,
+        "status": "in_progress",
         "tags_json": "[]",
         "title": "Accelerate the dominant qualified operation across the pair",
-        "updated_at": "2026-10-17T13:23:04Z",
-        "version": 2
+        "updated_at": "2026-10-17T13:42:57Z",
+        "version": 3
       },
       {
         "attention_reason": null,
@@ -3771,22 +3929,22 @@
     "workflow_lane_tasks": [
       {
         "activated_at": "2026-10-17T13:23:04Z",
-        "completed_at": null,
+        "completed_at": "2026-10-17T13:42:51Z",
         "enqueued_at": "2026-10-17T13:23:04Z",
         "lane_id": "V200-CAPACITY-COMPUTE-1-MAIN",
         "position": 0,
-        "revision": 72,
-        "state": "active",
+        "revision": 78,
+        "state": "completed",
         "task_id": "V200-07"
       },
       {
-        "activated_at": null,
+        "activated_at": "2026-10-17T13:42:57Z",
         "completed_at": null,
         "enqueued_at": "2026-10-17T13:23:04Z",
         "lane_id": "V200-CAPACITY-COMPUTE-1-MAIN",
         "position": 1,
-        "revision": 71,
-        "state": "queued",
+        "revision": 79,
+        "state": "active",
         "task_id": "V200-08"
       },
       {
@@ -4006,11 +4164,11 @@
         "created_at": "2026-10-17T13:23:04Z",
         "id": "V200-CAPACITY-COMPUTE-1-MAIN",
         "parent_lane_id": null,
-        "revision": 72,
+        "revision": 79,
         "role": "implementer",
         "run_id": "V200-CAPACITY-COMPUTE-1",
         "state": "active",
-        "updated_at": "2026-10-17T13:23:04Z",
+        "updated_at": "2026-10-17T13:42:57Z",
         "workspace_mode": "exclusive"
       },
       {

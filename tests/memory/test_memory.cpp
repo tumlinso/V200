@@ -12,17 +12,24 @@
 #include <map>
 #include <set>
 #include <thread>
+#include <utility>
 #include <vector>
 
 namespace {
 
 struct FakeDriver {
+    struct AccessCall {
+        CUdeviceptr ptr = 0;
+        size_t size = 0;
+        std::vector<CUmemAccessDesc> descriptors;
+    };
     CUdeviceptr next_address = 0x10000000;
     CUmemGenericAllocationHandle next_handle = 1;
     std::map<CUdeviceptr, size_t> reservations;
     std::map<CUdeviceptr, size_t> mappings;
     std::set<CUmemGenericAllocationHandle> handles;
     std::vector<size_t> owner_created_bytes{0, 0};
+    std::vector<AccessCall> access_calls;
     size_t map_calls = 0;
     size_t unmap_calls = 0;
     size_t release_calls = 0;
@@ -118,9 +125,16 @@ CUresult CUDAAPI fake_unmap(void *data, CUdeviceptr ptr, size_t size) {
     return cursor == end ? CUDA_SUCCESS : CUDA_ERROR_INVALID_VALUE;
 }
 
-CUresult CUDAAPI fake_set_access(void *, CUdeviceptr, size_t,
+CUresult CUDAAPI fake_set_access(void *data, CUdeviceptr ptr, size_t size,
                                  const CUmemAccessDesc *desc, size_t count) {
-    return desc != nullptr && count != 0 ? CUDA_SUCCESS : CUDA_ERROR_INVALID_VALUE;
+    if (desc == nullptr || count == 0) return CUDA_ERROR_INVALID_VALUE;
+    auto &driver = *static_cast<FakeDriver *>(data);
+    FakeDriver::AccessCall call;
+    call.ptr = ptr;
+    call.size = size;
+    call.descriptors.assign(desc, desc + count);
+    driver.access_calls.push_back(std::move(call));
+    return CUDA_SUCCESS;
 }
 
 CUresult CUDAAPI fake_granularity(void *data, size_t *granularity,
@@ -260,6 +274,15 @@ void test_compound_vmm_and_lifetime() {
     access.location.id = 0;
     access.flags = CU_MEM_ACCESS_FLAGS_PROT_READWRITE;
     assert(manager.vmm_set_access(reservation, 24, &access, 1) == CUDA_SUCCESS);
+    assert(fake.access_calls.size() == 1);
+    assert(fake.access_calls.back().descriptors.size() == 2);
+    assert(fake.access_calls.back().descriptors[0].location.id == 0 &&
+           fake.access_calls.back().descriptors[1].location.id == 1);
+    access.flags = CU_MEM_ACCESS_FLAGS_PROT_NONE;
+    assert(manager.vmm_set_access(reservation, 24, &access, 1) == CUDA_SUCCESS);
+    assert(fake.access_calls.back().descriptors.size() == 2 &&
+           fake.access_calls.back().descriptors[0].flags == CU_MEM_ACCESS_FLAGS_PROT_NONE &&
+           fake.access_calls.back().descriptors[1].flags == CU_MEM_ACCESS_FLAGS_PROT_NONE);
 
     FakeCompletion completion;
     manager.set_completion_provider(&completion);
@@ -281,6 +304,60 @@ void test_compound_vmm_and_lifetime() {
     assert(manager.get_usage(&usage) == CUDA_SUCCESS);
     assert(usage.owner_used_bytes[0] == 0 && usage.owner_used_bytes[1] == 0);
     assert(manager.vmm_address_free(reservation, 32) == CUDA_SUCCESS);
+}
+
+void test_single_extent_allocation_has_pair_access() {
+    FakeDriver fake;
+    auto profile = make_profile();
+    auto driver = make_driver(fake);
+    v200::memory::MemoryManager manager;
+    assert(manager.configure(profile, driver) == CUDA_SUCCESS);
+
+    void *pointer = nullptr;
+    assert(manager.allocate(0, 8, 0, &pointer) == CUDA_SUCCESS);
+    assert(pointer != nullptr && fake.access_calls.size() == 1);
+    const auto &access = fake.access_calls.front().descriptors;
+    assert(access.size() == 2);
+    assert(access[0].location.id == 0 && access[1].location.id == 1);
+    assert(access[0].flags == CU_MEM_ACCESS_FLAGS_PROT_READWRITE &&
+           access[1].flags == CU_MEM_ACCESS_FLAGS_PROT_READWRITE);
+    v200_allocation_info info{};
+    info.struct_size = sizeof(info);
+    assert(manager.query(pointer, &info) == CUDA_SUCCESS);
+    assert(info.extent_count == 1 && info.owner_bytes[0] == 12 && info.owner_bytes[1] == 0);
+    assert(manager.release(pointer) == CUDA_SUCCESS);
+}
+
+void test_single_extent_vmm_anchor_access_expands_to_pair() {
+    FakeDriver fake;
+    auto profile = make_profile();
+    auto driver = make_driver(fake);
+    v200::memory::MemoryManager manager;
+    assert(manager.configure(profile, driver) == CUDA_SUCCESS);
+
+    CUdeviceptr reservation = 0;
+    assert(manager.vmm_address_reserve(&reservation, 12, 0, 0, 0) == CUDA_SUCCESS);
+    CUmemAllocationProp prop{};
+    prop.type = CU_MEM_ALLOCATION_TYPE_PINNED;
+    prop.location.type = CU_MEM_LOCATION_TYPE_DEVICE;
+    prop.location.id = 0;
+    CUmemGenericAllocationHandle handle = 0;
+    assert(manager.vmm_create(&handle, 12, &prop, 0) == CUDA_SUCCESS);
+    assert(manager.vmm_map(reservation, 12, 0, handle, 0) == CUDA_SUCCESS);
+
+    CUmemAccessDesc access{};
+    access.location.type = CU_MEM_LOCATION_TYPE_DEVICE;
+    access.location.id = 0;
+    access.flags = CU_MEM_ACCESS_FLAGS_PROT_READWRITE;
+    assert(manager.vmm_set_access(reservation, 12, &access, 1) == CUDA_SUCCESS);
+    assert(fake.access_calls.size() == 1);
+    assert(fake.access_calls.back().descriptors.size() == 2);
+    assert(fake.access_calls.back().descriptors[0].location.id == 0 &&
+           fake.access_calls.back().descriptors[1].location.id == 1);
+
+    assert(manager.vmm_release(handle) == CUDA_SUCCESS);
+    assert(manager.vmm_unmap(reservation, 12) == CUDA_SUCCESS);
+    assert(manager.vmm_address_free(reservation, 12) == CUDA_SUCCESS);
 }
 
 void test_allocate_rollback_and_retry() {
@@ -502,6 +579,8 @@ void test_submission_lease_closes_retain_race() {
 
 int main() {
     test_planner();
+    test_single_extent_allocation_has_pair_access();
+    test_single_extent_vmm_anchor_access_expands_to_pair();
     test_compound_vmm_and_lifetime();
     test_allocate_rollback_and_retry();
     test_completion_failure_keeps_accounting();

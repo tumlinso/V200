@@ -1,0 +1,75 @@
+{
+  "schema": "v200-operator-profile/v1",
+  "consumer": "llama.cpp CUDA backend",
+  "consumer_revision": "f280b26983ad0fdb705a0d9ebf0503e76f2899b0",
+  "operation": "Q4_K single-column quantized matrix-vector multiply",
+  "registered_kernel": "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb0ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj",
+  "scope": {
+    "ggml_type": "GGML_TYPE_Q4_K=12",
+    "ncols_dst": 1,
+    "fusion": false,
+    "small_k": false,
+    "halve_iters": false,
+    "compute_capability": "Volta sm_70",
+    "rows_per_grid_block": 1,
+    "grid_contract": {
+      "x": "independent output rows",
+      "y": 1,
+      "z": 1,
+      "block": [
+        32,
+        4,
+        1
+      ]
+    },
+    "runtime_argument_count": 19,
+    "q4_k_elements_per_block": 256,
+    "q4_k_bytes_per_block": 144,
+    "q8_1_elements_per_block": 32,
+    "q8_1_bytes_per_block": 36
+  },
+  "placement": {
+    "required_memory": "V200 pair-managed VMM allocations accessible on both owners",
+    "single_owner": "submit all rows to the physical owner of the weight extent",
+    "two_owner": "split at the contiguous preferred-owner extent boundary, rounded up to a complete row",
+    "minimum_rows_per_partition": 32,
+    "inter_partition_reduction": false,
+    "unrecognized_or_unsupported": "forward unchanged to the original anchor launch"
+  },
+  "numerical_contract": "Each output row executes the original pinned llama Q4_K kernel exactly once; no floating-point reduction is split or reordered.",
+  "verification": {
+    "enable": "V200_OPERATOR_VERIFY=1",
+    "behavior": "On the first peer-owner and first split route, run the same launch on the anchor as a reference, then run the routed launch and compare the full output bitwise.",
+    "maximum_output_bytes": 1048576,
+    "diagnostics": "V200_PROFILE_LOG receives v200-operator-ledger/v1 route, verification, and process-exit count records alongside frontdoor memory snapshots."
+  },
+  "fallbacks": [
+    "grid.y or grid.z is not one",
+    "fused, expert-indexed, batched, or multi-column specialization",
+    "input, output, or weight range is not fully pair-managed",
+    "weight ownership cannot be proven from the contiguous VMM extent record",
+    "the complete weight range is anchor-owned"
+  ],
+  "source_identity": {
+    "repository": "/home/tumlinson/Software/llama.cpp",
+    "revision": "f280b26983ad0fdb705a0d9ebf0503e76f2899b0",
+    "binary": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cuda.so.0.21.0"
+  },
+  "qualification": {
+    "status": "GPU_PASS_OWNER_ROUTING",
+    "controller_evidence_id": "522cf904-7936-47fd-951f-c9da82306355",
+    "run_directory": "evidence/B03/operator-r2",
+    "real_consumer_full_resident": true,
+    "anchor_local_calls": 68,
+    "peer_owner_calls": 174,
+    "split_calls": 0,
+    "anchor_rows": 135168,
+    "peer_rows": 335872,
+    "bitwise_verified_peer_rows": 4096,
+    "max_abs_error": 0,
+    "cleanup_accounting_zero": true,
+    "host_resources_released": true,
+    "speedup": "NOT_ESTABLISHED",
+    "split_route": "CPU_CHECKED_ONLY"
+  }
+}
