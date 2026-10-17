@@ -1,0 +1,12 @@
+{
+  "status": "NOT_RUN",
+  "task": "V200-06",
+  "bundle": "B01",
+  "source_identity": {"implementation_commit": null, "binary_sha256": null, "stack": null, "fixture_sha256": null},
+  "physical_gpu_uuids": [],
+  "case": {"operation": "pair VMM and completion qualification", "useful_work": {}, "transparency_tier": "T0"},
+  "correctness": {"oracle": null, "result": "not_checked", "tolerance": null},
+  "timing": null,
+  "limitations": ["Template only; no GPU experiment executed during bootstrap assembly."],
+  "cleanup": "not_applicable"
+}

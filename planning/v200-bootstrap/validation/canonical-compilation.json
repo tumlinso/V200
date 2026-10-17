@@ -1,0 +1,21 @@
+{
+  "status": "CANONICALLY_COMPILED_NOT_APPLIED",
+  "compiler_source": "project-control/src/project_control/preledger.py",
+  "compiler_version": 2,
+  "compiler_sha256": "f47180104ca5b8b219d057a86339fc2c0d018e2e8e0eae12b88c94e6a4f2f339",
+  "source_bytes_match_inspected_source": true,
+  "native_plan_schema_version": 2,
+  "target_repository_label": "V200",
+  "selected_tasks": 14,
+  "excluded_tasks": 0,
+  "task_edges": 24,
+  "interfaces_imported": 0,
+  "warnings": [],
+  "external_dependencies": [],
+  "package_semantic_digest": "9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94",
+  "plan_sha256": "8007770c2905311f3e19a5a406133acc677656e4ba8f35cb002eeb401eb32b89",
+  "deterministic_recompile": true,
+  "live_todo_validation": "NOT_RUN",
+  "application": "NOT_RUN",
+  "compiler_copy_in_deliverable": false
+}

@@ -1,0 +1,10 @@
+$ ctest --test-dir /mnt/data/v200-work/build --output-on-failure
+
+Internal ctest changing into directory: /mnt/data/v200-work/build
+Test project /mnt/data/v200-work/build
+    Start 1: cpu_planning
+1/1 Test #1: cpu_planning .....................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.00 sec

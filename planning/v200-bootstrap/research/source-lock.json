@@ -1,0 +1,345 @@
+{
+  "schema_version": 1,
+  "retrieved_date": "2026-10-17",
+  "skills_commit": "ac9e45e36664aee3fa4538c41fe7a59ee153d570",
+  "project_control_observed_head": "fba161b1dc6ed4399c1a3818071eacdb9b80c17d",
+  "project_control_dirty": true,
+  "llama_source_commit": "83f9389419ef93117d1444f87adfcd9f03ec0509",
+  "atlas_campaign": {
+    "id": "v100-20261006T145155Z-4bd01216",
+    "source_commit": "f223c51dcfacab602e9bc68b3e65cc75730dc7f8",
+    "portable_source_commit": "5b5629b001da4a42d6f41a84d94f73c07a29d478"
+  },
+  "sources": [
+    {
+      "id": "A-SKILL",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/SKILL.md",
+      "sha256": "b821b34a890d6081ebf9ad1c83cb4f5345ed6cf51c62342749a4d3a1004905b8",
+      "coverage": "Full entry instructions; advisory, no GPU execution authority.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-HOST",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/execution/host-execution.md",
+      "sha256": "5e8ba8349c57fe513c084a23b444ed44df72682c91947ca192320b30a5a9714d",
+      "coverage": "Host controller contract; build before reservation and quiescence.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-BACKGROUND",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/execution/controller-background-contract.md",
+      "sha256": "39b355e5eb57099f71c7247c82099d3641b381b3f96c3b7fa8e4a76045dc836c",
+      "coverage": "Foreground/background spec and explicit arming, no watch armed.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-CONTROLLER",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/scripts/cuda_controller.py",
+      "sha256": "07fd3704bdb441479c8accd75075e83fbccec824fd8d0b6e73f5e1df0c344959",
+      "coverage": "Selected ranges, including explicit resources.gpu_uuids and directed admission; not full source validation.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-LEASE",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/scripts/atlas_host.py",
+      "sha256": "c588d8a1028a280996c6cd286d82845fb38c70ceefd1675297eec22b75b26f49",
+      "coverage": "Selected lease/visible UUID check implementation; use canonical mechanism, not a new reservation manager.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-STATUS",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/CURRENT_STATUS.md",
+      "sha256": "f3f9285ab7d0c85f79c1c83141aa1f6d7a40abbd722b6122ee6b73285223e46f",
+      "coverage": "Dated 2026-10-06 evidence status; not every protocol executed.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-NEEDS",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/NEED_INDEX.md",
+      "sha256": "ddfc3bd88ce00eaf7b625b7291feadf0528f7c110427a8f2915a8546bf0ebc82",
+      "coverage": "Navigation only, not mechanism proof.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-R06",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/reference/R06-participation-visibility-and-progress.md",
+      "sha256": "4b02909469914911d50a73f3128880cec97a2d7f02060a4ae280d98c85718a1c",
+      "coverage": "Participation, visibility and progress contracts.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-R07",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/reference/R07-nvlink-pcie-and-numa-as-information-boundaries.md",
+      "sha256": "8a2c22bf34971da6c9571cbe6fdacf97293298278b79ba7ac8ecf253d4164b4b",
+      "coverage": "Directed topology and pull/push/staging trade-offs; no generic coherence or transit routing.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-R08",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/reference/R08-virtual-memory-ats-and-faults.md",
+      "sha256": "89d993bf0825ef15c198bcbaa6921f39cee5b4553f7f06c2ce040b7d622c7a4a",
+      "coverage": "VMM/UVA/managed memory distinct; platform-specific ATS and fault machinery.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-R09",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/reference/R09-the-non-sm-command-machine.md",
+      "sha256": "aae12126bafb2f528ecd144780ba9c87793adbc82c1ceb94139291c480641dd8",
+      "coverage": "Restricted CE/QMD machinery; not arbitrary DMA vector arithmetic or public command permission.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-M48",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/mechanisms/M48-cubin-and-sass-transformation.md",
+      "sha256": "af7b5233f9c337c247e82fe5229944c06198bae4cf63b8575cf27e51d41c8615",
+      "coverage": "Binary metadata and qualification requirements, not an arbitrary kernel rewriter.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-E00",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/experiments/E00-inventory-and-capability-gates.md",
+      "sha256": "bdb151d8c67f43e0775aacd9c8fb4608a2fd052fbe251fa9b241a9840613ed36",
+      "coverage": "One read-only inventory; no performance proof.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-E16",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/experiments/E16-persistent-roles-and-residency.md",
+      "sha256": "89775e284b94e0e74dc806f4a9ab3511e7bc9300d6de6da6e52bba02ece30086",
+      "coverage": "Selected resident/batched/graph cases only.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-E18",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/experiments/E18-peer-loads-cache-behavior-and-latency.md",
+      "sha256": "70847696a231f80fb049041ea5705b8dbf58e8bdaec5f7a16b3011ef39f4b6da",
+      "coverage": "One pair, dependent/independent/staged accesses; not cache coherence.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-E19",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/experiments/E19-peer-signaling-and-clock-relationships.md",
+      "sha256": "ab12bc9e78dee31cb81ab619cb249179d4710be99fe6ba5fba4c53bc2f43dd88",
+      "coverage": "Complete 64-phase protocols, not primitive latency.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-E20",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/experiments/E20-actual-nvlink-routing-and-saturation.md",
+      "sha256": "9b7925b29101332b9815d5c6ae4941bc971db4a3090249759bf3a21bf70bf2e0",
+      "coverage": "4 MiB directed rates; no independent route/saturation counters.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-E21",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/experiments/E21-host-numa-ingress.md",
+      "sha256": "d8f91b29c268f8167a45696b24f3cc3c0d6b279e8ed637bd9a558241ac527f43",
+      "coverage": "Only one NUMA node measured successfully; no local/remote comparison.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-E22",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/experiments/E22-stream-memory-operations.md",
+      "sha256": "af414f8e137c605b23c4da1e0b7b159ca6375b4f915a113dc2a3271cb503ac03",
+      "coverage": "Reachability with event ordering; no established speedup.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "A-E23",
+      "kind": "connected_source",
+      "project": "skills",
+      "repository": "skills",
+      "path": "cuda/references/architectures/volta/v100_atlas/experiments/E23-vmm-alias-and-view-behavior.md",
+      "sha256": "82ca70049a240cbc8a73b44dd3e3290e9c8457b603c914a1a8293efd941f9410",
+      "coverage": "Two fixed aliases of one allocation; not multi-device spanning backing.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "P-README",
+      "kind": "connected_source",
+      "project": "project-control",
+      "repository": "project-control",
+      "path": "README.md",
+      "sha256": "c632d2df9d01cf22a0f96064e9c471ff0facd8638de0763d0fc6c69209f5609c",
+      "coverage": "Current preledger CLI and source lifecycle.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "P-ADAPT",
+      "kind": "connected_source",
+      "project": "project-control",
+      "repository": "project-control",
+      "path": "docs/ADAPTIVE_EPICS.md",
+      "sha256": "881eea6774f4995cdc6d4899eb2b7a3c48be13df0298aad71e45b227050c5f9e",
+      "coverage": "Durable outcomes, selected alternatives, root autonomy.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "P-PRELEDGER",
+      "kind": "connected_source",
+      "project": "project-control",
+      "repository": "project-control",
+      "path": "src/project_control/preledger.py",
+      "sha256": "f47180104ca5b8b219d057a86339fc2c0d018e2e8e0eae12b88c94e6a4f2f339",
+      "coverage": "Full compiler read; exact byte-verified temporary copy used locally, not shipped.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "P-PLAN",
+      "kind": "connected_source",
+      "project": "project-control",
+      "repository": "project-control",
+      "path": "src/todo_orchestrator/plan.py",
+      "sha256": "fde2ca5a4b74ec47dc02d46d1ca9d286c902074f3589d1886988e348243e170d",
+      "coverage": "Validator source range1-220 read; full live Todo validation not claimed.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "P-INGEST",
+      "kind": "connected_source",
+      "project": "project-control",
+      "repository": "project-control",
+      "path": "docs/mutation/V1_CONTRACT.md",
+      "sha256": "30029c9fed0da3dd984441349432b980995cdadc289b463dfe201b0c9746de39",
+      "coverage": "Supported preledger fields; historical public tool counts not used.",
+      "observed_date": "2026-10-17"
+    },
+    {
+      "id": "W-CUDA12",
+      "kind": "primary_web_source",
+      "title": "CUDA C Programming Guide 12.9.1",
+      "url": "https://docs.nvidia.com/cuda/archive/12.9.1/cuda-c-programming-guide/index.html",
+      "observed_date": "2026-10-17",
+      "coverage": "Multi-device streams/events, VMM alias rules and generation-specific semantics."
+    },
+    {
+      "id": "W-VMM",
+      "kind": "primary_web_source",
+      "title": "CUDA Driver API 12.9.1: Virtual Memory Management",
+      "url": "https://docs.nvidia.com/cuda/archive/12.9.1/cuda-driver-api/group__CUDA__VA.html",
+      "observed_date": "2026-10-17",
+      "coverage": "Reservation/backing/access separation, zero map offset and whole mapped extent unmap."
+    },
+    {
+      "id": "W-ENTRY",
+      "kind": "primary_web_source",
+      "title": "CUDA Driver API 12.9.1: Driver Entry Point Access",
+      "url": "https://docs.nvidia.com/cuda/archive/12.9.1/cuda-driver-api/group__CUDA__DRIVER__ENTRY__POINT.html",
+      "observed_date": "2026-10-17",
+      "coverage": "Version-selected function pointers and default-stream variants."
+    },
+    {
+      "id": "W-CUDA13",
+      "kind": "primary_web_source",
+      "title": "NVIDIA: What is new and important in CUDA Toolkit 13.0",
+      "url": "https://developer.nvidia.com/blog/whats-new-and-important-in-cuda-toolkit-13-0/",
+      "observed_date": "2026-10-17",
+      "coverage": "Pre-7.5 offline compilation support removed; do not use CUDA13 for native Volta compilation."
+    },
+    {
+      "id": "W-OPEN",
+      "kind": "primary_web_source",
+      "title": "NVIDIA open GPU kernel modules",
+      "url": "https://github.com/NVIDIA/open-gpu-kernel-modules",
+      "observed_date": "2026-10-17",
+      "coverage": "Supported GPU compatibility is Turing and newer, not Volta."
+    },
+    {
+      "id": "W-LLAMA-CMAKE",
+      "kind": "primary_web_source",
+      "title": "llama.cpp CUDA build rules",
+      "url": "https://github.com/ggml-org/llama.cpp/blob/83f9389419ef93117d1444f87adfcd9f03ec0509/ggml/src/ggml-cuda/CMakeLists.txt",
+      "observed_date": "2026-10-17",
+      "coverage": "Pinned source; conditional static linkage, driver VMM linkage, graphs/custom CUDA compilation."
+    },
+    {
+      "id": "W-LLAMA-CUDA",
+      "kind": "primary_web_source",
+      "title": "llama.cpp CUDA backend",
+      "url": "https://github.com/ggml-org/llama.cpp/blob/83f9389419ef93117d1444f87adfcd9f03ec0509/ggml/src/ggml-cuda/ggml-cuda.cu",
+      "observed_date": "2026-10-17",
+      "coverage": "Source baseline for direct VMM and custom-kernel dispatch; actual host binary separately audited."
+    },
+    {
+      "id": "W-LLAMA-SERVER",
+      "kind": "primary_web_source",
+      "title": "llama.cpp server options",
+      "url": "https://github.com/ggml-org/llama.cpp/blob/83f9389419ef93117d1444f87adfcd9f03ec0509/tools/server/README.md",
+      "observed_date": "2026-10-17",
+      "coverage": "Ordinary device selection, split/fit options; benchmark exact chosen build flags."
+    },
+    {
+      "id": "W-SNURHAC",
+      "kind": "primary_web_source",
+      "title": "SnuRHAC original developer record",
+      "url": "https://gangwon.dev/",
+      "observed_date": "2026-10-17",
+      "coverage": "Author reports runtime, driver-level cluster unified memory and memory-access-pattern analysis for single-virtual-GPU CUDA; no reproduction attempted."
+    },
+    {
+      "id": "W-SNURHAC-DOI",
+      "kind": "primary_web_source",
+      "title": "SnuRHAC, HPDC 2021 bibliographic record",
+      "url": "https://doi.org/10.1145/3431379.3460647",
+      "observed_date": "2026-10-17",
+      "coverage": "Precedent only; full paper not analyzed in this session."
+    }
+  ]
+}

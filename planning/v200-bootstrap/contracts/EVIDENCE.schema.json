@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V200 case evidence (not a Todo schema)",
+  "type": "object",
+  "required": [
+    "status",
+    "task",
+    "bundle",
+    "source_identity",
+    "physical_gpu_uuids",
+    "case",
+    "correctness",
+    "timing",
+    "limitations",
+    "cleanup"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "CPU_PASS",
+        "COMPILED_ONLY",
+        "GPU_PASS",
+        "NOT_RUN",
+        "BLOCKED",
+        "INCONCLUSIVE",
+        "FAILED"
+      ]
+    },
+    "task": {
+      "type": "string"
+    },
+    "bundle": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_identity": {
+      "type": "object",
+      "required": [
+        "implementation_commit",
+        "binary_sha256",
+        "stack",
+        "fixture_sha256"
+      ],
+      "properties": {
+        "implementation_commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "binary_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stack": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "fixture_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "physical_gpu_uuids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "case": {
+      "type": "object",
+      "required": [
+        "operation",
+        "useful_work",
+        "transparency_tier"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string"
+        },
+        "useful_work": {
+          "type": "object"
+        },
+        "transparency_tier": {
+          "enum": [
+            "T0",
+            "T1",
+            "T2",
+            "T3",
+            "T4",
+            null
+          ]
+        }
+      }
+    },
+    "correctness": {
+      "type": "object",
+      "required": [
+        "oracle",
+        "result",
+        "tolerance"
+      ],
+      "properties": {
+        "oracle": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "result": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_checked"
+          ]
+        },
+        "tolerance": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    "timing": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "boundary",
+        "units",
+        "samples",
+        "baseline_identity"
+      ],
+      "properties": {
+        "boundary": {
+          "type": "string"
+        },
+        "units": {
+          "type": "string"
+        },
+        "samples": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "baseline_identity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cleanup": {
+      "enum": [
+        "not_applicable",
+        "verified",
+        "uncertain",
+        "failed"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "GPU_PASS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "physical_gpu_uuids": {
+            "minItems": 1
+          },
+          "correctness": {
+            "properties": {
+              "result": {
+                "const": "pass"
+              },
+              "oracle": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "cleanup": {
+            "const": "verified"
+          },
+          "source_identity": {
+            "properties": {
+              "implementation_commit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "binary_sha256": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{64}$"
+              },
+              "stack": {
+                "type": "object",
+                "minProperties": 1
+              },
+              "fixture_sha256": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{64}$"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

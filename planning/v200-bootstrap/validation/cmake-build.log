@@ -1,0 +1,3 @@
+$ cmake --build /mnt/data/v200-work/build --parallel 2
+
+[100%] Built target v200_planning_test

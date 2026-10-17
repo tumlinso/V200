@@ -1,0 +1,10 @@
+{
+  "format": "V200-BOOTSTRAP-SUMMARY/1",
+  "task_count": 14,
+  "repository_label": "V200",
+  "initial_state": "unapplied",
+  "tasks_file": "proposed_todos.json",
+  "design": "docs/DESIGN.md",
+  "gpu_execution_authorized_by_package": false,
+  "conditional_work": "Only selected branches are materialized by the authorized root; no alternatives are mandatory dependencies."
+}

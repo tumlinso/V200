@@ -1,0 +1,40 @@
+{
+  "project_root": "/REPLACE/with/V200",
+  "package_relative": "planning/v200-bootstrap",
+  "toolkit_root": "/REPLACE/with/qualified/cuda-12.x",
+  "gpu_uuids": [
+    "GPU-REPLACE-A",
+    "GPU-REPLACE-B"
+  ],
+  "approved": false,
+  "cpu_threads": 2,
+  "argv": [
+    "/REPLACE/with/V200/build/bootstrap-examples/v200_pair_probe",
+    "--execute",
+    "--expect-a",
+    "GPU-REPLACE-A",
+    "--expect-b",
+    "GPU-REPLACE-B"
+  ],
+  "build_argv": [
+    "cmake",
+    "--build",
+    "build/bootstrap-examples",
+    "--target",
+    "v200_pair_probe",
+    "--parallel",
+    "2"
+  ],
+  "binary_paths": [
+    "build/bootstrap-examples/v200_pair_probe"
+  ],
+  "source_paths": [
+    "planning/v200-bootstrap/examples/cuda/pair_vmm_probe.cpp",
+    "planning/v200-bootstrap/examples/include/v200/planning.hpp"
+  ],
+  "evidence_relative": "evidence/B01/REPLACE-run-id",
+  "wall_seconds": 90,
+  "allocation_cap_mib_per_gpu": 512,
+  "fixture_enforces_allocation_cap": true,
+  "notes": "Not runnable. Replace every placeholder and set approved only after actual execution authorization. Configure CMake before rendering/running."
+}

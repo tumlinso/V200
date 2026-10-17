@@ -1,0 +1,1131 @@
+{
+  "tasks": [
+    {
+      "id": "V200-01",
+      "title": "Adopt the charter, source pins and minimal execution foundation",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Create the authorized V200 working foundation with source-bound contracts and a CPU-first build, without consuming GPU time. Read planning/v200-bootstrap/tasks/V200-01.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "root",
+      "builds_on": [],
+      "write_scope": [
+        "docs/v200",
+        "build-support",
+        "tests/host",
+        "CMakeLists.txt"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Confirm repository registration/initialization through supported workflow tools; preserve existing work. Adopt this package read-only under planning/v200-bootstrap. Pin the actual executable and compatible toolkit. Freeze only I01\u2013I04 fields needed by parallel owners. Build the included CPU examples and establish the existing controller spec/receipt binding. Keep this a small setup outcome, not an orchestration rewrite.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-01.md",
+        "decision_checkpoints": [
+          "D01",
+          "D05"
+        ],
+        "research_refs": [
+          "P-README",
+          "P-ADAPT",
+          "P-PRELEDGER",
+          "A-SKILL",
+          "A-HOST"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Build examples with CUDA probe OFF",
+          "Package integrity and canonical plan checks"
+        ],
+        "gpu": "None; any later read-only runtime inventory belongs to an admitted bundle."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "docs/v200/charter.md",
+        "docs/v200/source-profile.json",
+        "build-support/README.md",
+        "tests/host/"
+      ],
+      "completion_condition": [
+        "Supported V200 authority and current task/run context are identified; no guessed UUID or registration state.",
+        "CPU build and focused tests run without GPU, live model service or mandatory network.",
+        "Approved source/toolkit/app identity and bundle binding contract exist; no watch is armed."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-01-READY"
+    },
+    {
+      "id": "V200-02",
+      "title": "Implement a coherent and auditable CUDA presentation boundary",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Produce the smallest consistent device/ABI boundary for the actual first consumer, ready for an early hardware closure test. Read planning/v200-bootstrap/tasks/V200-02.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-01"
+      ],
+      "write_scope": [
+        "src/frontdoor",
+        "include/v200/frontdoor",
+        "tests/abi",
+        "docs/v200/abi-profile.json"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Use source/ELF audit before runtime tracing. Prototype anchor-backed versus synthetic handle families. Version driver entry-point wrappers and PTDS behavior; account for direct driver calls and dynamic resolution. Unknown APIs must be classified, not silently forwarded. Do not implement all CUDA APIs before the observed consumer surface is known.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-02.md",
+        "decision_checkpoints": [
+          "D01"
+        ],
+        "research_refs": [
+          "W-ENTRY",
+          "W-LLAMA-CMAKE",
+          "W-LLAMA-CUDA"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "ELF/source inventory",
+          "Resolver recursion/version/handle tests",
+          "Compile only against pinned headers"
+        ],
+        "gpu": "B02 owned by V200-06; no claim of live closure here."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "src/frontdoor/",
+        "include/v200/frontdoor/",
+        "tests/abi/",
+        "docs/v200/abi-profile.json"
+      ],
+      "completion_condition": [
+        "CPU dispatch-table and handle-routing tests cover observed ABI signatures and default-stream variants.",
+        "Original-binary and any source-unmodified-rebuild tier are distinguished.",
+        "A bounded B02 closure fixture is built; unresolved private paths and GPU state are explicitly pending V200-06."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-02-READY"
+    },
+    {
+      "id": "V200-03",
+      "title": "Implement canonical pair memory and ownership lifetimes",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Provide a pair-backed canonical allocation model and consumer VMM lifecycle candidate with correct accounting and rollback. Read planning/v200-bootstrap/tasks/V200-03.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-01"
+      ],
+      "write_scope": [
+        "src/memory",
+        "include/v200/memory",
+        "tests/memory",
+        "docs/v200/memory-contract.md"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Start from explicit two-owner extents and I02. Adapt the small pair probe, but build a real ownership ledger for consumer allocations, direct VMM, pointer queries and cleanup. Keep aliases/remapping out of the first live path. Address compound logical handles rather than assuming cudaMalloc interception captures everything.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-03.md",
+        "decision_checkpoints": [
+          "D02"
+        ],
+        "research_refs": [
+          "A-R08",
+          "A-E23",
+          "W-VMM",
+          "W-LLAMA-CUDA"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Extent/overlap/overflow/rollback tests",
+          "Build pair VMM probe"
+        ],
+        "gpu": "B01 joint foundation proof in V200-06; B04 capacity in V200-07."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "src/memory/",
+        "include/v200/memory/",
+        "tests/memory/",
+        "docs/v200/memory-contract.md"
+      ],
+      "completion_condition": [
+        "Checked sizes, granularity, accounting, fragmentation and partial-failure rollback are CPU-tested.",
+        "A single logical allocation larger than an owner has a specified legal representation; direct VMM queries/lifetimes are covered or explicitly blocked.",
+        "B01 qualification and later B04 capacity fixture are prepared; hardware behavior remains pending V200-06/07."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-03-READY"
+    },
+    {
+      "id": "V200-04",
+      "title": "Implement logical completion and safe owner execution",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Provide stream/context/module ownership and completion semantics that can safely join both physical workers. Read planning/v200-bootstrap/tasks/V200-04.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-01"
+      ],
+      "write_scope": [
+        "src/execution",
+        "include/v200/execution",
+        "tests/execution",
+        "docs/v200/completion-contract.md"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Begin with explicit owner execution and event fan-out/fan-in; use a conservative host wait only as measured temporary debt. Preserve context stacks and error propagation. Qualify module globals and remote memory/atomic scope before owner fallback. Graph semantics are not automatically inherited from ordinary stream support.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-04.md",
+        "decision_checkpoints": [
+          "D01",
+          "D03",
+          "D06"
+        ],
+        "research_refs": [
+          "A-R06",
+          "A-E19",
+          "A-E22",
+          "W-CUDA12"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Completion prefix/handle lifetime tests",
+          "Compilation of explicit event probe"
+        ],
+        "gpu": "B01/B02 accepted jointly by V200-06; no permanent polling benchmark."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "src/execution/",
+        "include/v200/execution/",
+        "tests/execution/",
+        "docs/v200/completion-contract.md"
+      ],
+      "completion_condition": [
+        "CPU dependency tests reject cycles, stale event generations and premature frees.",
+        "Asynchronous peer failure has a defined fail-stop path; no reset or arbitrary replay.",
+        "Finite B01/B02 tests cover joined completion, remote visibility and current-context restoration once run; implementation is labeled pending hardware proof."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-04-READY"
+    },
+    {
+      "id": "V200-05",
+      "title": "Prepare the real consumer and matched native baseline fixture",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Create one reproducible application fixture and truthful compatibility/performance controls, without a broad model benchmark collection. Read planning/v200-bootstrap/tasks/V200-05.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-01"
+      ],
+      "write_scope": [
+        "tests/consumer",
+        "benchmarks/fixtures",
+        "docs/v200/consumer-profile.json"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Use the actual working llama-server binary first, and the pinned source build as a comparison. Freeze model/tokenizer hashes and all meaningful workload flags. Prepare a fitting smoke workload plus a resident-capacity workload. Identify custom kernels and direct VMM from source. Do not download a model just to fill a fixture; bind an authorized existing asset.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-05.md",
+        "decision_checkpoints": [
+          "D01",
+          "D07"
+        ],
+        "research_refs": [
+          "W-LLAMA-CUDA",
+          "W-LLAMA-SERVER",
+          "A-E20"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Validate fixture schema, hashes and explicit controls",
+          "Compile existing consumer only if authorized and needed"
+        ],
+        "gpu": "B03 baseline/application session in V200-06; larger fixtures deferred."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "tests/consumer/",
+        "benchmarks/fixtures/",
+        "docs/v200/consumer-profile.json"
+      ],
+      "completion_condition": [
+        "Fixture binds actual binary/DSOs/model/configuration and provides an independent output oracle.",
+        "Native single, pair and facade-owner controls are defined where applicable.",
+        "Automatic fit/offload/precision changes cannot silently alter useful work."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-05-READY"
+    },
+    {
+      "id": "V200-06",
+      "title": "Deliver the first real single-device consumer",
+      "repository": "V200",
+      "task_kind": "integration",
+      "purpose": "Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "root",
+      "builds_on": [
+        "V200-02",
+        "V200-03",
+        "V200-04",
+        "V200-05"
+      ],
+      "write_scope": [
+        "src/integration",
+        "tests/integration",
+        "docs/v200/first-consumer.md"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "First run bounded B01 pair-memory/completion and B02 ABI closure. Then execute B03 on a small real workload. A legal owner-execution path is acceptable for this first application milestone, but it is not dual-compute success. Resolve observed essential graph/library/VMM calls here rather than hiding them behind a deferred task. If only a rebuilt or special-backend consumer works, use D01/D08.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-06.md",
+        "decision_checkpoints": [
+          "D01",
+          "D02",
+          "D08"
+        ],
+        "research_refs": [
+          "A-R06",
+          "A-E23",
+          "W-ENTRY",
+          "W-LLAMA-CUDA"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Build before every admitted bundle",
+          "Small focused regression only"
+        ],
+        "gpu": [
+          "B01",
+          "B02",
+          "B03"
+        ],
+        "stop": "On foundational failure, release GPUs and open D01/D02; do not continue a full sweep."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "tests/integration/first_consumer.py",
+        "docs/v200/first-consumer.md",
+        "evidence/B01",
+        "evidence/B02",
+        "evidence/B03"
+      ],
+      "completion_condition": [
+        "Actual logical enumeration/selection and correct consumer output are recorded.",
+        "B01 and B02 hardware evidence matches the exact pair/stack and complete operation contract.",
+        "No required API returns false success or bypasses ownership tracking.",
+        "Transparency tier and remaining capacity/compute limitations are explicit; T1 cannot be accepted as T2 without user choice."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root integration outcome. Independent CPU work may continue while a GPU window or user decision is pending.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-06-READY"
+    },
+    {
+      "id": "V200-07",
+      "title": "Qualify useful capacity beyond one physical V100",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Prove genuinely resident aggregate HBM with live application data that does not fit on either constituent alone. Read planning/v200-bootstrap/tasks/V200-07.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-06"
+      ],
+      "write_scope": [
+        "tests/capacity",
+        "docs/v200/capacity.md"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Run B04 only when both devices have the required headroom. Target a chosen fixture around 24 GiB resident payload where feasible, not a mandatory exact number. Include one spanning allocation/lifecycle case and the actual consumer residency evidence. Report context/workspace reserve and physical owner bytes.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-07.md",
+        "decision_checkpoints": [
+          "D02",
+          "D05",
+          "D07"
+        ],
+        "research_refs": [
+          "W-VMM",
+          "A-E23",
+          "A-R07"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Preflight budget/fixture checks"
+        ],
+        "gpu": [
+          "B04"
+        ],
+        "reuse": "One matched capacity case and limited lifecycle checks; no allocation-size sweep."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "tests/capacity/",
+        "docs/v200/capacity.md",
+        "evidence/B04"
+      ],
+      "completion_condition": [
+        "Live payload exceeds each single device available capacity, with both physical backing owners verified.",
+        "No managed-memory/CPU offload or reduced workload is substituted without user decision.",
+        "Correct outputs, freeing/reallocation and accounting are checked; insufficient headroom is BLOCKED, not a smaller passing test."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-07-READY"
+    },
+    {
+      "id": "V200-08",
+      "title": "Accelerate the dominant qualified operation across the pair",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Make both V100s perform meaningful selected application work under the unchanged outward interface. Read planning/v200-bootstrap/tasks/V200-08.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-06"
+      ],
+      "write_scope": [
+        "src/operators",
+        "include/v200/operators",
+        "tests/operators",
+        "docs/v200/operator-profile.json"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Use the observed hot operation. Choose a vendor-library split, exact kernel replacement or qualified grid transform. Preserve grid-stride, packed layouts, numerical accumulation and aliases. Keep a same-operation native baseline and a safe owner route. Include the index/ABI/module identity in the qualification key. Do not implement every transformer operation.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-08.md",
+        "decision_checkpoints": [
+          "D03",
+          "D07"
+        ],
+        "research_refs": [
+          "A-M48",
+          "A-R06",
+          "W-LLAMA-CUDA",
+          "W-CUDA12"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Code/layout contract review and compile",
+          "Index/numeric fixtures"
+        ],
+        "gpu": [
+          "B03"
+        ],
+        "performance": "Full promotion decision owned by V200-12/B05.",
+        "gpu_subset": "B03 selected operator/consumer subset"
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "src/operators/",
+        "include/v200/operators/",
+        "tests/operators/",
+        "docs/v200/operator-profile.json"
+      ],
+      "completion_condition": [
+        "At least one significant real-consumer operation is correctly distributed with both owners doing useful work.",
+        "Focused B03 checks compare exact useful work and outputs; timing uncertainty is stated.",
+        "General split-safety is not inferred from the toy grid sample or symbol matching."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-08-READY"
+    },
+    {
+      "id": "V200-09",
+      "title": "Optimize pair locality and NVLink use with a small cost policy",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Choose data ownership and communication that improve complete application work rather than merely saturating NVLink. Read planning/v200-bootstrap/tasks/V200-09.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-03",
+        "V200-08"
+      ],
+      "write_scope": [
+        "src/placement",
+        "include/v200/placement",
+        "tests/placement",
+        "docs/v200/placement.md"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Compare remote reads, staging, owner computation and justified replicas for the qualified operation. Account for canonicalization and owner-memory interference. Retain shards only at known compatible boundaries. Use deterministic measured thresholds before any adaptive system. Dual host ingress is optional only if loader time matters and page locality is available.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-09.md",
+        "decision_checkpoints": [
+          "D04",
+          "D05"
+        ],
+        "research_refs": [
+          "A-R07",
+          "A-E18",
+          "A-E20",
+          "A-E21",
+          "A-E19"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Placement policy/range/version-invalidation checks"
+        ],
+        "gpu": "B05 in V200-12; a narrow B03 regression only after changed code."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "src/placement/",
+        "include/v200/placement/",
+        "tests/placement/",
+        "docs/v200/placement.md"
+      ],
+      "completion_condition": [
+        "Policy choices have explicit full-path cost and legality inputs; unknown cases take the qualified conservative route.",
+        "No assumed six-links-per-peer, arbitrary multi-hop forwarding or coherent writable aliases.",
+        "B05 comparisons are prepared; a failed locality hypothesis can be rejected without building new infrastructure."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-09-READY"
+    },
+    {
+      "id": "V200-10",
+      "title": "Close the observed compatibility profile and targeted regressions",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Extend the first profile only where actual consumer behavior or a chosen second fixture requires it, preserving ordinary CUDA semantics. Read planning/v200-bootstrap/tasks/V200-10.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-06"
+      ],
+      "write_scope": [
+        "src/compat",
+        "tests/compat",
+        "docs/v200/compatibility.md"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Cover observed graph capture/replay/update, library workspaces/pointer modes, stream behavior, module state and diagnostics. Essential first-consumer features already belong to V200-06. Add the narrowest second consumer/kernel family that tests generality. IPC, cooperative grids and MPS remain explicit unsupported features unless made part of the selected profile.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-10.md",
+        "decision_checkpoints": [
+          "D01",
+          "D08"
+        ],
+        "research_refs": [
+          "W-ENTRY",
+          "W-CUDA12",
+          "W-LLAMA-CUDA"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "ABI/graph/handle contract fixtures"
+        ],
+        "gpu": [
+          "B03"
+        ],
+        "limit": "No all-framework test matrix.",
+        "gpu_subset": "B03 selected regression subset"
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "src/compat/",
+        "tests/compat/",
+        "docs/v200/compatibility.md"
+      ],
+      "completion_condition": [
+        "Compatibility matrix distinguishes tested/unsupported/unqualified for exact stack and binary profiles.",
+        "Graph and async-lifetime regressions are covered where supported; disabling a required feature is disclosed.",
+        "No broad compatibility claim is based only on one model running."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-10-READY"
+    },
+    {
+      "id": "V200-11",
+      "title": "Expose and integrate two logical V200 devices",
+      "repository": "V200",
+      "task_kind": "integration",
+      "purpose": "Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-04",
+        "V200-07",
+        "V200-08",
+        "V200-09"
+      ],
+      "write_scope": [
+        "src/multi_pair",
+        "tests/multi_pair",
+        "docs/v200/two-device.md"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Implement stable two-device enumeration and logical copies using eligible physical endpoints. Separate general peer-load permission from routable bulk copy. Do not advertise arbitrary cross-pair pointers when some constituent paths are inaccessible. Qualify native consumer layer/pipeline distribution across two logical IDs and any needed collective/NVML handling.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-11.md",
+        "decision_checkpoints": [
+          "D04",
+          "D05",
+          "D08"
+        ],
+        "research_refs": [
+          "A-R07",
+          "A-E20",
+          "W-LLAMA-SERVER"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Directed endpoint/capability map tests"
+        ],
+        "gpu": [
+          "B06"
+        ],
+        "budget": "Four-device admission only after pair readiness; keep session short."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "src/multi_pair/",
+        "tests/multi_pair/",
+        "docs/v200/two-device.md",
+        "evidence/B06"
+      ],
+      "completion_condition": [
+        "Both logical devices enumerate with stable identity and independent resource accounting.",
+        "B06 validates selected inter-pair copy and consumer workload over the recorded/rediscovered topology.",
+        "No claim that a generic shim infers model layer/sequence/expert semantics without a contract."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-11-READY"
+    },
+    {
+      "id": "V200-12",
+      "title": "Make the measured performance and product decision",
+      "repository": "V200",
+      "task_kind": "validation",
+      "purpose": "Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "root",
+      "builds_on": [
+        "V200-07",
+        "V200-08",
+        "V200-09",
+        "V200-10"
+      ],
+      "write_scope": [
+        "benchmarks/comparison",
+        "docs/v200/performance.md"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Run B05 with the strongest matched native pair baseline and facade-owner control, prefill/decode separately. Include conversion, gathering and context/workspace accounting. Start with a few repetitions and increase only if the decision is genuinely ambiguous. Compare four-device results from B06 separately when available. Do not blend incompatible regimes into an arbitrary winner.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-12.md",
+        "decision_checkpoints": [
+          "D04",
+          "D05",
+          "D07"
+        ],
+        "research_refs": [
+          "A-E16",
+          "A-E18",
+          "A-E19",
+          "A-E20",
+          "P-ADAPT"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Matched-case and arithmetic/evidence checks"
+        ],
+        "gpu": [
+          "B05"
+        ],
+        "stop": "No tuning campaign beyond the agreed cap without a specific unresolved decision."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "benchmarks/comparison/",
+        "docs/v200/performance.md",
+        "evidence/B05"
+      ],
+      "completion_condition": [
+        "Correctness passes precede performance interpretation for each selected case.",
+        "Observed overhead/scaling, raw samples, contamination and uncertainty are documented.",
+        "D04 is resolved or explicitly pending user preference; a faster less-transparent route cannot silently redefine V200."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "May finish pair performance before V200-11 receives a four-GPU window. Do not block pair decisions on optional deeper experiments.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-12-READY"
+    },
+    {
+      "id": "V200-13",
+      "title": "Package a reversible deployment and diagnostic surface",
+      "repository": "V200",
+      "task_kind": "task",
+      "purpose": "Deliver an opt-in application-scoped deployment with accurate identity, compatibility and rollback information. Read planning/v200-bootstrap/tasks/V200-13.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "implementer",
+      "builds_on": [
+        "V200-11",
+        "V200-12"
+      ],
+      "write_scope": [
+        "packaging",
+        "tools/v200",
+        "docs/v200/deployment.md"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Package launcher/facade, versioned profiles and source/binary provenance. Keep native CUDA untouched outside the launch scope. Diagnostics show logical-to-physical mapping and failures. Provide installation/uninstallation steps that do not modify system driver state. Never claim system-wide PCI/NVML device unification unless separately authorized and implemented.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-13.md",
+        "decision_checkpoints": [
+          "D08"
+        ],
+        "research_refs": [
+          "A-HOST",
+          "P-README",
+          "W-OPEN"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Package/load-path/rollback tests"
+        ],
+        "gpu": "Reuse accepted B03/B06 evidence; one focused deployment smoke only if binaries or loader paths changed."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "packaging/",
+        "tools/v200/",
+        "docs/v200/deployment.md"
+      ],
+      "completion_condition": [
+        "Deployment is reproducible for the accepted profile and removable without altering unrelated GPU software.",
+        "Unsupported APIs, actual transparency tier, capacity reserve and measured performance are plainly documented.",
+        "No hidden watcher/model service/GPU resident daemon is installed."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root may delegate nonoverlapping implementation after interface agreement.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-13-READY"
+    },
+    {
+      "id": "V200-14",
+      "title": "Integrate and hand off the accepted V200 release",
+      "repository": "V200",
+      "task_kind": "integration",
+      "purpose": "Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "workstream": "V200 single-device product",
+      "category": "outcome",
+      "suggested_lane": "root",
+      "builds_on": [
+        "V200-13"
+      ],
+      "write_scope": [
+        "docs/v200/release.md",
+        "tests/release"
+      ],
+      "permitted_read_scope": [
+        "planning/v200-bootstrap/",
+        "docs/v200"
+      ],
+      "implementation_mechanism": {
+        "recommended_start": "Root reviews producer commits, selected branch decisions, acceptance receipts and dirty-work preservation. Run only tests affected by final integration. Use supported Todo integration/completion mechanisms and retain a restartable next-work backlog. Research negatives remain evidence, not missing acceptance hidden by a green summary.",
+        "agent_freedom": "Choose local design, tests and decomposition from source and measurements; preserve the external contract.",
+        "task_sheet": "planning/v200-bootstrap/tasks/V200-14.md",
+        "decision_checkpoints": [
+          "D08"
+        ],
+        "research_refs": [
+          "P-README",
+          "P-ADAPT",
+          "A-HOST"
+        ]
+      },
+      "invariants": [
+        "Ordinary single logical device per physical pair; no silent product downgrade.",
+        "Correctness, memory ordering, lifetime and numeric contract are mandatory.",
+        "GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption."
+      ],
+      "forbidden_shortcuts": [
+        "No fake capacity/feature/SM semantics.",
+        "No treating CPU checks or compilation as GPU qualification.",
+        "No broad retesting campaign or new scheduler as prerequisite."
+      ],
+      "validation": {
+        "cpu": [
+          "Final changed-boundary checks and packaging integrity"
+        ],
+        "gpu": "Reuse compatible evidence; do not rerun all bundles by default."
+      },
+      "expected_inputs": [
+        "Accepted project charter and prerequisite outcome receipts",
+        "Current source and exact application/stack identity"
+      ],
+      "expected_outputs": [
+        "docs/v200/release.md",
+        "tests/release/",
+        "release provenance and Todo integration receipt"
+      ],
+      "completion_condition": [
+        "All mandatory product outcomes have current evidence or an explicit user-approved revised scope.",
+        "Native single-device presentation, capacity and useful dual compute claims match actual tested tier.",
+        "Release note includes exact tests and known limits; no GPU lease, background watch or unfinished owned process remains."
+      ],
+      "performance_evidence": "Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.",
+      "failure_cases_and_fallback": "A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.",
+      "experimental": true,
+      "negative_result_acceptable": false,
+      "parallelism": "Root final acceptance only; helpers may review but cannot change the objective or authorize system mutations.",
+      "explicit_out_of_scope": [
+        "Driver/firmware/system changes without separate authorization",
+        "Any nonselected hypothetical branch"
+      ],
+      "produces_checkpoint": "V200-14-READY"
+    }
+  ]
+}

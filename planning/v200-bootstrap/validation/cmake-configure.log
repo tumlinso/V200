@@ -1,0 +1,5 @@
+$ cmake -S /mnt/data/v200-bootstrap/examples -B /mnt/data/v200-work/build -DV200_BUILD_CUDA_PROBE=OFF
+
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /mnt/data/v200-work/build

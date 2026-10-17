@@ -1,0 +1,33 @@
+$ /opt/pyvenv/bin/python /mnt/data/v200-bootstrap/tools/validate_package.py /mnt/data/v200-bootstrap --no-manifest
+
+{
+  "format": "V200-PACKAGE-CHECK/1",
+  "status": "CPU_PASS",
+  "checks": 244,
+  "tasks": 14,
+  "task_edges": 24,
+  "bundles": 7,
+  "topological_order": [
+    "V200-01",
+    "V200-02",
+    "V200-03",
+    "V200-04",
+    "V200-05",
+    "V200-06",
+    "V200-07",
+    "V200-08",
+    "V200-10",
+    "V200-09",
+    "V200-11",
+    "V200-12",
+    "V200-13",
+    "V200-14"
+  ],
+  "errors": [],
+  "not_qualified": [
+    "live Todo authority/application",
+    "CUDA compilation",
+    "GPU execution",
+    "consumer compatibility/performance"
+  ]
+}

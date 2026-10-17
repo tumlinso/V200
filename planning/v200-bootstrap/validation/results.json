@@ -1,0 +1,137 @@
+{
+  "format": "V200-BOOTSTRAP-VALIDATION/1",
+  "status": "CPU_PASS_AND_CANONICALLY_COMPILED",
+  "checked_utc": "2026-10-17T11:18:39.308989+00:00",
+  "environment": {
+    "python": "3.13.5",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "cxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cmake": "cmake version 3.31.6",
+    "nvcc_path": null,
+    "nvidia_smi_path": null
+  },
+  "python_tests": {
+    "run": 14,
+    "failed": 0,
+    "skipped": 0
+  },
+  "cpp": {
+    "status": "CPU_PASS",
+    "checks": 1461,
+    "gpu_evidence": false
+  },
+  "ctest": {
+    "tests": 1,
+    "passed": 1,
+    "failed": 0
+  },
+  "schema": {
+    "status": "CPU_PASS",
+    "checks": 5,
+    "scope": "JSON schema validity, NOT_RUN template, rejection of evidence-free GPU_PASS, acceptance of a synthetic well-shaped record, rejection of missing GPU binary identity",
+    "synthetic_record_is_not_hardware_evidence": true
+  },
+  "compiler": {
+    "status": "CANONICALLY_COMPILED_NOT_APPLIED",
+    "compiler_source": "project-control/src/project_control/preledger.py",
+    "compiler_version": 2,
+    "compiler_sha256": "f47180104ca5b8b219d057a86339fc2c0d018e2e8e0eae12b88c94e6a4f2f339",
+    "source_bytes_match_inspected_source": true,
+    "native_plan_schema_version": 2,
+    "target_repository_label": "V200",
+    "selected_tasks": 14,
+    "excluded_tasks": 0,
+    "task_edges": 24,
+    "interfaces_imported": 0,
+    "warnings": [],
+    "external_dependencies": [],
+    "package_semantic_digest": "9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94",
+    "plan_sha256": "8007770c2905311f3e19a5a406133acc677656e4ba8f35cb002eeb401eb32b89",
+    "deterministic_recompile": true,
+    "live_todo_validation": "NOT_RUN",
+    "application": "NOT_RUN",
+    "compiler_copy_in_deliverable": false
+  },
+  "commands": [
+    {
+      "name": "python-tests",
+      "argv": [
+        "/opt/pyvenv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "/mnt/data/v200-bootstrap/tests",
+        "-v"
+      ],
+      "returncode": 0,
+      "log": "python-tests.log"
+    },
+    {
+      "name": "cmake-configure",
+      "argv": [
+        "cmake",
+        "-S",
+        "/mnt/data/v200-bootstrap/examples",
+        "-B",
+        "/mnt/data/v200-work/build",
+        "-DV200_BUILD_CUDA_PROBE=OFF"
+      ],
+      "returncode": 0,
+      "log": "cmake-configure.log"
+    },
+    {
+      "name": "cmake-build",
+      "argv": [
+        "cmake",
+        "--build",
+        "/mnt/data/v200-work/build",
+        "--parallel",
+        "2"
+      ],
+      "returncode": 0,
+      "log": "cmake-build.log"
+    },
+    {
+      "name": "ctest",
+      "argv": [
+        "ctest",
+        "--test-dir",
+        "/mnt/data/v200-work/build",
+        "--output-on-failure"
+      ],
+      "returncode": 0,
+      "log": "ctest.log"
+    },
+    {
+      "name": "cpp-checks",
+      "argv": [
+        "/mnt/data/v200-work/build/v200_planning_test"
+      ],
+      "returncode": 0,
+      "log": "cpp-checks.log"
+    },
+    {
+      "name": "package-structure",
+      "argv": [
+        "/opt/pyvenv/bin/python",
+        "/mnt/data/v200-bootstrap/tools/validate_package.py",
+        "/mnt/data/v200-bootstrap",
+        "--no-manifest"
+      ],
+      "returncode": 0,
+      "log": "package-structure.log"
+    }
+  ],
+  "boundary": {
+    "cuda_example_compilation": "NOT_RUN: no CUDA toolkit in authoring environment",
+    "gpu_execution": "NOT_RUN",
+    "consumer_compatibility": "NOT_RUN",
+    "performance": "NOT_RUN",
+    "live_todo_validation": "NOT_RUN",
+    "todo_apply": "NOT_RUN",
+    "host_gpu_reservations": 0,
+    "connected_repository_mutations": 0
+  },
+  "package_integrity": "Final manifest and ZIP verified separately after this report was written."
+}

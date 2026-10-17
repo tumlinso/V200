@@ -1,0 +1,8 @@
+{
+  "format": "project-control-preledger",
+  "schema_version": 1,
+  "tasks": "proposed_todos.json",
+  "dependency_index": "dependency_edges.csv",
+  "summary": "plan_summary.json",
+  "manifest": "MANIFEST.sha256"
+}

@@ -1,0 +1,21 @@
+$ /opt/pyvenv/bin/python -m unittest discover -s /mnt/data/v200-bootstrap/tests -v
+
+test_bad_uuid_and_extra_gpu_refused (test_tools.Tools.test_bad_uuid_and_extra_gpu_refused) ... ok
+test_bounded_cpu_child (test_tools.Tools.test_bounded_cpu_child) ... ok
+test_bounded_timeout_cpu_child (test_tools.Tools.test_bounded_timeout_cpu_child) ... ok
+test_canonical_adapter_does_not_silently_fork (test_tools.Tools.test_canonical_adapter_does_not_silently_fork) ... ok
+test_caps_cannot_expand_silently (test_tools.Tools.test_caps_cannot_expand_silently) ... ok
+test_elf_not_executed (test_tools.Tools.test_elf_not_executed) ... ok
+test_lease_shape_and_wrong_owner (test_tools.Tools.test_lease_shape_and_wrong_owner) ... ok
+test_missing_live_lease_fails_closed (test_tools.Tools.test_missing_live_lease_fails_closed) ... ok
+test_no_vram_enforcement_claim (test_tools.Tools.test_no_vram_enforcement_claim) ... ok
+test_non_elf_rejected (test_tools.Tools.test_non_elf_rejected) ... ok
+test_package_structure (test_tools.Tools.test_package_structure) ... ok
+test_render_is_inert_and_uses_native_uuid_key (test_tools.Tools.test_render_is_inert_and_uses_native_uuid_key) ... ok
+test_unapproved_binding_refused (test_tools.Tools.test_unapproved_binding_refused) ... ok
+test_unsafe_paths_and_argv (test_tools.Tools.test_unsafe_paths_and_argv) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 2.032s
+
+OK

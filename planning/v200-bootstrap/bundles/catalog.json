@@ -1,0 +1,359 @@
+{
+  "format": "V200-GPU-BUNDLES/1",
+  "schema_version": 1,
+  "authority": "dormant definitions; existing CUDA controller owns execution",
+  "bundles": [
+    {
+      "id": "B01",
+      "title": "Small pair VMM and completion qualification",
+      "owner": "V200-06",
+      "stage": "early foundation",
+      "code": "Included example; CUDA compilation and execution pending",
+      "decision": [
+        "D02"
+      ],
+      "prereq": [
+        "Pinned CUDA12.x and actual UUID pair",
+        "CPU example checks and CUDA probe build",
+        "Read-only topology proves selected UUID pair has intended direct NVLink connectivity"
+      ],
+      "steps": [
+        "Validate controller receipt and visible UUIDs before GPU work",
+        "Query sm_70, VMM and bidirectional peer capability",
+        "Create two small owner allocations in one canonical VA, explicit permissions",
+        "Write disjoint explicit-index ranges; join via cross-device events",
+        "Read and verify whole range from both GPUs, then release only owned resources"
+      ],
+      "accept": [
+        "Both SM verification paths correct",
+        "Actual rounded bytes and UUIDs recorded",
+        "No claim of app transparency or physical NVLink saturation"
+      ],
+      "stop": [
+        "Unsupported VMM/peer access",
+        "Wrong pair",
+        "Any mismatch, timeout or uncertain cleanup"
+      ],
+      "status": "NOT_RUN",
+      "automatic_execution_enabled": false,
+      "max_gpu_count": 2,
+      "max_wall_seconds": 90,
+      "application_allocation_cap_mib_per_gpu": 512,
+      "max_cpu_threads": 4,
+      "max_build_seconds": 900,
+      "host_ram_cap_mib": 4096,
+      "default_repetitions": 1,
+      "artifact_contract": [
+        "source/stack/fixture identities",
+        "approved and actual GPU UUIDs",
+        "controller lease and cleanup outcome",
+        "case-level correctness and timed boundary",
+        "raw samples or null",
+        "limitations and unrun cases"
+      ]
+    },
+    {
+      "id": "B02",
+      "title": "Observed consumer ABI and device boundary closure",
+      "owner": "V200-06",
+      "stage": "early foundation",
+      "code": "Fixture implemented by V200-02/04",
+      "decision": [
+        "D01"
+      ],
+      "prereq": [
+        "B01 or equivalent accepted pair proof",
+        "Pinned binary/DSO/symbol manifest",
+        "Small synthetic consumer with same entry-point paths"
+      ],
+      "steps": [
+        "Run native control and facade process separately",
+        "Check one logical device, properties and allocation/copy/query/free",
+        "Exercise observed runtime plus direct Driver VMM and versioned function-pointer path",
+        "Test joined streams/events, default-stream mode and argument lifetime",
+        "Capture unknown/bypassed entries; stop before unsupported side effects"
+      ],
+      "accept": [
+        "Observed surface is mediated consistently",
+        "Outputs and required ordering correct",
+        "Actual transparency tier and unsupported entries recorded"
+      ],
+      "stop": [
+        "Private bypass invalidates ledger",
+        "Inconsistent property/handle semantics",
+        "Unknown required API"
+      ],
+      "status": "NOT_RUN",
+      "automatic_execution_enabled": false,
+      "max_gpu_count": 2,
+      "max_wall_seconds": 120,
+      "application_allocation_cap_mib_per_gpu": 1024,
+      "max_cpu_threads": 4,
+      "max_build_seconds": 900,
+      "host_ram_cap_mib": 4096,
+      "default_repetitions": 1,
+      "artifact_contract": [
+        "source/stack/fixture identities",
+        "approved and actual GPU UUIDs",
+        "controller lease and cleanup outcome",
+        "case-level correctness and timed boundary",
+        "raw samples or null",
+        "limitations and unrun cases"
+      ]
+    },
+    {
+      "id": "B03",
+      "title": "First consumer and selected regression/operation check",
+      "owner": "V200-06",
+      "stage": "first useful application; reused selectively",
+      "code": "Fixture implemented by V200-05/06; operation subset extended by V200-08/10",
+      "decision": [
+        "D01",
+        "D03",
+        "D07"
+      ],
+      "prereq": [
+        "Accepted B01/B02",
+        "Existing authorized model fixture",
+        "Exact native/facade inputs/configuration and expected output contract"
+      ],
+      "steps": [
+        "Run one small fixed workload in native control and facade",
+        "Assert ordinary single logical device selection without physical split flags",
+        "Check output/logits or selected operator oracle",
+        "For accelerated variant, verify useful selected work on both physical devices",
+        "Record cold/steady intervals separately; do not claim broad performance from smoke"
+      ],
+      "accept": [
+        "Correct real application run for the stated tier",
+        "No hidden offload/quantization/context changes",
+        "Focused changed-boundary regression only"
+      ],
+      "stop": [
+        "Output mismatch",
+        "Undeclared API",
+        "Changed useful work",
+        "Allocation cap exceeded"
+      ],
+      "status": "NOT_RUN",
+      "automatic_execution_enabled": false,
+      "max_gpu_count": 2,
+      "max_wall_seconds": 300,
+      "application_allocation_cap_mib_per_gpu": 12288,
+      "max_cpu_threads": 4,
+      "max_build_seconds": 900,
+      "host_ram_cap_mib": 32768,
+      "default_repetitions": 1,
+      "artifact_contract": [
+        "source/stack/fixture identities",
+        "approved and actual GPU UUIDs",
+        "controller lease and cleanup outcome",
+        "case-level correctness and timed boundary",
+        "raw samples or null",
+        "limitations and unrun cases"
+      ]
+    },
+    {
+      "id": "B04",
+      "title": "Resident capacity exceeding a single V100",
+      "owner": "V200-07",
+      "stage": "after first real application",
+      "code": "Fixture implemented by V200-03/05/07",
+      "decision": [
+        "D02",
+        "D05",
+        "D07"
+      ],
+      "prereq": [
+        "Accepted B03",
+        "Both owners have explicit live-free headroom",
+        "Chosen live payload exceeds either constituent capacity; around24GiB is a suggested fixture, not an assumption"
+      ],
+      "steps": [
+        "Check budget including application workspace and reserves",
+        "Exercise one logical spanning allocation and the selected consumer resident fixture",
+        "Record physical owner backing and live residency; prohibit silent CPU/managed offload",
+        "Check results and limited free/reallocation lifecycle",
+        "Stop without shrinking the proof when headroom is insufficient"
+      ],
+      "accept": [
+        "Actual live resident payload exceeds each single-GPU available capacity",
+        "Correct output and accounting",
+        "No generic32GB-free claim"
+      ],
+      "stop": [
+        "Insufficient headroom => BLOCKED",
+        "Hidden oversubscription/offload",
+        "Any correctness or lifetime failure"
+      ],
+      "status": "NOT_RUN",
+      "automatic_execution_enabled": false,
+      "max_gpu_count": 2,
+      "max_wall_seconds": 300,
+      "application_allocation_cap_mib_per_gpu": 14336,
+      "max_cpu_threads": 4,
+      "max_build_seconds": 900,
+      "host_ram_cap_mib": 32768,
+      "default_repetitions": 1,
+      "artifact_contract": [
+        "source/stack/fixture identities",
+        "approved and actual GPU UUIDs",
+        "controller lease and cleanup outcome",
+        "case-level correctness and timed boundary",
+        "raw samples or null",
+        "limitations and unrun cases"
+      ]
+    },
+    {
+      "id": "B05",
+      "title": "Matched pair performance decision",
+      "owner": "V200-12",
+      "stage": "consolidated late validation",
+      "code": "Fixture implemented by V200-08/09/12",
+      "decision": [
+        "D04",
+        "D05"
+      ],
+      "prereq": [
+        "Accepted correctness and capacity/operator prerequisites",
+        "Same source/binary/model/shape/precision/fit settings",
+        "Idle/contamination checks and native pair baseline"
+      ],
+      "steps": [
+        "Warm chosen paths once; use a small fixed sample set, initially5 repeats",
+        "Compare native owner where fitting, facade-owner, strongest native pair and V200 split",
+        "Separate prefill and decode; include communication/conversion/materialization",
+        "Retain raw samples and matched timing boundaries",
+        "Promote, reject or open D04; only add cases when they resolve that decision"
+      ],
+      "accept": [
+        "Correctness before timing interpretation",
+        "Repeatability and application cost boundary stated",
+        "No low-level timing presented as a whole-application speedup"
+      ],
+      "stop": [
+        "Contaminated timing",
+        "Incomparable workload",
+        "Practical regression requiring user choice",
+        "Wall cap reached => remaining cases NOT_RUN"
+      ],
+      "status": "NOT_RUN",
+      "automatic_execution_enabled": false,
+      "max_gpu_count": 2,
+      "max_wall_seconds": 600,
+      "application_allocation_cap_mib_per_gpu": 14336,
+      "max_cpu_threads": 4,
+      "max_build_seconds": 900,
+      "host_ram_cap_mib": 32768,
+      "default_repetitions": 5,
+      "artifact_contract": [
+        "source/stack/fixture identities",
+        "approved and actual GPU UUIDs",
+        "controller lease and cleanup outcome",
+        "case-level correctness and timed boundary",
+        "raw samples or null",
+        "limitations and unrun cases"
+      ]
+    },
+    {
+      "id": "B06",
+      "title": "Two logical devices on all four physical GPUs",
+      "owner": "V200-11",
+      "stage": "late integration only",
+      "code": "Fixture implemented by V200-11",
+      "decision": [
+        "D04",
+        "D05",
+        "D08"
+      ],
+      "prereq": [
+        "Each pair separately qualified",
+        "Both logical IDs and full directed physical topology identified",
+        "Explicit four-GPU window"
+      ],
+      "steps": [
+        "Verify two logical devices and both underlying UUID pairs",
+        "Check eligible endpoint copies in each required direction",
+        "Do not advertise arbitrary peer-pointer access when a constituent cannot map it",
+        "Run one ordinary two-logical-device consumer configuration and matched native control",
+        "Record inter-pair transfer cost and all owned-resource release"
+      ],
+      "accept": [
+        "Correct two-device presentation and useful application output",
+        "Topology is respected internally",
+        "Pair and four-device results remain separate"
+      ],
+      "stop": [
+        "Unavailable four-GPU window => defer",
+        "Unsupported peer semantics",
+        "Incorrect collective/identity mapping"
+      ],
+      "status": "NOT_RUN",
+      "automatic_execution_enabled": false,
+      "max_gpu_count": 4,
+      "max_wall_seconds": 300,
+      "application_allocation_cap_mib_per_gpu": 14336,
+      "max_cpu_threads": 4,
+      "max_build_seconds": 900,
+      "host_ram_cap_mib": 32768,
+      "default_repetitions": 1,
+      "artifact_contract": [
+        "source/stack/fixture identities",
+        "approved and actual GPU UUIDs",
+        "controller lease and cleanup outcome",
+        "case-level correctness and timed boundary",
+        "raw samples or null",
+        "limitations and unrun cases"
+      ]
+    },
+    {
+      "id": "B07",
+      "title": "One justified advanced-mechanism discriminator",
+      "owner": "root-selected conditional outcome",
+      "stage": "optional; never a release prerequisite by default",
+      "code": "Not implemented; materialize only a selected bounded candidate",
+      "decision": [
+        "D03",
+        "D06"
+      ],
+      "prereq": [
+        "Specific remaining measured cost",
+        "Native supported alternative baseline",
+        "Root scope plus user approval for private/system-affecting mechanisms",
+        "Safe rollback and no foreign state changes"
+      ],
+      "steps": [
+        "Test one precisely stated mechanism and one matched baseline",
+        "Keep useful work, correctness and lifetime contract equal",
+        "Capture exact binary/toolkit/source and limits",
+        "Reject an ineffective candidate without creating a campaign"
+      ],
+      "accept": [
+        "Answers one stated decision only",
+        "Restricted access is not inferred from source/header presence"
+      ],
+      "stop": [
+        "No actual access authority",
+        "Scope expands",
+        "Unexpected device fault or cleanup uncertainty"
+      ],
+      "status": "NOT_RUN",
+      "automatic_execution_enabled": false,
+      "max_gpu_count": 2,
+      "max_wall_seconds": 120,
+      "application_allocation_cap_mib_per_gpu": 1024,
+      "max_cpu_threads": 4,
+      "max_build_seconds": 900,
+      "host_ram_cap_mib": 4096,
+      "default_repetitions": 1,
+      "artifact_contract": [
+        "source/stack/fixture identities",
+        "approved and actual GPU UUIDs",
+        "controller lease and cleanup outcome",
+        "case-level correctness and timed boundary",
+        "raw samples or null",
+        "limitations and unrun cases"
+      ]
+    }
+  ]
+}

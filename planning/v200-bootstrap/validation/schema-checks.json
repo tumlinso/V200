@@ -1,0 +1,6 @@
+{
+  "status": "CPU_PASS",
+  "checks": 5,
+  "scope": "JSON schema validity, NOT_RUN template, rejection of evidence-free GPU_PASS, acceptance of a synthetic well-shaped record, rejection of missing GPU binary identity",
+  "synthetic_record_is_not_hardware_evidence": true
+}
