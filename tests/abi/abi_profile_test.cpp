@@ -30,6 +30,18 @@ int main() {
           "driver entry-point version selection must honor its minimum version");
     check(classify_api("cudaGraphLaunch") == ApiDisposition::native_anchor_passthrough,
           "native graph execution must be explicitly classified as anchor dispatch");
+    check(classify_api("cudaMemset") == ApiDisposition::wrapped,
+          "synchronous memset must be intercepted for managed-memory lifetime tracking");
+    check(classify_api("cuMemGetInfo_v2") == ApiDisposition::wrapped &&
+              classify_api("cuDeviceTotalMem_v2") == ApiDisposition::wrapped,
+          "Driver memory queries must report the same pair capacity contract");
+    check(classify_api("cuMemsetD8Async") == ApiDisposition::wrapped &&
+              classify_api("cuMemsetD16Async") == ApiDisposition::wrapped &&
+              classify_api("cuMemsetD32Async") == ApiDisposition::wrapped &&
+              classify_api("cuMemsetD2D8Async") == ApiDisposition::wrapped &&
+              classify_api("cuMemsetD2D16Async") == ApiDisposition::wrapped &&
+              classify_api("cuMemsetD2D32Async") == ApiDisposition::wrapped,
+          "asynchronous Driver memset variants must retain pair-backed memory through completion");
     check(classify_api("cudaLaunchKernel") == ApiDisposition::wrapped &&
               classify_api("cudaLaunchKernelExC") == ApiDisposition::wrapped,
           "opaque-argument runtime launch entry points must be intercepted for prefix retention");

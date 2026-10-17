@@ -3,6 +3,7 @@
 #include "v200/core/runtime_init.hpp"
 #include "v200/frontdoor/runtime.h"
 
+#include <algorithm>
 #include <array>
 #include <charconv>
 #include <cinttypes>
@@ -22,7 +23,9 @@ namespace {
 constexpr std::uint64_t kLogicalDevice = 1;
 constexpr std::uint32_t kAnchorOwner = 0;
 constexpr std::uint64_t kMiB = 1024ull * 1024ull;
+constexpr std::uint64_t kGiB = 1024ull * 1024ull * 1024ull;
 constexpr std::uint64_t kMaxOwnerBudgetMiB = 12288;
+constexpr std::uint64_t kPhysicalReserveBytes = kGiB;
 constexpr char kExpectedUuid0[] = "GPU-21131915-1488-23af-38dd-1743ae1f5cc8";
 constexpr char kExpectedUuid1[] = "GPU-d745da9c-7649-8334-41f1-483afa6f3206";
 constexpr char kExpectedB01[] = "8426eab5-278d-4687-ab7d-f5ec937e46ec";
@@ -119,6 +122,7 @@ bool api_complete(const RuntimeInitApi &api) noexcept {
          api.primary_context_retain != nullptr &&
          api.primary_context_release != nullptr && api.context_push != nullptr &&
          api.context_pop != nullptr && api.allocation_granularity != nullptr &&
+         api.memory_info != nullptr &&
          exec.abi_version == V200_EXECUTION_ABI_VERSION &&
          exec.struct_size >= sizeof(v200_execution_driver_api_v1) &&
          exec.ctx_push_current != nullptr && exec.ctx_pop_current != nullptr &&
@@ -190,6 +194,7 @@ class NativeBindings final {
   using ContextPop = CUresult(CUDAAPI *)(CUcontext *);
   using Granularity = CUresult(CUDAAPI *)(size_t *, const CUmemAllocationProp *,
                                           CUmemAllocationGranularity_flags);
+  using MemoryInfo = CUresult(CUDAAPI *)(size_t *, size_t *);
   using EventCreate = CUresult(CUDAAPI *)(CUevent *, unsigned int);
   using EventDestroy = CUresult(CUDAAPI *)(CUevent);
   using EventRecord = CUresult(CUDAAPI *)(CUevent, CUstream);
@@ -219,6 +224,7 @@ class NativeBindings final {
   ContextPush context_push{};
   ContextPop context_pop{};
   Granularity allocation_granularity{};
+  MemoryInfo memory_info{};
   EventCreate event_create{};
   EventDestroy event_destroy{};
   EventRecord event_record{};
@@ -260,6 +266,8 @@ class NativeBindings final {
         lookup("cuCtxPopCurrent_v2", "cuCtxPopCurrent"));
     allocation_granularity = reinterpret_cast<Granularity>(
         lookup("cuMemGetAllocationGranularity"));
+    memory_info = reinterpret_cast<MemoryInfo>(
+        lookup("cuMemGetInfo_v2", "cuMemGetInfo"));
     event_create = reinterpret_cast<EventCreate>(lookup("cuEventCreate"));
     event_destroy = reinterpret_cast<EventDestroy>(
         lookup("cuEventDestroy_v2", "cuEventDestroy"));
@@ -283,6 +291,7 @@ class NativeBindings final {
     return init && device_count && device_get && device_get_uuid &&
            device_get_attribute && primary_retain && primary_release &&
            context_push && context_pop && allocation_granularity &&
+           memory_info &&
            event_create && event_destroy && event_record && event_record_ptsz && event_query &&
            event_synchronize && stream_synchronize && stream_wait_event &&
            stream_synchronize_ptsz && stream_wait_event_ptsz &&
@@ -396,6 +405,7 @@ class NativeBindings final {
     api.context_push = context_push;
     api.context_pop = context_pop;
     api.allocation_granularity = allocation_granularity;
+    api.memory_info = memory_info;
     api.execution.abi_version = V200_EXECUTION_ABI_VERSION;
     api.execution.struct_size = sizeof(api.execution);
     api.execution.user_data = this;
@@ -534,6 +544,31 @@ class RuntimeInitializer::Impl final {
       if (granularities_[owner] == 0) {
         return fail(CUDA_ERROR_INVALID_CONTEXT);
       }
+
+      size_t physical_free = 0;
+      size_t physical_total = 0;
+      status = api_.context_push(contexts_[owner]);
+      if (status != CUDA_SUCCESS) return fail(status);
+      status = api_.memory_info(&physical_free, &physical_total);
+      CUcontext memory_popped = nullptr;
+      const CUresult memory_pop_status = api_.context_pop(&memory_popped);
+      if (memory_pop_status != CUDA_SUCCESS) {
+        unsafe_context_state_ = true;
+        return fail(memory_pop_status);
+      }
+      if (memory_popped != contexts_[owner]) {
+        unsafe_context_state_ = true;
+        return fail(CUDA_ERROR_INVALID_CONTEXT);
+      }
+      if (status != CUDA_SUCCESS) return fail(status);
+      if (physical_total == 0 || physical_free > physical_total) {
+        return fail(CUDA_ERROR_INVALID_VALUE);
+      }
+      const std::uint64_t usable_free = physical_free > kPhysicalReserveBytes
+                                            ? physical_free - kPhysicalReserveBytes
+                                            : 0;
+      budgets_[owner] = std::min<std::uint64_t>(budgets_[owner], usable_free);
+      if (budgets_[owner] == 0) return fail(CUDA_ERROR_OUT_OF_MEMORY);
     }
 
     handle_ = v200_execution_create(&api_.execution);

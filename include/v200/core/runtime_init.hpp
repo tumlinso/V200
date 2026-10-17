@@ -31,6 +31,7 @@ struct RuntimeInitApi {
   using AllocationGranularity = CUresult(CUDAAPI *)(
       size_t *, const CUmemAllocationProp *,
       CUmemAllocationGranularity_flags);
+  using MemoryInfo = CUresult(CUDAAPI *)(size_t *, size_t *);
 
   Init init{};
   DeviceCount device_count{};
@@ -42,6 +43,7 @@ struct RuntimeInitApi {
   ContextPush context_push{};
   ContextPop context_pop{};
   AllocationGranularity allocation_granularity{};
+  MemoryInfo memory_info{};
   v200_execution_driver_api_v1 execution{};
   v200_memory_driver_api memory{};
   int (*register_owner)(v200_execution_handle *, uint64_t, uint32_t, void *){};

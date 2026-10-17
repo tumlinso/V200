@@ -1,0 +1,120 @@
+{
+  "schema_version": 3,
+  "project": {
+    "name": "V200"
+  },
+  "tasks": [
+    {
+      "checkpoints": [
+        {
+          "id": "V200-07-READY",
+          "title": "V200-07-READY"
+        }
+      ],
+      "depends_on": [],
+      "id": "V200-07",
+      "kind": "task",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Live payload exceeds each single device available capacity, with both physical backing owners verified.\",\"No managed-memory/CPU offload or reduced workload is substituted without user decision.\",\"Correct outputs, freeing/reallocation and accounting are checked; insufficient headroom is BLOCKED, not a smaller passing test.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D02\",\"D05\",\"D07\"],\"recommended_start\":\"Run B04 only when both devices have the required headroom. Target a chosen fixture around 24 GiB resident payload where feasible, not a mandatory exact number. Include one spanning allocation/lifecycle case and the actual consumer residency evidence. Report context/workspace reserve and physical owner bytes.\",\"research_refs\":[\"W-VMM\",\"A-E23\",\"A-R07\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-07.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-07\",\"outputs\":[\"tests/capacity/\",\"docs/v200/capacity.md\",\"evidence/B04\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Preflight budget/fixture checks\"],\"gpu\":[\"B04\"],\"reuse\":\"One matched capacity case and limited lifecycle checks; no allocation-size sweep.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17 implementation mandate: preserve completed06 receipt; rootowns integrated source repairs and deployment. 07may delegate independent CPU implementation of08 operator behind opt-in hook while capacity is integrated; no08 GPUacceptance before07. Use HPC CUDA12.9. Implement functionality first; only focused correctness and finite controller checks. No terminal prerequisite upserts.",
+      "objective": "Prove genuinely resident aggregate HBM with live application data that does not fit on either constituent alone. Read planning/v200-bootstrap/tasks/V200-07.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "src",
+          "include/v200",
+          "tests",
+          "scripts/v200",
+          "scripts/qualification",
+          "benchmarks/fixtures",
+          "docs/v200/capacity.md",
+          "docs/v200/first-consumer.md",
+          "README.md",
+          "evidence/B04",
+          "evidence/B03",
+          "evidence/operators"
+        ],
+        "read_paths": [
+          "docs/v200",
+          "planning/v200-bootstrap",
+          "build-support",
+          "evidence/foundation",
+          "evidence/B02"
+        ]
+      },
+      "title": "Qualify useful capacity beyond one physical V100"
+    },
+    {
+      "checkpoints": [
+        {
+          "id": "V200-08-READY",
+          "title": "V200-08-READY"
+        }
+      ],
+      "depends_on": [
+        {
+          "type": "task",
+          "task_id": "V200-07"
+        }
+      ],
+      "id": "V200-08",
+      "kind": "task",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"At least one significant real-consumer operation is correctly distributed with both owners doing useful work.\",\"Focused B03 checks compare exact useful work and outputs; timing uncertainty is stated.\",\"General split-safety is not inferred from the toy grid sample or symbol matching.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D03\",\"D07\"],\"recommended_start\":\"Use the observed hot operation. Choose a vendor-library split, exact kernel replacement or qualified grid transform. Preserve grid-stride, packed layouts, numerical accumulation and aliases. Keep a same-operation native baseline and a safe owner route. Include the index/ABI/module identity in the qualification key. Do not implement every transformer operation.\",\"research_refs\":[\"A-M48\",\"A-R06\",\"W-LLAMA-CUDA\",\"W-CUDA12\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-08.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-08\",\"outputs\":[\"src/operators/\",\"include/v200/operators/\",\"tests/operators/\",\"docs/v200/operator-profile.json\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Code/layout contract review and compile\",\"Index/numeric fixtures\"],\"gpu\":[\"B03\"],\"gpu_subset\":\"B03 selected operator/consumer subset\",\"performance\":\"Full promotion decision owned by V200-12/B05.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17 implementation mandate: preserve completed06 receipt; rootowns integrated source repairs and deployment. 07may delegate independent CPU implementation of08 operator behind opt-in hook while capacity is integrated; no08 GPUacceptance before07. Use HPC CUDA12.9. Implement functionality first; only focused correctness and finite controller checks. No terminal prerequisite upserts.",
+      "objective": "Make both V100s perform meaningful selected application work under the unchanged outward interface. Read planning/v200-bootstrap/tasks/V200-08.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "src",
+          "include/v200",
+          "tests",
+          "scripts/v200",
+          "scripts/qualification",
+          "benchmarks/fixtures",
+          "docs/v200/operator-profile.json",
+          "docs/v200/first-consumer.md",
+          "README.md",
+          "evidence/operators",
+          "evidence/B03",
+          "evidence/B04"
+        ],
+        "read_paths": [
+          "docs/v200",
+          "planning/v200-bootstrap",
+          "build-support",
+          "evidence/foundation",
+          "evidence/B02"
+        ]
+      },
+      "title": "Accelerate the dominant qualified operation across the pair"
+    }
+  ],
+  "runs": [
+    {
+      "id": "V200-CAPACITY-COMPUTE-1",
+      "root_task_id": "V200-07",
+      "charter": {
+        "objective": "Deliver real pair-resident llama payload, then useful transparent computation on both V100s",
+        "boundaries": [
+          "Keep unchanged consumer and native fallback; no new scheduler or broad exploratory campaign"
+        ],
+        "invariants": [
+          "Correct lifetimes and complete-prefix ordering",
+          "Actual application data beyond single-GPUcapacity before07acceptance",
+          "08GPUacceptance follows07; independent CPU implementation can overlap",
+          "HPC SDK CUDA12.9, controller admitted finiteGPUchecks"
+        ]
+      },
+      "lanes": [
+        {
+          "id": "V200-CAPACITY-COMPUTE-1-MAIN",
+          "role": "implementer",
+          "tasks": [
+            "V200-07",
+            "V200-08"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        }
+      ]
+    }
+  ]
+}

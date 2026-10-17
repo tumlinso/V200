@@ -100,9 +100,11 @@ def _parse_gpu_option(value: str | None, authorized_pair: list[str]) -> list[str
     return selected
 
 
-def _server_args(mode: str, duration_seconds: int | None,
-                 port: int | None) -> tuple[list[str], str, int]:
+def _server_args(mode: str, duration_seconds: int | None, port: int | None,
+                 workload_name: str) -> tuple[list[str], str, int]:
     if mode == "serve":
+        if workload_name != "smoke":
+            raise LaunchError("finite foreground service currently uses the smoke workload")
         duration = SERVE_DEFAULT_SECONDS if duration_seconds is None else duration_seconds
         if isinstance(duration, bool) or not 1 <= duration <= SERVE_MAX_SECONDS:
             raise LaunchError(f"serve duration must be between 1 and {SERVE_MAX_SECONDS} seconds")
@@ -115,6 +117,8 @@ def _server_args(mode: str, duration_seconds: int | None,
             raise LaunchError("--duration-seconds applies only to --mode serve")
         if port is not None:
             raise LaunchError("--port applies only to --mode serve")
+        if workload_name == "resident_capacity":
+            return ["native_pair", "facade_owner"], "B04", 0
         return ["native_single", "facade_owner"], "B03", 0
     raise LaunchError(f"unsupported mode {mode!r}")
 
@@ -122,17 +126,19 @@ def _server_args(mode: str, duration_seconds: int | None,
 def _make_plan(mode: str, uuids: list[str], run_id: str,
                duration_seconds: int | None = None,
                port: int | None = None,
-               python_executable: str | None = None) -> dict[str, Any]:
+               python_executable: str | None = None,
+               workload_name: str = "smoke") -> dict[str, Any]:
     fixture = _read_json(FIXTURE_PATH)
     selected_port = DEFAULT_SERVER_PORT if mode == "serve" and port is None else port
-    controls, bundle, duration = _server_args(mode, duration_seconds, selected_port)
+    controls, bundle, duration = _server_args(
+        mode, duration_seconds, selected_port, workload_name)
     if len(uuids) != 2 or len(set(uuids)) != 2 or any(UUID_RE.fullmatch(item) is None for item in uuids):
         raise LaunchError("launch requires the exact two UUIDs from the B01 pair profile")
     python = python_executable or sys.executable
     fixture, _profile = consumer.load_documents(FIXTURE_PATH, PROFILE_PATH)
     profile = _read_json(PROFILE_PATH)
-    workload = fixture["workloads"]["smoke"]
-    preflights = [consumer.memory_preflight("smoke", control, fixture, "pair")
+    workload = fixture["workloads"][workload_name]
+    preflights = [consumer.memory_preflight(workload_name, control, fixture, "pair")
                   for control in controls]
     refused = [item for item in preflights if not item["fits_static_preflight"]]
     if refused:
@@ -144,14 +150,21 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         controller_timeout = bounded_seconds + SERVE_CONTROLLER_MARGIN_SECONDS
         wrapper = BOUNDED_ADAPTER
     else:
-        evidence_dir = REPO_ROOT / "evidence/B03/preview-runs" / run_id
-        spec_path = REPO_ROOT / "evidence/B03/preview-launch-specs" / f"{run_id}.controller.json"
-        bounded_seconds = PREVIEW_BOUNDED_SECONDS
-        controller_timeout = PREVIEW_BOUNDED_SECONDS + PREVIEW_CONTROLLER_MARGIN_SECONDS
-        wrapper = BOOTSTRAP_RUNNER
+        if workload_name == "resident_capacity":
+            evidence_dir = REPO_ROOT / "evidence/B04/capacity-runs" / run_id
+            spec_path = REPO_ROOT / "evidence/B04/capacity-launch-specs" / f"{run_id}.controller.json"
+            bounded_seconds = PREVIEW_BOUNDED_SECONDS
+            controller_timeout = PREVIEW_BOUNDED_SECONDS + PREVIEW_CONTROLLER_MARGIN_SECONDS
+            wrapper = BOUNDED_ADAPTER
+        else:
+            evidence_dir = REPO_ROOT / "evidence/B03/preview-runs" / run_id
+            spec_path = REPO_ROOT / "evidence/B03/preview-launch-specs" / f"{run_id}.controller.json"
+            bounded_seconds = PREVIEW_BOUNDED_SECONDS
+            controller_timeout = PREVIEW_BOUNDED_SECONDS + PREVIEW_CONTROLLER_MARGIN_SECONDS
+            wrapper = BOOTSTRAP_RUNNER
 
     output_dir = evidence_dir / "consumer"
-    inner = [python, str(CONSUMER_RUNNER), "--workload", "smoke"]
+    inner = [python, str(CONSUMER_RUNNER), "--workload", workload_name]
     for control in controls:
         inner.extend(["--control", control])
     for library in (FRONTDOOR_DSO, PAIR_INIT_DSO):
@@ -209,6 +222,7 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
     }
     return {
         "mode": mode,
+        "workload": workload_name,
         "bundle": bundle,
         "controls": controls,
         "run_id": run_id,
@@ -220,7 +234,7 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
                   "sha256": fixture["model"]["sha256"]},
         "consumer_binary": {"path": profile["binary"]["path"],
                             "sha256": profile["binary"]["sha256"]},
-        "smoke_config": {"context": workload["ctx_size"],
+        "workload_config": {"context": workload["ctx_size"],
                           "gpu_layers": workload["n_gpu_layers"],
                           "request": workload["request"],
                           "oracle": workload["oracle"]},
@@ -337,7 +351,7 @@ def _print_plan(plan: dict[str, Any], missing: list[str], execute: bool) -> None
     print(f"Graph policy: {plan['graph_policy']}")
     print(f"Pinned model: {json.dumps(plan['model'], sort_keys=True)}")
     print(f"Pinned consumer: {json.dumps(plan['consumer_binary'], sort_keys=True)}")
-    print(f"Smoke configuration: {json.dumps(plan['smoke_config'], sort_keys=True)}")
+    print(f"Workload configuration: {json.dumps(plan['workload_config'], sort_keys=True)}")
     print(f"Pair facade preloads: {json.dumps(plan['preload_libraries'])}")
     print(f"Static smoke memory preflight: {json.dumps(plan['static_memory_preflight'], sort_keys=True)}")
     print(f"Per-GPU application allocation budget: {plan['app_allocation_cap_mib_per_gpu']} MiB")
@@ -348,7 +362,7 @@ def _print_plan(plan: dict[str, Any], missing: list[str], execute: bool) -> None
         print(f"Service duration after the exact startup self-check: {plan['duration_seconds']} seconds")
         print("The command stays in the foreground; query /health until ready and stop it with Ctrl-C.")
     else:
-        print("Preview runs native_single then facade_owner sequentially with the same smoke workload.")
+        print(f"Preview runs {', '.join(plan['controls'])} sequentially with {plan['workload']}.")
     print(f"Controller hard timeout: {plan['controller_timeout_seconds']} seconds")
     print(f"Controller spec: {plan['controller_spec_path']}")
     print("Controller spec preview: " + json.dumps(plan["controller_spec"], sort_keys=True))
@@ -394,6 +408,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help=f"serve lifetime after correctness check (default {SERVE_DEFAULT_SECONDS}, max {SERVE_MAX_SECONDS})")
     parser.add_argument("--port", type=int, default=None,
                         help=f"loopback server port in serve mode (default {DEFAULT_SERVER_PORT})")
+    parser.add_argument("--workload", choices=("smoke", "resident_capacity"), default="smoke",
+                        help="preview workload; resident_capacity runs the bounded B04 full-resident pair case")
     parser.add_argument("--execute", action="store_true",
                         help="explicitly enter the CUDA controller; without this flag, print a dry-run plan")
     return parser.parse_args(argv)
@@ -406,7 +422,8 @@ def main(argv: list[str] | None = None) -> int:
         selected = _parse_gpu_option(args.gpus, authorized_pair)
         run_id = f"{args.mode}-{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}-{uuid.uuid4().hex[:12]}"
         plan = _make_plan(args.mode, selected, run_id,
-                          duration_seconds=args.duration_seconds, port=args.port)
+                          duration_seconds=args.duration_seconds, port=args.port,
+                          workload_name=args.workload)
         plan["pair_profile_identity"] = pair_identity
     except (LaunchError, OSError, KeyError, TypeError, ValueError) as exc:
         print(f"V200 serve refused: {exc}", file=sys.stderr)

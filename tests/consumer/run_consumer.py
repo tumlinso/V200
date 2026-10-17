@@ -135,7 +135,7 @@ def effective_gpu_layers(workload: dict[str, Any], fixture: dict[str, Any]) -> i
 
 def memory_preflight(workload_name: str, control_name: str,
                      fixture: dict[str, Any], facade_mode: str | None = None) -> dict[str, Any]:
-    """Conservative descriptor-based estimate; not a substitute for the cap."""
+    """Estimate CUDA allocations using the selected control's actual placement."""
     try:
         workload = fixture["workloads"][workload_name]
         control = fixture["controls"][control_name]
@@ -164,14 +164,33 @@ def memory_preflight(workload_name: str, control_name: str,
         ctx = int(workload["ctx_size"])
         kv_bytes = (ctx * layers * int(model["kv_heads"])
                     * (int(model["key_length"]) + int(model["value_length"])) * 2)
-        # Assume all non-block tensors may land on one owner; this intentionally
-        # overestimates the balanced pair case rather than relying on placement.
         non_block = int(layout["non_block_tensor_bytes"])
-        per_owner_layers = (layer_tensor_bytes + owners - 1) // owners
-        per_owner_kv = (kv_bytes + owners - 1) // owners
         workspace = int(guard["workspace_reserve_bytes_per_gpu"])
-        estimate = per_owner_layers + non_block + per_owner_kv + workspace
         limit_bytes = int(guard["per_physical_gpu_application_limit_mib"]) * 1024 * 1024
+        if control_name == "facade_owner" and owner_count == 2:
+            # Every ordinary single-device allocation targets the visible anchor.
+            # The VMM planner consumes that owner's budget first, then backs the
+            # remainder from the peer. Model the same placement instead of
+            # pretending the allocator stripes every llama buffer evenly.
+            pair_payload = layer_tensor_bytes + non_block + kv_bytes
+            estimate_total = pair_payload + workspace * owners
+            owner_estimates = [min(estimate_total, limit_bytes),
+                               max(0, estimate_total - limit_bytes)]
+            placement = "preferred_owner_with_peer_spill"
+        elif owner_count == 2:
+            layer_first = (layer_tensor_bytes + 1) // 2
+            layer_second = layer_tensor_bytes // 2
+            kv_first = (kv_bytes + 1) // 2
+            kv_second = kv_bytes // 2
+            owner_estimates = [layer_first + non_block + kv_first + workspace,
+                               layer_second + kv_second + workspace]
+            estimate_total = sum(owner_estimates)
+            placement = "native_layer_split_with_non_block_on_anchor"
+        else:
+            estimate_total = layer_tensor_bytes + non_block + kv_bytes + workspace
+            owner_estimates = [estimate_total]
+            placement = "single_owner"
+        estimate = max(owner_estimates)
         result = {
             "workload": workload_name,
             "control": control_name,
@@ -179,15 +198,17 @@ def memory_preflight(workload_name: str, control_name: str,
             "requested_gpu_layers": int(workload["n_gpu_layers"]),
             "owner_count_assumed": owner_count,
             "gpu_layer_tensor_bytes_total": layer_tensor_bytes,
-            "non_block_tensor_bytes_assumed_per_owner": non_block,
+            "non_block_tensor_bytes_total_assumed": non_block,
             "kv_bytes_total": kv_bytes,
-            "kv_bytes_assumed_per_owner": per_owner_kv,
             "workspace_reserve_bytes_per_owner": workspace,
+            "placement_policy": placement,
+            "estimated_allocation_bytes_total": estimate_total,
+            "estimated_bytes_by_owner": owner_estimates,
             "estimated_bytes_per_owner": estimate,
             "estimated_mib_per_owner": round(estimate / (1024 * 1024), 3),
             "application_limit_bytes_per_owner": limit_bytes,
-            "fits_static_preflight": estimate <= limit_bytes,
-            "basis": "GGUF tensor descriptors + explicit f16 KV formula + 1 GiB workspace reserve; conservative non-block assignment",
+            "fits_static_preflight": all(value <= limit_bytes for value in owner_estimates),
+            "basis": "GGUF tensor descriptors + explicit f16 KV formula + workspace reserve, placed according to native split or V200 preferred-owner allocation with peer spill",
         }
         if backend not in ("native", "v200-preload"):
             raise ConsumerError(f"unknown backend {backend!r}")
@@ -337,7 +358,7 @@ def _verify_hash(path_text: str, expected: str) -> str:
 
 
 def _argv_for(control_name: str, workload: dict[str, Any], fixture: dict[str, Any],
-              binary_path: str, port: int) -> list[str]:
+              binary_path: str, port: int, workload_name: str = "smoke") -> list[str]:
     control = fixture["controls"][control_name]
     argv = [binary_path]
     replacements = {"{model}": fixture["model"]["path"],
@@ -347,6 +368,12 @@ def _argv_for(control_name: str, workload: dict[str, Any], fixture: dict[str, An
     for value in fixture["server"]["fixed_arguments"]:
         argv.append(replacements.get(value, value))
     argv.extend(str(arg) for arg in control["arguments"])
+    if workload_name == "resident_capacity":
+        # llama.cpp normally keeps its input embedding on CPU even when every
+        # supported layer is offloaded. Keep the full-resident workload's GGUF
+        # tensor payload on CUDA0, and retain trace logs proving that placement.
+        argv.extend(["--override-tensor", r"^token_embd\.weight$=CUDA0",
+                     "--verbosity", "5"])
     return argv
 
 
@@ -488,6 +515,88 @@ def _verify_nvidia_smi_uuid_selection(selected_uuids: list[str]) -> tuple[str, l
     return executable, observed
 
 
+def _nvidia_smi_memory(nvidia_smi: str, selected_uuids: list[str]) -> dict[str, dict[str, int]]:
+    command = [nvidia_smi, "--query-gpu=uuid,memory.total,memory.free",
+               "--format=csv,noheader,nounits"]
+    try:
+        completed = subprocess.run(command, check=True, capture_output=True,
+                                   text=True, timeout=5)
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise ConsumerError(f"cannot query selected physical GPU memory: {exc}") from exc
+    observed: dict[str, dict[str, int]] = {}
+    for raw in completed.stdout.splitlines():
+        if not raw.strip():
+            continue
+        parts = [part.strip() for part in raw.split(",")]
+        if len(parts) != 3:
+            raise ConsumerError(f"malformed nvidia-smi GPU-memory row: {raw!r}")
+        gpu_uuid, total_text, free_text = parts
+        try:
+            total_mib, free_mib = int(total_text), int(free_text)
+        except ValueError as exc:
+            raise ConsumerError(f"unparseable nvidia-smi GPU-memory row: {raw!r}") from exc
+        if total_mib <= 0 or free_mib < 0 or free_mib > total_mib:
+            raise ConsumerError(f"invalid nvidia-smi physical memory values: {raw!r}")
+        observed[gpu_uuid] = {
+            "total_mib": total_mib,
+            "free_mib": free_mib,
+            "total_bytes": total_mib * 1024 * 1024,
+            "free_bytes": free_mib * 1024 * 1024,
+        }
+    missing = [gpu_uuid for gpu_uuid in selected_uuids if gpu_uuid not in observed]
+    if missing:
+        raise ConsumerError(f"selected physical GPU memory is unavailable for UUIDs: {missing}")
+    return {gpu_uuid: observed[gpu_uuid] for gpu_uuid in selected_uuids}
+
+
+def _check_physical_headroom(workload_name: str, control_name: str,
+                             fixture: dict[str, Any], preflight: dict[str, Any],
+                             selected_uuids: list[str],
+                             memory_by_uuid: dict[str, dict[str, int]],
+                             facade_mode: str | None) -> dict[str, Any]:
+    """Refuse a full-resident run when live per-owner headroom cannot fit it."""
+    reserve = 1024 * 1024 * 1024
+    cap = int(fixture["memory_guard"]["per_physical_gpu_application_limit_mib"]) * 1024 * 1024
+    qualified = [max(0, min(cap, memory_by_uuid[item]["free_bytes"] - reserve))
+                 for item in selected_uuids]
+    required = list(preflight["estimated_bytes_by_owner"])
+    if control_name == "facade_owner" and (facade_mode or "pair") == "pair":
+        # Each V200 allocation goes to the visible anchor first. If that owner
+        # has less live headroom than the static cap, the spill boundary moves
+        # with it; the manager independently enforces the same startup budgets.
+        total_required = int(preflight["estimated_allocation_bytes_total"])
+        required = [min(total_required, qualified[0]),
+                    max(0, total_required - min(total_required, qualified[0]))]
+    if len(required) != len(selected_uuids):
+        raise ConsumerError("preflight owner count differs from controller-selected physical GPUs")
+    failures = [
+        {"gpu_uuid": gpu_uuid, "required_bytes": needed,
+         "qualified_app_bytes": budget}
+        for gpu_uuid, needed, budget in zip(selected_uuids, required, qualified)
+        if needed > budget
+    ]
+    if failures:
+        raise ConsumerError(f"insufficient live pair headroom for the unchanged workload: {failures}")
+    capacity_payload_bytes = int(
+        fixture["model"]["tensor_layout"]["total_tensor_bytes"])
+    physical_capacity_max = max(memory_by_uuid[item]["total_bytes"]
+                                for item in selected_uuids)
+    exceeds_physical_capacity = capacity_payload_bytes > physical_capacity_max
+    if workload_name == "resident_capacity" and not exceeds_physical_capacity:
+        raise ConsumerError(
+            "resident-capacity payload does not exceed the largest selected physical GPU capacity")
+    return {
+        "status": "PASS",
+        "physical_reserve_bytes_per_owner": reserve,
+        "qualified_application_bytes_by_uuid": dict(zip(selected_uuids, qualified)),
+        "required_application_bytes_by_uuid": dict(zip(selected_uuids, required)),
+        "resident_payload_bytes": capacity_payload_bytes,
+        "maximum_selected_physical_capacity_bytes": physical_capacity_max,
+        "payload_exceeds_each_physical_gpu_capacity": (
+            workload_name == "resident_capacity" and exceeds_physical_capacity),
+    }
+
+
 class ProcessMemoryGuard:
     def __init__(self, proc: subprocess.Popen[Any], selected_uuids: list[str],
                  limit_mib: int, poll_seconds: float,
@@ -611,13 +720,18 @@ def _write_json_atomic(path: Path, value: dict[str, Any]) -> None:
 
 
 def _read_profile_log(path: Path, selected_uuids: list[str],
-                      expected_budget_bytes: int,
-                      expected_qualification_id: str | None = None) -> dict[str, Any]:
+                      max_owner_budget_bytes: int,
+                      expected_qualification_id: str | None = None,
+                      minimum_resident_bytes: int = 0) -> dict[str, Any]:
     if not path.exists():
         return {"status": "MISSING", "path": str(path), "records": []}
     try:
         raw = path.read_bytes()
         records = []
+        accepted_budgets: list[int] | None = None
+        peak_used = [0, 0]
+        peak_total = 0
+        peak_event = None
         for line_number, line in enumerate(raw.splitlines(), start=1):
             if not line.strip():
                 continue
@@ -641,10 +755,13 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
             budgets = value["owner_budget_bytes"]
             usage = value["owner_used_bytes"]
             if (not isinstance(budgets, list) or len(budgets) != 2
-                    or any(isinstance(item, bool) or not isinstance(item, int) for item in budgets)):
+                    or any(isinstance(item, bool) or not isinstance(item, int)
+                           or item <= 0 or item > max_owner_budget_bytes for item in budgets)):
                 raise ValueError(f"line {line_number} owner budgets are malformed")
-            if budgets != [expected_budget_bytes, expected_budget_bytes]:
-                raise ValueError(f"line {line_number} owner budgets differ from fixture cap")
+            if accepted_budgets is None:
+                accepted_budgets = list(budgets)
+            elif budgets != accepted_budgets:
+                raise ValueError(f"line {line_number} owner budgets changed during the process")
             if (not isinstance(usage, list) or len(usage) != 2
                     or any(isinstance(item, bool) or not isinstance(item, int) for item in usage)):
                 raise ValueError(f"line {line_number} owner usage is malformed")
@@ -652,11 +769,34 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
                 raise ValueError(f"line {line_number} owner usage is negative")
             if any(item > budget for item, budget in zip(usage, budgets)):
                 raise OverflowError(f"line {line_number} owner usage exceeded configured budget")
+            total_used = sum(usage)
+            if total_used > peak_total:
+                peak_total = total_used
+                peak_used = list(usage)
+                peak_event = value["event"]
             for field in ("live_allocation_count", "live_reservation_count", "cleanup_pending_count"):
                 if isinstance(value[field], bool) or not isinstance(value[field], int) or value[field] < 0:
                     raise ValueError(f"line {line_number} {field} is malformed")
-        return {"status": "PASS" if records else "EMPTY", "path": str(path),
-                "sha256": hashlib.sha256(raw).hexdigest(), "records": records}
+        cleanup_ok = bool(records) and all(records[-1][field] == 0 for field in (
+            "live_allocation_count", "live_reservation_count", "cleanup_pending_count")) \
+            and records[-1]["owner_used_bytes"] == [0, 0]
+        if not records:
+            status = "EMPTY"
+        elif not cleanup_ok:
+            status = "LIVE_RESOURCES_AT_EXIT"
+        elif minimum_resident_bytes > 0 and (
+                peak_total < minimum_resident_bytes or min(peak_used) <= 0):
+            status = "INSUFFICIENT_RESIDENT_PAYLOAD"
+        else:
+            status = "PASS"
+        return {"status": status, "path": str(path),
+                "sha256": hashlib.sha256(raw).hexdigest(), "records": records,
+                "owner_budget_bytes": accepted_budgets,
+                "peak_owner_used_bytes": peak_used,
+                "peak_total_owner_used_bytes": peak_total,
+                "peak_event": peak_event,
+                "cleanup_accounting_zero": cleanup_ok,
+                "minimum_resident_bytes_required": minimum_resident_bytes}
     except OverflowError as exc:
         return {"status": "OVER_BUDGET", "path": str(path),
                 "sha256": hashlib.sha256(raw).hexdigest() if "raw" in locals() else None,
@@ -666,6 +806,49 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
                 "sha256": hashlib.sha256(raw).hexdigest() if "raw" in locals() else None,
                 "records": records if "records" in locals() else [],
                 "error": f"{type(exc).__name__}: {exc}"}
+
+
+def _layer_offload_evidence(path: Path, workload_name: str,
+                            fixture: dict[str, Any]) -> dict[str, Any]:
+    try:
+        log = path.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        return {"status": "MISSING", "path": str(path), "error": str(exc)}
+    matches = re.findall(r"offloaded\s+(\d+)\s*/\s*(\d+)\s+layers\s+to\s+GPU",
+                         log, flags=re.IGNORECASE)
+    if not matches:
+        return {"status": "MISSING", "path": str(path), "matched_lines": []}
+    offloaded, available = (int(item) for item in matches[-1])
+    model_layers = int(fixture["model"]["block_count"])
+    expected = model_layers + 1 if workload_name == "resident_capacity" else None
+    full = offloaded == available and (expected is None or available >= expected)
+    return {
+        "status": "PASS" if full or expected is None else "PARTIAL_OFFLOAD",
+        "path": str(path),
+        "offloaded_layers": offloaded,
+        "available_layers": available,
+        "full_gpu_offload": full,
+        "required_layers": expected,
+    }
+
+
+def _input_embedding_evidence(path: Path, workload_name: str) -> dict[str, Any]:
+    if workload_name != "resident_capacity":
+        return {"status": "NOT_REQUIRED"}
+    try:
+        log = path.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        return {"status": "MISSING", "path": str(path), "error": str(exc)}
+    matches = re.findall(
+        r"tensor\s+(token_embd\.weight)\s+\([^\n]*?\)\s+buffer type overridden to\s+(\S+)",
+        log, flags=re.IGNORECASE)
+    if not matches:
+        return {"status": "MISSING", "path": str(path),
+                "expected_buffer_type": "CUDA0"}
+    tensor_name, buffer_type = matches[-1]
+    return {"status": "PASS" if buffer_type == "CUDA0" else "WRONG_BUFFER_TYPE",
+            "path": str(path), "tensor": tensor_name,
+            "buffer_type": buffer_type, "required_buffer_type": "CUDA0"}
 
 
 def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
@@ -678,7 +861,8 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
              nvidia_smi_path: str | None = None,
              visible_gpu_uuids: list[str] | None = None,
              server_port: int | None = None,
-             serve_duration_seconds: int = 0) -> dict[str, Any]:
+             serve_duration_seconds: int = 0,
+             physical_memory_baseline: dict[str, dict[str, int]] | None = None) -> dict[str, Any]:
     workload = fixture["workloads"][workload_name]
     preflight = memory_preflight(workload_name, control_name, fixture, facade_mode)
     if not preflight["fits_static_preflight"]:
@@ -686,12 +870,20 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
             f"static preflight estimates {preflight['estimated_mib_per_owner']} MiB/owner, "
             f"over {preflight['application_limit_bytes_per_owner'] / (1024 * 1024):.0f} MiB"
         )
+    physical_headroom = None
+    if physical_memory_baseline is not None:
+        physical_headroom = _check_physical_headroom(
+            workload_name, control_name, fixture, preflight, selected_uuids,
+            physical_memory_baseline, facade_mode)
+    elif monitor and workload_name == "resident_capacity":
+        raise ConsumerError("resident-capacity workload requires live selected-GPU headroom")
     if isinstance(serve_duration_seconds, bool) or not 0 <= serve_duration_seconds <= MAX_SERVE_DURATION_S:
         raise ConsumerError(f"serve duration must be between 0 and {MAX_SERVE_DURATION_S} seconds")
     port = _free_loopback_port() if server_port is None else int(server_port)
     if not 1 <= port <= 65535:
         raise ConsumerError("server port must be between 1 and 65535")
-    argv = _argv_for(control_name, workload, fixture, profile["binary"]["path"], port)
+    argv = _argv_for(control_name, workload, fixture,
+                     profile["binary"]["path"], port, workload_name)
     started = time.time()
     monotonic_start = time.monotonic()
     run_id = f"{workload_name}-{control_name}-{time.time_ns()}"
@@ -712,7 +904,7 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
         "partial_offload_preview": workload_name == "smoke",
         "capacity_claim": ("NONE: partial CPU-offload correctness preview"
                            if workload_name == "smoke"
-                           else "candidate-only-until-controller-and-allocator-receipts"),
+                           else "PENDING: requires full layer-offload and live pair-residency evidence"),
         "fixture_id": fixture["fixture_id"],
         "identities": identities,
         "selected_gpu_uuids": selected_uuids,
@@ -724,14 +916,17 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
             "policy": fixture["server"]["preview_policy"],
         },
         "preflight": preflight,
+        "physical_gpu_memory_before_launch": physical_memory_baseline or {},
+        "physical_headroom_preflight": physical_headroom,
         "allocation_evidence": {
             "application_limit_bytes_per_owner": preflight["application_limit_bytes_per_owner"],
             "facade_limit_enforcer": "V200 per-owner allocation ledger" if control_name == "facade_owner" else None,
             "native_limit_enforcement": "descriptor-based preflight only; no native allocator ledger",
             "v200_memory_api_receipt": "not exported by this consumer process launch contract",
-            "fixture_expected_v200_owner_budgets": ([
+            "fixture_v200_owner_budget_caps": ([
                 {"gpu_uuid": uuid,
-                 "budget_bytes": int(fixture["memory_guard"]["per_physical_gpu_application_limit_mib"]) * 1024 * 1024}
+                 "maximum_budget_bytes": int(fixture["memory_guard"]["per_physical_gpu_application_limit_mib"]) * 1024 * 1024,
+                 "startup_policy": "min(cap, native free bytes minus 1 GiB reserve)"}
                 for uuid in selected_uuids] if control_name == "facade_owner" else []),
         },
         "argv": argv,
@@ -759,6 +954,7 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
                      "status": "PENDING"} if serve_duration_seconds else None),
         "application_status": "FAIL",
         "gpu_qualification": "NOT_CLAIMED",
+        "layer_offload_evidence": {"status": "PENDING"},
         "failure": None,
         "cleanup": None,
         "log_path": str(log_path),
@@ -844,6 +1040,11 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
                     "FAIL" if memory_guard.error or memory_guard.over_limit else "PASS")
                 result["memory_guard"]["error"] = memory_guard.error
                 result["memory_guard"]["over_limit"] = memory_guard.over_limit
+                memory_peaks = {uuid: 0 for uuid in selected_uuids}
+                for sample in memory_guard.samples:
+                    for uuid, used in sample["owned_used_memory_bytes_by_uuid"].items():
+                        memory_peaks[uuid] = max(memory_peaks.get(uuid, 0), int(used))
+                result["memory_guard"]["peak_owned_used_memory_bytes_by_uuid"] = memory_peaks
                 if memory_guard.error or memory_guard.over_limit:
                     result["application_status"] = "FAIL"
                     result["failure"] = result["failure"] or str(memory_guard.error or memory_guard.over_limit)
@@ -855,17 +1056,51 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
                 if not cleanup["no_live_group_members"]:
                     result["application_status"] = "FAIL"
                     result["failure"] = result["failure"] or "owned process group did not terminate cleanly"
+            offload = _layer_offload_evidence(log_path, workload_name, fixture)
+            result["layer_offload_evidence"] = offload
+            if workload_name == "resident_capacity" and offload["status"] != "PASS":
+                result["application_status"] = "FAIL"
+                result["failure"] = result["failure"] or (
+                    f"resident-capacity run did not offload every model layer: {offload}")
+            embedding = _input_embedding_evidence(log_path, workload_name)
+            result["input_embedding_evidence"] = embedding
+            if workload_name == "resident_capacity" and embedding["status"] != "PASS":
+                result["application_status"] = "FAIL"
+                result["failure"] = result["failure"] or (
+                    f"resident-capacity input embedding was not confirmed in CUDA0 memory: {embedding}")
+            if (workload_name == "resident_capacity" and memory_guard is not None
+                    and any(value <= 0 for value in result["memory_guard"].get(
+                        "peak_owned_used_memory_bytes_by_uuid", {}).values())):
+                result["application_status"] = "FAIL"
+                result["failure"] = result["failure"] or (
+                    "resident-capacity process was not observed resident on both selected GPUs")
             if profile_log_path is not None:
                 budget = int(fixture["memory_guard"]["per_physical_gpu_application_limit_mib"]) * 1024 * 1024
+                minimum_resident = (int(fixture["model"]["tensor_layout"]["total_tensor_bytes"])
+                                    if workload_name == "resident_capacity" else 0)
                 profile_info = _read_profile_log(
                     profile_log_path, selected_uuids, budget,
-                    str(fixture["controls"]["facade_owner"]["required_b01_evidence_id"]))
+                    str(fixture["controls"]["facade_owner"]["required_b01_evidence_id"]),
+                    minimum_resident_bytes=minimum_resident)
                 result["v200_profile_telemetry"] = profile_info
                 result["allocation_evidence"]["v200_memory_api_receipt"] = profile_info["status"]
+                if workload_name == "resident_capacity":
+                    result["allocation_evidence"]["minimum_real_gpu_payload_bytes"] = minimum_resident
+                    result["allocation_evidence"]["measured_peak_pair_backing_bytes"] = profile_info.get(
+                        "peak_total_owner_used_bytes")
                 if profile_info["status"] != "PASS":
                     result["application_status"] = "FAIL"
                     result["failure"] = result["failure"] or (
                         f"pair facade owner-ledger receipt is {profile_info['status']}")
+            if workload_name == "resident_capacity":
+                if control_name == "facade_owner" and result["application_status"] == "PASS":
+                    result["gpu_qualification"] = "PASS_RESIDENT_PAIR_CAPACITY"
+                    result["capacity_claim"] = (
+                        "PASS: one-device llama-server loaded the full GGUF tensor payload onto the V200 pair; "
+                        "the payload exceeds either physical V100 and the owner ledger recorded both GPUs")
+                elif control_name == "native_pair" and result["application_status"] == "PASS":
+                    result["gpu_qualification"] = "NATIVE_PAIR_BASELINE"
+                    result["capacity_claim"] = "native two-device split baseline; not a V200 capacity claim"
             result["elapsed_seconds"] = time.monotonic() - monotonic_start
             result["finished_unix_time"] = time.time()
             _write_json_atomic(result_path, result)
@@ -923,12 +1158,15 @@ def run_matrix(workload_name: str, controls: list[str], output_dir: Path,
                                     preloads if "facade_owner" in controls else None)
     results = []
     for control in controls:
+        physical_memory = (_nvidia_smi_memory(nvidia_smi_path, uuid_map[control])
+                           if monitor and nvidia_smi_path is not None else None)
         result = _run_one(workload_name, control, fixture, profile, identities,
                           uuid_map[control], output_dir, preloads, monitor,
                           facade_mode, env, nvidia_smi_path=nvidia_smi_path,
                           visible_gpu_uuids=visible_gpu_uuids,
                           server_port=server_port,
-                          serve_duration_seconds=serve_duration_seconds)
+                          serve_duration_seconds=serve_duration_seconds,
+                          physical_memory_baseline=physical_memory)
         results.append(result)
         if result["application_status"] != "PASS":
             break

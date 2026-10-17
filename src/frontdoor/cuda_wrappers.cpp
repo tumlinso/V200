@@ -3,6 +3,7 @@
 #include "v200/frontdoor/abi_profile.hpp"
 #include "v200/execution/owner_execution_c.h"
 #include "v200/memory/api.h"
+#include "v200/operators/launch.hpp"
 
 #include <cuda_runtime_api.h>
 
@@ -16,6 +17,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <map>
+#include <limits>
 #include <mutex>
 #include <set>
 #include <memory>
@@ -28,12 +30,30 @@
 
 using namespace v200::frontdoor::detail;
 
+// The CUDA header optionally maps these spellings to the per-thread default
+// stream ABI. The frontdoor exports both ABI forms explicitly instead.
+#undef cuMemsetD8Async
+#undef cuMemsetD16Async
+#undef cuMemsetD32Async
+#undef cuMemsetD2D8Async
+#undef cuMemsetD2D16Async
+#undef cuMemsetD2D32Async
+
 extern "C" CUresult CUDAAPI cuMemcpyHtoDAsync_v2_ptsz(
     CUdeviceptr, const void *, size_t, CUstream);
 extern "C" CUresult CUDAAPI cuMemcpyDtoHAsync_v2_ptsz(
     void *, CUdeviceptr, size_t, CUstream);
 extern "C" CUresult CUDAAPI cuMemcpyDtoDAsync_v2_ptsz(
     CUdeviceptr, CUdeviceptr, size_t, CUstream);
+extern "C" CUresult CUDAAPI cuMemsetD8Async_ptsz(CUdeviceptr, unsigned char, size_t, CUstream);
+extern "C" CUresult CUDAAPI cuMemsetD16Async_ptsz(CUdeviceptr, unsigned short, size_t, CUstream);
+extern "C" CUresult CUDAAPI cuMemsetD32Async_ptsz(CUdeviceptr, unsigned int, size_t, CUstream);
+extern "C" CUresult CUDAAPI cuMemsetD2D8Async_ptsz(
+    CUdeviceptr, size_t, unsigned char, size_t, size_t, CUstream);
+extern "C" CUresult CUDAAPI cuMemsetD2D16Async_ptsz(
+    CUdeviceptr, size_t, unsigned short, size_t, size_t, CUstream);
+extern "C" CUresult CUDAAPI cuMemsetD2D32Async_ptsz(
+    CUdeviceptr, size_t, unsigned int, size_t, size_t, CUstream);
 extern "C" CUresult CUDAAPI cuLaunchKernel_ptsz(
     CUfunction, unsigned int, unsigned int, unsigned int, unsigned int,
     unsigned int, unsigned int, unsigned int, CUstream, void **, void **);
@@ -255,6 +275,19 @@ cudaError_t cuda_error_for(CUresult result) {
     }
 }
 
+CUresult driver_error_for(cudaError_t result) {
+    switch (result) {
+        case cudaSuccess: return CUDA_SUCCESS;
+        case cudaErrorInvalidValue: return CUDA_ERROR_INVALID_VALUE;
+        case cudaErrorMemoryAllocation: return CUDA_ERROR_OUT_OF_MEMORY;
+        case cudaErrorInitializationError: return CUDA_ERROR_NOT_INITIALIZED;
+        case cudaErrorInvalidDevice: return CUDA_ERROR_INVALID_DEVICE;
+        case cudaErrorNotReady: return CUDA_ERROR_NOT_READY;
+        case cudaErrorNotSupported: return CUDA_ERROR_NOT_SUPPORTED;
+        default: return CUDA_ERROR_UNKNOWN;
+    }
+}
+
 using MemConfigured = int (*)();
 using MemOwnsPointer = int (*)(const void *);
 using MemAllocateOn = CUresult (*)(CUdevice, size_t, size_t, void **);
@@ -278,6 +311,7 @@ Function memory_fn(const char *name) {
 }
 
 CUresult ensure_pair_profile();
+cudaError_t prepare_runtime_call();
 
 bool pair_memory_ready() {
     if (!pair_mode() || ensure_pair_profile() != CUDA_SUCCESS) return false;
@@ -327,6 +361,117 @@ CUresult ensure_pair_profile() {
     profile_state = profile_error == CUDA_SUCCESS ? 2 : 3;
     if (profile_error == CUDA_SUCCESS) v200_frontdoor_snapshot("profile_initialized");
     return profile_error;
+}
+
+CUresult native_owner_free_bytes(CUdevice device, size_t *free_bytes) {
+    using Retain = CUresult (CUDAAPI *)(CUcontext *, CUdevice);
+    using Release = CUresult (CUDAAPI *)(CUdevice);
+    using Push = CUresult (CUDAAPI *)(CUcontext);
+    using Pop = CUresult (CUDAAPI *)(CUcontext *);
+    using GetInfo = CUresult (CUDAAPI *)(size_t *, size_t *);
+    auto retain = next_fn<Retain>("cuDevicePrimaryCtxRetain");
+    auto release = next_fn<Release>("cuDevicePrimaryCtxRelease_v2");
+    if (release == nullptr) release = next_fn<Release>("cuDevicePrimaryCtxRelease");
+    auto push = next_fn<Push>("cuCtxPushCurrent_v2");
+    if (push == nullptr) push = next_fn<Push>("cuCtxPushCurrent");
+    auto pop = next_fn<Pop>("cuCtxPopCurrent_v2");
+    if (pop == nullptr) pop = next_fn<Pop>("cuCtxPopCurrent");
+    auto get_info = next_fn<GetInfo>("cuMemGetInfo_v2");
+    if (get_info == nullptr) get_info = next_fn<GetInfo>("cuMemGetInfo");
+    if (retain == nullptr || release == nullptr || push == nullptr || pop == nullptr ||
+        get_info == nullptr) return CUDA_ERROR_NOT_SUPPORTED;
+
+    CUcontext context = nullptr;
+    {
+        InternalCallScope bypass;
+        const CUresult retained = retain(&context, device);
+        if (retained != CUDA_SUCCESS) return retained;
+    }
+    CUresult status = CUDA_SUCCESS;
+    bool pushed = false;
+    {
+        InternalCallScope bypass;
+        status = push(context);
+        pushed = status == CUDA_SUCCESS;
+    }
+    size_t total = 0;
+    if (status == CUDA_SUCCESS) {
+        InternalCallScope bypass;
+        status = get_info(free_bytes, &total);
+    }
+    CUresult pop_status = CUDA_SUCCESS;
+    if (pushed) {
+        CUcontext restored = nullptr;
+        InternalCallScope bypass;
+        pop_status = pop(&restored);
+        if (pop_status == CUDA_SUCCESS && restored != context)
+            pop_status = CUDA_ERROR_INVALID_CONTEXT;
+    }
+    // A failed pop leaves the caller's context stack uncertain. Preserve the
+    // extra primary-context retain so the context remains alive for recovery.
+    if (pushed && pop_status != CUDA_SUCCESS) return pop_status;
+    CUresult release_status;
+    {
+        InternalCallScope bypass;
+        release_status = release(device);
+    }
+    if (release_status != CUDA_SUCCESS) return release_status;
+    return status;
+}
+
+CUresult pair_memory_capacity(size_t *free_bytes, size_t *total_bytes) {
+    if (free_bytes == nullptr || total_bytes == nullptr) return CUDA_ERROR_INVALID_VALUE;
+    const CUresult ready = ensure_pair_profile();
+    if (ready != CUDA_SUCCESS) return ready;
+    auto get_usage = memory_fn<CUresult (*)(v200_memory_usage_info *)>("v200_memory_get_usage");
+    auto get_profile = memory_fn<CUresult (*)(v200_memory_pair_profile *)>("v200_memory_get_profile");
+    if (get_usage == nullptr || get_profile == nullptr) return CUDA_ERROR_NOT_SUPPORTED;
+    v200_memory_usage_info usage{};
+    usage.abi_version = V200_MEMORY_ABI_VERSION;
+    usage.struct_size = sizeof(usage);
+    const CUresult queried = get_usage(&usage);
+    if (queried != CUDA_SUCCESS) return queried;
+    v200_memory_pair_profile profile{};
+    profile.abi_version = V200_MEMORY_ABI_VERSION;
+    profile.struct_size = sizeof(profile);
+    const CUresult profile_status = get_profile(&profile);
+    if (profile_status != CUDA_SUCCESS) return profile_status;
+
+    uint64_t free_total = 0;
+    uint64_t capacity_total = 0;
+    for (size_t owner = 0; owner != 2; ++owner) {
+        const uint64_t budget = usage.owner_budget_bytes[owner];
+        const uint64_t used = usage.owner_used_bytes[owner];
+        if (used > budget || capacity_total > std::numeric_limits<uint64_t>::max() - budget)
+            return CUDA_ERROR_INVALID_VALUE;
+        capacity_total += budget;
+        size_t physical_free = 0;
+        const CUresult physical_status = native_owner_free_bytes(profile.owner_device[owner],
+                                                                 &physical_free);
+        if (physical_status != CUDA_SUCCESS) return physical_status;
+        constexpr uint64_t reserve = 1ULL << 30;
+        const uint64_t physical_available = physical_free > reserve ? physical_free - reserve : 0;
+        const uint64_t ledger_available = budget - used;
+        const uint64_t owner_available = std::min<uint64_t>(ledger_available, physical_available);
+        if (free_total > std::numeric_limits<uint64_t>::max() - owner_available)
+            return CUDA_ERROR_INVALID_VALUE;
+        free_total += owner_available;
+    }
+    if (capacity_total > std::numeric_limits<size_t>::max() ||
+        free_total > std::numeric_limits<size_t>::max()) return CUDA_ERROR_INVALID_VALUE;
+    *free_bytes = static_cast<size_t>(free_total);
+    *total_bytes = static_cast<size_t>(capacity_total);
+    return CUDA_SUCCESS;
+}
+
+CUresult synchronize_native_anchor() {
+    const cudaError_t prepared = prepare_runtime_call();
+    if (prepared != cudaSuccess) return driver_error_for(prepared);
+    using Fn = CUresult (CUDAAPI *)(void);
+    auto synchronize = next_fn<Fn>("cuCtxSynchronize");
+    if (synchronize == nullptr) return CUDA_ERROR_NOT_SUPPORTED;
+    InternalCallScope bypass;
+    return synchronize();
 }
 
 CUresult wait_stream_prefix(void *stream) {
@@ -464,16 +609,20 @@ bool has_suffix(std::string_view text, std::string_view suffix) {
 void *driver_wrapper_for(std::string_view requested, bool per_thread) {
     if (has_suffix(requested, "_ptsz")) requested.remove_suffix(5);
     if (requested == "cuGetProcAddress") requested = "cuGetProcAddress_v2";
+    if (requested == "cuDeviceTotalMem") requested = "cuDeviceTotalMem_v2";
+    if (requested == "cuMemGetInfo") requested = "cuMemGetInfo_v2";
     if (requested == "cuMemcpyHtoDAsync") requested = "cuMemcpyHtoDAsync_v2";
     if (requested == "cuMemcpyDtoHAsync") requested = "cuMemcpyDtoHAsync_v2";
     if (requested == "cuMemcpyDtoDAsync") requested = "cuMemcpyDtoDAsync_v2";
 
     if (requested == "cuDeviceGetCount") return reinterpret_cast<void *>(&cuDeviceGetCount);
     if (requested == "cuDeviceGet") return reinterpret_cast<void *>(&cuDeviceGet);
+    if (requested == "cuDeviceTotalMem_v2") return reinterpret_cast<void *>(&cuDeviceTotalMem_v2);
     if (requested == "cuGetProcAddress_v2") return reinterpret_cast<void *>(&cuGetProcAddress_v2);
     if (requested == "cuMemAddressReserve") return reinterpret_cast<void *>(&cuMemAddressReserve);
     if (requested == "cuMemAddressFree") return reinterpret_cast<void *>(&cuMemAddressFree);
     if (requested == "cuMemCreate") return reinterpret_cast<void *>(&cuMemCreate);
+    if (requested == "cuMemGetInfo_v2") return reinterpret_cast<void *>(&cuMemGetInfo_v2);
     if (requested == "cuMemGetAllocationGranularity") return reinterpret_cast<void *>(&cuMemGetAllocationGranularity);
     if (requested == "cuMemMap") return reinterpret_cast<void *>(&cuMemMap);
     if (requested == "cuMemSetAccess") return reinterpret_cast<void *>(&cuMemSetAccess);
@@ -488,6 +637,24 @@ void *driver_wrapper_for(std::string_view requested, bool per_thread) {
     if (requested == "cuMemcpyDtoDAsync_v2")
         return per_thread ? reinterpret_cast<void *>(&cuMemcpyDtoDAsync_v2_ptsz)
                           : reinterpret_cast<void *>(&cuMemcpyDtoDAsync_v2);
+    if (requested == "cuMemsetD8Async")
+        return per_thread ? reinterpret_cast<void *>(&cuMemsetD8Async_ptsz)
+                          : reinterpret_cast<void *>(&cuMemsetD8Async);
+    if (requested == "cuMemsetD16Async")
+        return per_thread ? reinterpret_cast<void *>(&cuMemsetD16Async_ptsz)
+                          : reinterpret_cast<void *>(&cuMemsetD16Async);
+    if (requested == "cuMemsetD32Async")
+        return per_thread ? reinterpret_cast<void *>(&cuMemsetD32Async_ptsz)
+                          : reinterpret_cast<void *>(&cuMemsetD32Async);
+    if (requested == "cuMemsetD2D8Async")
+        return per_thread ? reinterpret_cast<void *>(&cuMemsetD2D8Async_ptsz)
+                          : reinterpret_cast<void *>(&cuMemsetD2D8Async);
+    if (requested == "cuMemsetD2D16Async")
+        return per_thread ? reinterpret_cast<void *>(&cuMemsetD2D16Async_ptsz)
+                          : reinterpret_cast<void *>(&cuMemsetD2D16Async);
+    if (requested == "cuMemsetD2D32Async")
+        return per_thread ? reinterpret_cast<void *>(&cuMemsetD2D32Async_ptsz)
+                          : reinterpret_cast<void *>(&cuMemsetD2D32Async);
     if (requested == "cuLaunchKernel")
         return per_thread ? reinterpret_cast<void *>(&cuLaunchKernel_ptsz)
                           : reinterpret_cast<void *>(&cuLaunchKernel);
@@ -503,6 +670,8 @@ void *driver_wrapper_for(std::string_view requested, bool per_thread) {
 const v200::frontdoor::ApiEntry *driver_api_profile(std::string_view requested) {
     if (has_suffix(requested, "_ptsz")) requested.remove_suffix(5);
     if (requested == "cuGetProcAddress") requested = "cuGetProcAddress_v2";
+    if (requested == "cuDeviceTotalMem") requested = "cuDeviceTotalMem_v2";
+    if (requested == "cuMemGetInfo") requested = "cuMemGetInfo_v2";
     if (requested == "cuMemcpyHtoDAsync") requested = "cuMemcpyHtoDAsync_v2";
     if (requested == "cuMemcpyDtoHAsync") requested = "cuMemcpyDtoHAsync_v2";
     if (requested == "cuMemcpyDtoDAsync") requested = "cuMemcpyDtoDAsync_v2";
@@ -519,6 +688,9 @@ bool native_proc_is_per_thread(const char *requested, void *native_pointer) {
     else if (base == "cuMemcpyDtoDAsync") base = "cuMemcpyDtoDAsync_v2";
     if (base == "cuMemcpyHtoDAsync_v2" || base == "cuMemcpyDtoHAsync_v2" ||
         base == "cuMemcpyDtoDAsync_v2" || base == "cuLaunchKernel" ||
+        base == "cuMemsetD8Async" || base == "cuMemsetD16Async" ||
+        base == "cuMemsetD32Async" || base == "cuMemsetD2D8Async" ||
+        base == "cuMemsetD2D16Async" || base == "cuMemsetD2D32Async" ||
         base == "cuStreamSynchronize" || base == "cuStreamWaitEvent") {
         std::string symbol(base);
         symbol.append("_ptsz");
@@ -698,11 +870,26 @@ cudaError_t runtime_device_ordinal(int logical, int &physical) {
     return cudaSuccess;
 }
 
-cudaError_t register_created_stream(cudaStream_t stream) {
+cudaError_t register_created_stream(cudaStream_t *stream) {
+    if (stream == nullptr) return cudaSuccess;
     if (!execution_attached()) return cudaSuccess;
-    const int status = register_execution_stream(stream);
+    const int status = register_execution_stream(*stream);
     if (status == V200_EXECUTION_OK || status == V200_EXECUTION_DUPLICATE_BINDING) return cudaSuccess;
-    return cudaErrorNotSupported;
+    using Destroy = cudaError_t (CUDARTAPI *)(cudaStream_t);
+    auto destroy = next_fn<Destroy>("cudaStreamDestroy");
+    if (destroy == nullptr) return cudaErrorNotSupported;
+    cudaError_t cleanup;
+    {
+        InternalCallScope bypass;
+        cleanup = destroy(*stream);
+    }
+    if (cleanup == cudaSuccess) {
+        forget_stream(*stream);
+        forget_stream_gate(*stream);
+        *stream = nullptr;
+        return cudaErrorNotSupported;
+    }
+    return cleanup;
 }
 
 cudaError_t prepare_async_call() {
@@ -759,8 +946,22 @@ cudaError_t CUDARTAPI cudaGetDeviceProperties_v2(cudaDeviceProp *properties, int
     int physical = -1;
     const cudaError_t mapped = runtime_device_ordinal(device, physical);
     if (mapped != cudaSuccess) return mapped;
-    InternalCallScope bypass;
-    return real ? real(properties, physical) : cudaErrorNotSupported;
+    if (!real) return cudaErrorNotSupported;
+    const cudaError_t prepared = prepare_runtime_call();
+    if (prepared != cudaSuccess) return prepared;
+    cudaError_t result;
+    {
+        InternalCallScope bypass;
+        result = real(properties, physical);
+    }
+    if (result != cudaSuccess || properties == nullptr || !pair_mode()) return result;
+    size_t free_bytes = 0;
+    size_t total_bytes = 0;
+    const CUresult capacity = pair_memory_capacity(&free_bytes, &total_bytes);
+    (void)free_bytes;
+    if (capacity != CUDA_SUCCESS) return cuda_error_for(capacity);
+    properties->totalGlobalMem = total_bytes;
+    return result;
 }
 
 #ifdef cudaGetDeviceProperties
@@ -847,6 +1048,8 @@ cudaError_t CUDARTAPI cudaFree(void *device_ptr) {
     if (pair_mode() && ensure_pair_profile() == CUDA_SUCCESS) {
         auto owns = memory_fn<MemOwnsPointer>("v200_memory_owns_pointer");
         if (owns != nullptr && owns(device_ptr) != 0) {
+            const CUresult drained = synchronize_native_anchor();
+            if (drained != CUDA_SUCCESS) return cuda_error_for(drained);
             std::unique_lock<std::shared_mutex> gate(tracked_use_gate);
             auto release = memory_fn<MemReleasePointer>("v200_memory_release");
             const CUresult result = release ? release(device_ptr) : CUDA_ERROR_NOT_SUPPORTED;
@@ -877,6 +1080,16 @@ cudaError_t CUDARTAPI cudaMemGetInfo(size_t *free_bytes, size_t *total_bytes) {
     if (internal_call()) return real ? real(free_bytes, total_bytes) : cudaErrorNotSupported;
     const cudaError_t prepared = prepare_runtime_call();
     if (prepared != cudaSuccess) return prepared;
+    if (pair_mode()) {
+        if (free_bytes == nullptr || total_bytes == nullptr) return cudaErrorInvalidValue;
+        size_t pair_free = 0;
+        size_t pair_total = 0;
+        const CUresult capacity = pair_memory_capacity(&pair_free, &pair_total);
+        if (capacity != CUDA_SUCCESS) return cuda_error_for(capacity);
+        *free_bytes = pair_free;
+        *total_bytes = pair_total;
+        return cudaSuccess;
+    }
     InternalCallScope bypass;
     return real ? real(free_bytes, total_bytes) : cudaErrorNotSupported;
 }
@@ -885,19 +1098,19 @@ cudaError_t CUDARTAPI cudaMemset(void *device_ptr, int value, size_t bytes) {
     using Fn = cudaError_t (CUDARTAPI *)(void *, int, size_t);
     auto real = next_fn<Fn>("cudaMemset");
     if (internal_call()) return real ? real(device_ptr, value, bytes) : cudaErrorNotSupported;
-    const CUresult profile = require_pair_profile();
-    if (profile != CUDA_SUCCESS) return cuda_error_for(profile);
-    const cudaError_t prepared = prepare_runtime_call();
+    const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
-    std::shared_lock<std::shared_mutex> use_lock(tracked_use_gate);
-    InternalCallScope bypass;
-    return real ? real(device_ptr, value, bytes) : cudaErrorNotSupported;
+    if (!real) return cudaErrorNotSupported;
+    return dispatch_async(nullptr, [=](void *) {
+        return real(device_ptr, value, bytes);
+    });
 }
 
 cudaError_t CUDARTAPI cudaLaunchKernel(const void *function, dim3 grid, dim3 block,
                                       void **arguments, size_t shared_bytes,
                                       cudaStream_t stream) {
     using Fn = cudaError_t (CUDARTAPI *)(const void *, dim3, dim3, void **, size_t, cudaStream_t);
+    using OperatorTryLaunch = decltype(&v200_operator_try_launch);
     auto real = next_fn<Fn>("cudaLaunchKernel");
     if (internal_call() || !real)
         return real ? real(function, grid, block, arguments, shared_bytes, stream)
@@ -905,6 +1118,19 @@ cudaError_t CUDARTAPI cudaLaunchKernel(const void *function, dim3 grid, dim3 blo
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     return dispatch_async(stream, [=](void *native_stream) {
+        const char *enabled = std::getenv("V200_PAIR_COMPUTE");
+        if (pair_mode() && enabled != nullptr && std::strcmp(enabled, "1") == 0) {
+            const auto operator_launch = reinterpret_cast<OperatorTryLaunch>(
+                lookup_v200("v200_operator_try_launch"));
+            if (operator_launch != nullptr) {
+                cudaError_t operator_status = cudaErrorNotSupported;
+                const int handled = operator_launch(
+                    function, grid, block, arguments, shared_bytes,
+                    reinterpret_cast<cudaStream_t>(native_stream), real, &operator_status);
+                if (handled == 1) return operator_status;
+                if (handled != 0) return cudaErrorNotSupported;
+            }
+        }
         return real(function, grid, block, arguments, shared_bytes,
                     reinterpret_cast<cudaStream_t>(native_stream));
     });
@@ -1009,7 +1235,7 @@ cudaError_t CUDARTAPI cudaStreamCreateWithFlags(cudaStream_t *stream, unsigned i
     if (prepared != cudaSuccess) return prepared;
     InternalCallScope bypass;
     const cudaError_t result = real ? real(stream, flags) : cudaErrorNotSupported;
-    if (result == cudaSuccess && stream != nullptr) return register_created_stream(*stream);
+    if (result == cudaSuccess) return register_created_stream(stream);
     return result;
 }
 
@@ -1020,7 +1246,7 @@ cudaError_t CUDARTAPI cudaStreamCreateWithPriority(cudaStream_t *stream, unsigne
     if (prepared != cudaSuccess) return prepared;
     InternalCallScope bypass;
     const cudaError_t result = real ? real(stream, flags, priority) : cudaErrorNotSupported;
-    if (result == cudaSuccess && stream != nullptr) return register_created_stream(*stream);
+    if (result == cudaSuccess) return register_created_stream(stream);
     return result;
 }
 
@@ -1173,8 +1399,8 @@ cudaError_t CUDARTAPI cudaGraphExecUpdate(cudaGraphExec_t graph_exec, cudaGraph_
 
 extern "C" {
 
-/* Driver device presentation uses native CUdevice/CUcontext handles.  Only
- * the ordinal namespace is collapsed; properties remain those of the anchor. */
+/* Driver device presentation uses native CUdevice/CUcontext handles.  The
+ * logical capacity is pair-backed while compute properties stay anchor-local. */
 CUresult CUDAAPI cuDeviceGetCount(int *count) {
     using Fn = CUresult (CUDAAPI *)(int *);
     auto real = next_fn<Fn>("cuDeviceGetCount");
@@ -1194,6 +1420,39 @@ CUresult CUDAAPI cuDeviceGet(CUdevice *device, int ordinal) {
     if (!ensure_device_selection()) return selection.driver_error;
     *device = selection.device[0];
     return CUDA_SUCCESS;
+}
+
+CUresult CUDAAPI cuDeviceTotalMem_v2(size_t *bytes, CUdevice device) {
+    using Fn = CUresult (CUDAAPI *)(size_t *, CUdevice);
+    auto real = next_fn<Fn>("cuDeviceTotalMem_v2");
+    if (internal_call() || !presentation_enabled())
+        return real ? real(bytes, device) : CUDA_ERROR_NOT_SUPPORTED;
+    if (bytes == nullptr) return CUDA_ERROR_INVALID_VALUE;
+    if (!pair_mode()) {
+        InternalCallScope bypass;
+        return real ? real(bytes, device) : CUDA_ERROR_NOT_SUPPORTED;
+    }
+    if (!ensure_device_selection()) return selection.driver_error;
+    if (device != selection.device[0]) return CUDA_ERROR_INVALID_DEVICE;
+    size_t free_bytes = 0;
+    size_t total_bytes = 0;
+    const CUresult capacity = pair_memory_capacity(&free_bytes, &total_bytes);
+    (void)free_bytes;
+    if (capacity != CUDA_SUCCESS) return capacity;
+    *bytes = total_bytes;
+    return CUDA_SUCCESS;
+}
+
+CUresult CUDAAPI cuMemGetInfo_v2(size_t *free_bytes, size_t *total_bytes) {
+    using Fn = CUresult (CUDAAPI *)(size_t *, size_t *);
+    auto real = next_fn<Fn>("cuMemGetInfo_v2");
+    if (internal_call() || !presentation_enabled())
+        return real ? real(free_bytes, total_bytes) : CUDA_ERROR_NOT_SUPPORTED;
+    if (!pair_mode()) {
+        InternalCallScope bypass;
+        return real ? real(free_bytes, total_bytes) : CUDA_ERROR_NOT_SUPPORTED;
+    }
+    return pair_memory_capacity(free_bytes, total_bytes);
 }
 
 CUresult CUDAAPI cuMemcpyHtoDAsync_v2(CUdeviceptr dst, const void *src, size_t bytes,
@@ -1267,6 +1526,72 @@ CUresult CUDAAPI cuMemcpyDtoDAsync_v2_ptsz(CUdeviceptr dst, CUdeviceptr src, siz
         return real(dst, src, bytes, stream);
     });
 }
+
+#define V200_DEFINE_MEMSET_ASYNC_1D(name, value_type)                                      \
+    CUresult CUDAAPI name(CUdeviceptr dst, value_type value, size_t count, CUstream stream) { \
+        using Fn = CUresult (CUDAAPI *)(CUdeviceptr, value_type, size_t, CUstream);         \
+        auto real = next_fn<Fn>(#name);                                                     \
+        if (internal_call() || !real)                                                       \
+            return real ? real(dst, value, count, stream) : CUDA_ERROR_NOT_SUPPORTED;       \
+        const CUresult profile = require_pair_profile();                                    \
+        if (profile != CUDA_SUCCESS) return profile;                                        \
+        return dispatch_async(stream, [=](void *native_stream) {                            \
+            return real(dst, value, count, reinterpret_cast<CUstream>(native_stream));       \
+        });                                                                                 \
+    }                                                                                       \
+    CUresult CUDAAPI name##_ptsz(CUdeviceptr dst, value_type value, size_t count,            \
+                                 CUstream stream) {                                         \
+        using Fn = CUresult (CUDAAPI *)(CUdeviceptr, value_type, size_t, CUstream);         \
+        auto real = next_fn<Fn>(#name "_ptsz");                                             \
+        if (internal_call() || !real)                                                       \
+            return real ? real(dst, value, count, stream) : CUDA_ERROR_NOT_SUPPORTED;       \
+        const CUresult profile = require_pair_profile();                                    \
+        if (profile != CUDA_SUCCESS) return profile;                                        \
+        return dispatch_async(per_thread_tracking_stream(stream), [=](void *) {             \
+            return real(dst, value, count, stream);                                          \
+        });                                                                                 \
+    }
+
+#define V200_DEFINE_MEMSET_ASYNC_2D(name, value_type)                                        \
+    CUresult CUDAAPI name(CUdeviceptr dst, size_t pitch, value_type value, size_t width,      \
+                          size_t height, CUstream stream) {                                  \
+        using Fn = CUresult (CUDAAPI *)(CUdeviceptr, size_t, value_type, size_t, size_t,      \
+                                        CUstream);                                            \
+        auto real = next_fn<Fn>(#name);                                                       \
+        if (internal_call() || !real)                                                        \
+            return real ? real(dst, pitch, value, width, height, stream)                      \
+                        : CUDA_ERROR_NOT_SUPPORTED;                                          \
+        const CUresult profile = require_pair_profile();                                     \
+        if (profile != CUDA_SUCCESS) return profile;                                         \
+        return dispatch_async(stream, [=](void *native_stream) {                             \
+            return real(dst, pitch, value, width, height,                                     \
+                        reinterpret_cast<CUstream>(native_stream));                            \
+        });                                                                                  \
+    }                                                                                        \
+    CUresult CUDAAPI name##_ptsz(CUdeviceptr dst, size_t pitch, value_type value,             \
+                                 size_t width, size_t height, CUstream stream) {              \
+        using Fn = CUresult (CUDAAPI *)(CUdeviceptr, size_t, value_type, size_t, size_t,      \
+                                        CUstream);                                            \
+        auto real = next_fn<Fn>(#name "_ptsz");                                              \
+        if (internal_call() || !real)                                                        \
+            return real ? real(dst, pitch, value, width, height, stream)                     \
+                        : CUDA_ERROR_NOT_SUPPORTED;                                          \
+        const CUresult profile = require_pair_profile();                                     \
+        if (profile != CUDA_SUCCESS) return profile;                                         \
+        return dispatch_async(per_thread_tracking_stream(stream), [=](void *) {              \
+            return real(dst, pitch, value, width, height, stream);                            \
+        });                                                                                  \
+    }
+
+V200_DEFINE_MEMSET_ASYNC_1D(cuMemsetD8Async, unsigned char)
+V200_DEFINE_MEMSET_ASYNC_1D(cuMemsetD16Async, unsigned short)
+V200_DEFINE_MEMSET_ASYNC_1D(cuMemsetD32Async, unsigned int)
+V200_DEFINE_MEMSET_ASYNC_2D(cuMemsetD2D8Async, unsigned char)
+V200_DEFINE_MEMSET_ASYNC_2D(cuMemsetD2D16Async, unsigned short)
+V200_DEFINE_MEMSET_ASYNC_2D(cuMemsetD2D32Async, unsigned int)
+
+#undef V200_DEFINE_MEMSET_ASYNC_1D
+#undef V200_DEFINE_MEMSET_ASYNC_2D
 
 CUresult CUDAAPI cuLaunchKernel(CUfunction function,
     unsigned int grid_x, unsigned int grid_y, unsigned int grid_z,
@@ -1471,6 +1796,8 @@ extern "C" CUresult CUDAAPI cuMemUnmap(CUdeviceptr ptr, size_t size) {
         return real ? real(ptr, size) : CUDA_ERROR_NOT_SUPPORTED;
     }
     if (!pair_memory_ready()) return ensure_pair_profile();
+    const CUresult drained = synchronize_native_anchor();
+    if (drained != CUDA_SUCCESS) return drained;
     auto fn = memory_fn<MemVmmUnmap>("v200_memory_vmm_unmap");
     CUresult result = CUDA_ERROR_NOT_SUPPORTED;
     {

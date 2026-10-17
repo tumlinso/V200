@@ -1,0 +1,42 @@
+{
+  "returncode": 0,
+  "timed_out": false,
+  "interrupted": false,
+  "orphaned_children": false,
+  "termination_uncertain": false,
+  "wall_seconds": 56.67245689799893,
+  "stdout_sha256": "7c1202e2e7592019bad7cb8dcb0f8ca64cace25cc3a66b087204a51162c71ee3",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "bundle": "B04",
+  "argv": [
+    "env",
+    "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "python3",
+    "/home/tumlinson/V200/tests/consumer/run_consumer.py",
+    "--workload",
+    "resident_capacity",
+    "--control",
+    "native_pair",
+    "--control",
+    "facade_owner",
+    "--preload-library",
+    "/home/tumlinson/V200/build/src/frontdoor/libv200_frontdoor.so",
+    "--preload-library",
+    "/home/tumlinson/V200/build/src/integration/libv200_pair_init.so",
+    "--output-dir",
+    "/home/tumlinson/V200/evidence/B04/capacity-r1/consumer",
+    "--execute"
+  ],
+  "lease": {
+    "receipt": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/b5898d4a-5892-41a2-8aae-a55d729a6d50/lease.json",
+    "owner_pid": 365731,
+    "visible_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ]
+  },
+  "allocation_cap_mib_per_gpu": 12288,
+  "memory_cap_enforcement": "fixture responsibility; not an OS hard quota",
+  "gpu_correctness": "read case-level fixture output; child exit alone is not GPU acceptance",
+  "status": "CHILD_COMPLETED"
+}

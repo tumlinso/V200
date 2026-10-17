@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T12:43:12Z",
+  "generated_at": "2026-10-17T13:42:19Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 70,
+  "project_revision": 73,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 70,
+    "project_revision": 73,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -100,7 +100,7 @@
         "id": "V200-07-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 2,
+        "revision": 71,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-07",
@@ -110,7 +110,7 @@
         "id": "V200-08-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 2,
+        "revision": 71,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-08",
@@ -898,6 +898,36 @@
         "revision": 70,
         "seq": 70,
         "timestamp": "2026-10-17T12:43:12Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "6c6463a7-0f66-4e12-813f-c17e46185775",
+        "entity_type": "project",
+        "event_type": "plan.applied",
+        "payload_json": "{\"plan_digest\": \"b5eac0c00987f6f8fa5adf56f01ab8819e417289d51ca8026168969f1c3e5542\", \"source\": \"project-control\"}",
+        "revision": 71,
+        "seq": 71,
+        "timestamp": "2026-10-17T13:23:04Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-CAPACITY-COMPUTE-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-CAPACITY-COMPUTE-1-MAIN\", \"run_id\": \"V200-CAPACITY-COMPUTE-1\", \"status\": \"claimed\", \"task_id\": \"V200-07\"}",
+        "revision": 72,
+        "seq": 72,
+        "timestamp": "2026-10-17T13:23:04Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "6a74eee1-4b52-4014-b4f2-d3f443462b8c",
+        "entity_type": "gate_binding",
+        "event_type": "workflow.gates.bound",
+        "payload_json": "{\"gate_count\": 2}",
+        "revision": 73,
+        "seq": 73,
+        "timestamp": "2026-10-17T13:42:19Z"
       }
     ],
     "evidence": [
@@ -1227,6 +1257,32 @@
         "task_id": "V200-06",
         "type": "command",
         "valid": 1
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"tests/capacity/verify_capacity.py\"], \"cwd\": \".\", \"input_paths\": [\"tests/capacity\", \"tests/consumer\", \"evidence/B04\", \"benchmarks/fixtures\"], \"timeout\": 30}",
+        "id": "V200-07-CAPACITY",
+        "input_fingerprint": null,
+        "last_run_at": null,
+        "required": 1,
+        "revision": 73,
+        "status": "pending",
+        "task_id": "V200-07",
+        "type": "command",
+        "valid": 0
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_runtime_init_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','v200_rtld_local_closure_test','v200_fake_cuda_driver','v200_fake_cudart','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|rtld_local_native_dispatch|memory_tests|runtime_init_host|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"CMakeLists.txt\", \"include/v200/core\", \"include/v200/frontdoor\", \"include/v200/memory\", \"include/v200/execution\", \"include/v200/operators/launch.hpp\", \"src/frontdoor\", \"src/memory\", \"src/execution\", \"src/integration\", \"tests/abi\", \"tests/memory\", \"tests/integration/runtime_init_test.cpp\", \"tests/consumer\", \"scripts/v200\", \"benchmarks/fixtures\"], \"timeout\": 180}",
+        "id": "V200-07-CPU",
+        "input_fingerprint": null,
+        "last_run_at": null,
+        "required": 1,
+        "revision": 73,
+        "status": "pending",
+        "task_id": "V200-07",
+        "type": "command",
+        "valid": 0
       },
       {
         "checkpoint_id": null,
@@ -1718,17 +1774,87 @@
       },
       {
         "mode": "exclusive",
+        "path": "CMakeLists.txt",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "README.md",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "benchmarks/fixtures",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
         "path": "docs/v200/capacity.md",
         "task_id": "V200-07"
       },
       {
         "mode": "exclusive",
-        "path": "tests/capacity",
+        "path": "docs/v200/first-consumer.md",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B03",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B04",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/operators",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "include/v200",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/qualification",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/v200",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "src",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "read",
+        "path": "build-support",
         "task_id": "V200-07"
       },
       {
         "mode": "read",
         "path": "docs/v200",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B02",
+        "task_id": "V200-07"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/foundation",
         "task_id": "V200-07"
       },
       {
@@ -1738,27 +1864,87 @@
       },
       {
         "mode": "exclusive",
+        "path": "CMakeLists.txt",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "exclusive",
+        "path": "README.md",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "exclusive",
+        "path": "benchmarks/fixtures",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "exclusive",
+        "path": "docs/v200/first-consumer.md",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "exclusive",
         "path": "docs/v200/operator-profile.json",
         "task_id": "V200-08"
       },
       {
         "mode": "exclusive",
-        "path": "include/v200/operators",
+        "path": "evidence/B03",
         "task_id": "V200-08"
       },
       {
         "mode": "exclusive",
-        "path": "src/operators",
+        "path": "evidence/B04",
         "task_id": "V200-08"
       },
       {
         "mode": "exclusive",
-        "path": "tests/operators",
+        "path": "evidence/operators",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "exclusive",
+        "path": "include/v200",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/qualification",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/v200",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "exclusive",
+        "path": "src",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "read",
+        "path": "build-support",
         "task_id": "V200-08"
       },
       {
         "mode": "read",
         "path": "docs/v200",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B02",
+        "task_id": "V200-08"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/foundation",
         "task_id": "V200-08"
       },
       {
@@ -2211,28 +2397,6 @@
         "checkpoint_id": null,
         "condition_json": "{}",
         "decision_id": null,
-        "id": 9,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-06",
-        "task_id": "V200-07",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 10,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-06",
-        "task_id": "V200-08",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
         "id": 11,
         "interface_id": null,
         "prerequisite_task_id": "V200-03",
@@ -2436,6 +2600,17 @@
         "prerequisite_task_id": "V200-Q01",
         "task_id": "V200-06",
         "type": "task"
+      },
+      {
+        "barrier_id": null,
+        "checkpoint_id": null,
+        "condition_json": "{}",
+        "decision_id": null,
+        "id": 35,
+        "interface_id": null,
+        "prerequisite_task_id": "V200-07",
+        "task_id": "V200-08",
+        "type": "task"
       }
     ],
     "task_invariants": [],
@@ -2602,19 +2777,19 @@
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Live payload exceeds each single device available capacity, with both physical backing owners verified.\",\"No managed-memory/CPU offload or reduced workload is substituted without user decision.\",\"Correct outputs, freeing/reallocation and accounting are checked; insufficient headroom is BLOCKED, not a smaller passing test.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D02\",\"D05\",\"D07\"],\"recommended_start\":\"Run B04 only when both devices have the required headroom. Target a chosen fixture around 24 GiB resident payload where feasible, not a mandatory exact number. Include one spanning allocation/lifecycle case and the actual consumer residency evidence. Report context/workspace reserve and physical owner bytes.\",\"research_refs\":[\"W-VMM\",\"A-E23\",\"A-R07\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-07.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-07\",\"outputs\":[\"tests/capacity/\",\"docs/v200/capacity.md\",\"evidence/B04\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Preflight budget/fixture checks\"],\"gpu\":[\"B04\"],\"reuse\":\"One matched capacity case and limited lifecycle checks; no allocation-size sweep.\"},\"workstream\":\"V200 single-device product\"}",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Live payload exceeds each single device available capacity, with both physical backing owners verified.\",\"No managed-memory/CPU offload or reduced workload is substituted without user decision.\",\"Correct outputs, freeing/reallocation and accounting are checked; insufficient headroom is BLOCKED, not a smaller passing test.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D02\",\"D05\",\"D07\"],\"recommended_start\":\"Run B04 only when both devices have the required headroom. Target a chosen fixture around 24 GiB resident payload where feasible, not a mandatory exact number. Include one spanning allocation/lifecycle case and the actual consumer residency evidence. Report context/workspace reserve and physical owner bytes.\",\"research_refs\":[\"W-VMM\",\"A-E23\",\"A-R07\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-07.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-07\",\"outputs\":[\"tests/capacity/\",\"docs/v200/capacity.md\",\"evidence/B04\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Preflight budget/fixture checks\"],\"gpu\":[\"B04\"],\"reuse\":\"One matched capacity case and limited lifecycle checks; no allocation-size sweep.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17 implementation mandate: preserve completed06 receipt; rootowns integrated source repairs and deployment. 07may delegate independent CPU implementation of08 operator behind opt-in hook while capacity is integrated; no08 GPUacceptance before07. Use HPC CUDA12.9. Implement functionality first; only focused correctness and finite controller checks. No terminal prerequisite upserts.",
         "objective": "Prove genuinely resident aggregate HBM with live application data that does not fit on either constituent alone. Read planning/v200-bootstrap/tasks/V200-07.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 2,
-        "status": "planned",
+        "revision": 72,
+        "status": "in_progress",
         "tags_json": "[]",
         "title": "Qualify useful capacity beyond one physical V100",
-        "updated_at": "2026-10-17T11:40:58Z",
-        "version": 1
+        "updated_at": "2026-10-17T13:23:04Z",
+        "version": 3
       },
       {
         "attention_reason": null,
@@ -2627,19 +2802,19 @@
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"At least one significant real-consumer operation is correctly distributed with both owners doing useful work.\",\"Focused B03 checks compare exact useful work and outputs; timing uncertainty is stated.\",\"General split-safety is not inferred from the toy grid sample or symbol matching.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D03\",\"D07\"],\"recommended_start\":\"Use the observed hot operation. Choose a vendor-library split, exact kernel replacement or qualified grid transform. Preserve grid-stride, packed layouts, numerical accumulation and aliases. Keep a same-operation native baseline and a safe owner route. Include the index/ABI/module identity in the qualification key. Do not implement every transformer operation.\",\"research_refs\":[\"A-M48\",\"A-R06\",\"W-LLAMA-CUDA\",\"W-CUDA12\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-08.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-08\",\"outputs\":[\"src/operators/\",\"include/v200/operators/\",\"tests/operators/\",\"docs/v200/operator-profile.json\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Code/layout contract review and compile\",\"Index/numeric fixtures\"],\"gpu\":[\"B03\"],\"gpu_subset\":\"B03 selected operator/consumer subset\",\"performance\":\"Full promotion decision owned by V200-12/B05.\"},\"workstream\":\"V200 single-device product\"}",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"At least one significant real-consumer operation is correctly distributed with both owners doing useful work.\",\"Focused B03 checks compare exact useful work and outputs; timing uncertainty is stated.\",\"General split-safety is not inferred from the toy grid sample or symbol matching.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D03\",\"D07\"],\"recommended_start\":\"Use the observed hot operation. Choose a vendor-library split, exact kernel replacement or qualified grid transform. Preserve grid-stride, packed layouts, numerical accumulation and aliases. Keep a same-operation native baseline and a safe owner route. Include the index/ABI/module identity in the qualification key. Do not implement every transformer operation.\",\"research_refs\":[\"A-M48\",\"A-R06\",\"W-LLAMA-CUDA\",\"W-CUDA12\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-08.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-08\",\"outputs\":[\"src/operators/\",\"include/v200/operators/\",\"tests/operators/\",\"docs/v200/operator-profile.json\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Code/layout contract review and compile\",\"Index/numeric fixtures\"],\"gpu\":[\"B03\"],\"gpu_subset\":\"B03 selected operator/consumer subset\",\"performance\":\"Full promotion decision owned by V200-12/B05.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17 implementation mandate: preserve completed06 receipt; rootowns integrated source repairs and deployment. 07may delegate independent CPU implementation of08 operator behind opt-in hook while capacity is integrated; no08 GPUacceptance before07. Use HPC CUDA12.9. Implement functionality first; only focused correctness and finite controller checks. No terminal prerequisite upserts.",
         "objective": "Make both V100s perform meaningful selected application work under the unchanged outward interface. Read planning/v200-bootstrap/tasks/V200-08.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 2,
+        "revision": 71,
         "status": "planned",
         "tags_json": "[]",
         "title": "Accelerate the dominant qualified operation across the pair",
-        "updated_at": "2026-10-17T11:40:58Z",
-        "version": 1
+        "updated_at": "2026-10-17T13:23:04Z",
+        "version": 2
       },
       {
         "attention_reason": null,
@@ -2843,6 +3018,74 @@
       }
     ],
     "workflow_context_fragments": [
+      {
+        "content_hash": "191726d0db3ea1659b23a81812244584999b77903b2a9f0d0adc93bebad0e0f8",
+        "content_json": "{\"authority\":\"server_enforced_role_and_task_scope\",\"interfaces\":[],\"ordered_tasks\":[\"V200-07\",\"V200-08\"],\"rendezvous\":[],\"role\":\"implementer\",\"workspace_mode\":\"exclusive\"}",
+        "created_at": "2026-10-17T13:23:04Z",
+        "creation_revision": 71,
+        "id": "V200-CAPACITY-COMPUTE-1:lane_brief:V200-CAPACITY-COMPUTE-1-MAIN:-:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "lane_brief",
+        "lane_id": "V200-CAPACITY-COMPUTE-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-CAPACITY-COMPUTE-1-MAIN\",\"run_id\":\"V200-CAPACITY-COMPUTE-1\"}",
+        "run_id": "V200-CAPACITY-COMPUTE-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": null,
+        "version": 1
+      },
+      {
+        "content_hash": "99e33bf201414005c9a7c147853bbad2c646fe7ba79ce47fb419bb5cad8f88f7",
+        "content_json": "{\"boundaries\":[\"Keep unchanged consumer and native fallback; no new scheduler or broad exploratory campaign\"],\"invariants\":[\"Correct lifetimes and complete-prefix ordering\",\"Actual application data beyond single-GPUcapacity before07acceptance\",\"08GPUacceptance follows07; independent CPU implementation can overlap\",\"HPC SDK CUDA12.9, controller admitted finiteGPUchecks\"],\"objective\":\"Deliver real pair-resident llama payload, then useful transparent computation on both V100s\"}",
+        "created_at": "2026-10-17T13:23:04Z",
+        "creation_revision": 71,
+        "id": "V200-CAPACITY-COMPUTE-1:run_charter:-:-:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "run_charter",
+        "lane_id": null,
+        "owner_scope_json": "{\"run_id\":\"V200-CAPACITY-COMPUTE-1\"}",
+        "run_id": "V200-CAPACITY-COMPUTE-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": null,
+        "version": 1
+      },
+      {
+        "content_hash": "fd3b6d6cc439758c9210c752b89f95fac917335949e7dfe73cedfb7939b5bd10",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Prove genuinely resident aggregate HBM with live application data that does not fit on either constituent alone. Read planning/v200-bootstrap/tasks/V200-07.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Prove genuinely resident aggregate HBM with live application data that does not fit on either constituent alone. Read planning/v200-bootstrap/tasks/V200-07.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"CMakeLists.txt\",\"src\",\"include/v200\",\"tests\",\"scripts/v200\",\"scripts/qualification\",\"benchmarks/fixtures\",\"docs/v200/capacity.md\",\"docs/v200/first-consumer.md\",\"README.md\",\"evidence/B04\",\"evidence/B03\",\"evidence/operators\"],\"forbidden_paths\":[],\"read_paths\":[\"docs/v200\",\"planning/v200-bootstrap\",\"build-support\",\"evidence/foundation\",\"evidence/B02\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T13:23:04Z",
+        "creation_revision": 71,
+        "id": "V200-CAPACITY-COMPUTE-1:task_brief:V200-CAPACITY-COMPUTE-1-MAIN:V200-07:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "task_brief",
+        "lane_id": "V200-CAPACITY-COMPUTE-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-CAPACITY-COMPUTE-1-MAIN\",\"run_id\":\"V200-CAPACITY-COMPUTE-1\",\"task_id\":\"V200-07\"}",
+        "run_id": "V200-CAPACITY-COMPUTE-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": "V200-07",
+        "version": 1
+      },
+      {
+        "content_hash": "3a01f8e294c93c95b850fedf7be87169167b2e4e38b0420a90c45f19b886651b",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Make both V100s perform meaningful selected application work under the unchanged outward interface. Read planning/v200-bootstrap/tasks/V200-08.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Make both V100s perform meaningful selected application work under the unchanged outward interface. Read planning/v200-bootstrap/tasks/V200-08.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"CMakeLists.txt\",\"src\",\"include/v200\",\"tests\",\"scripts/v200\",\"scripts/qualification\",\"benchmarks/fixtures\",\"docs/v200/operator-profile.json\",\"docs/v200/first-consumer.md\",\"README.md\",\"evidence/operators\",\"evidence/B03\",\"evidence/B04\"],\"forbidden_paths\":[],\"read_paths\":[\"docs/v200\",\"planning/v200-bootstrap\",\"build-support\",\"evidence/foundation\",\"evidence/B02\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T13:23:04Z",
+        "creation_revision": 71,
+        "id": "V200-CAPACITY-COMPUTE-1:task_brief:V200-CAPACITY-COMPUTE-1-MAIN:V200-08:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "task_brief",
+        "lane_id": "V200-CAPACITY-COMPUTE-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-CAPACITY-COMPUTE-1-MAIN\",\"run_id\":\"V200-CAPACITY-COMPUTE-1\",\"task_id\":\"V200-08\"}",
+        "run_id": "V200-CAPACITY-COMPUTE-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": "V200-08",
+        "version": 1
+      },
       {
         "content_hash": "56088e8acc9899e00d8cb8a29a2aff1ae061a420d94fc8d8e28638e33d6d011e",
         "content_json": "{\"authority\":\"server_enforced_role_and_task_scope\",\"interfaces\":[],\"ordered_tasks\":[\"V200-I01\"],\"rendezvous\":[],\"role\":\"implementer\",\"workspace_mode\":\"exclusive\"}",
@@ -3527,6 +3770,26 @@
     "workflow_integration_queue": [],
     "workflow_lane_tasks": [
       {
+        "activated_at": "2026-10-17T13:23:04Z",
+        "completed_at": null,
+        "enqueued_at": "2026-10-17T13:23:04Z",
+        "lane_id": "V200-CAPACITY-COMPUTE-1-MAIN",
+        "position": 0,
+        "revision": 72,
+        "state": "active",
+        "task_id": "V200-07"
+      },
+      {
+        "activated_at": null,
+        "completed_at": null,
+        "enqueued_at": "2026-10-17T13:23:04Z",
+        "lane_id": "V200-CAPACITY-COMPUTE-1-MAIN",
+        "position": 1,
+        "revision": 71,
+        "state": "queued",
+        "task_id": "V200-08"
+      },
+      {
         "activated_at": "2026-10-17T12:20:30Z",
         "completed_at": "2026-10-17T12:35:11Z",
         "enqueued_at": "2026-10-17T12:14:25Z",
@@ -3740,6 +4003,18 @@
     "workflow_lanes": [
       {
         "context_cursor": 0,
+        "created_at": "2026-10-17T13:23:04Z",
+        "id": "V200-CAPACITY-COMPUTE-1-MAIN",
+        "parent_lane_id": null,
+        "revision": 72,
+        "role": "implementer",
+        "run_id": "V200-CAPACITY-COMPUTE-1",
+        "state": "active",
+        "updated_at": "2026-10-17T13:23:04Z",
+        "workspace_mode": "exclusive"
+      },
+      {
+        "context_cursor": 0,
         "created_at": "2026-10-17T12:14:25Z",
         "id": "V200-INIT-RUN-1-MAIN",
         "parent_lane_id": null,
@@ -3857,6 +4132,16 @@
     "workflow_rendezvous_participants": [],
     "workflow_run_charters": [
       {
+        "content_hash": "99e33bf201414005c9a7c147853bbad2c646fe7ba79ce47fb419bb5cad8f88f7",
+        "content_json": "{\"boundaries\":[\"Keep unchanged consumer and native fallback; no new scheduler or broad exploratory campaign\"],\"invariants\":[\"Correct lifetimes and complete-prefix ordering\",\"Actual application data beyond single-GPUcapacity before07acceptance\",\"08GPUacceptance follows07; independent CPU implementation can overlap\",\"HPC SDK CUDA12.9, controller admitted finiteGPUchecks\"],\"objective\":\"Deliver real pair-resident llama payload, then useful transparent computation on both V100s\"}",
+        "created_at": "2026-10-17T13:23:04Z",
+        "creation_revision": 71,
+        "run_id": "V200-CAPACITY-COMPUTE-1",
+        "superseded_at": null,
+        "superseded_revision": null,
+        "version": 1
+      },
+      {
         "content_hash": "ccc4ca2e9220dab9791241009a5e087d0043c8b27068633ebfe0579e274b2cff",
         "content_json": "{\"boundaries\":[\"No GPU execution before built admitted closure; no full graph or generic kernel redistribution implementation\"],\"invariants\":[\"Use actual native dispatch and the accepted B01 pair identity; constructor must not initialize CUDA\",\"Keep the selected llama workload and disclosed preview limits; no false capacity/speed claims\"],\"objective\":\"Integrate a small opt-in runtime without waiting for final frontdoor CPU closure\"}",
         "created_at": "2026-10-17T12:14:25Z",
@@ -3888,6 +4173,16 @@
       }
     ],
     "workflow_runs": [
+      {
+        "active_charter_version": 1,
+        "completed_at": null,
+        "created_at": "2026-10-17T13:23:04Z",
+        "id": "V200-CAPACITY-COMPUTE-1",
+        "revision": 71,
+        "root_task_id": "V200-07",
+        "status": "active",
+        "updated_at": "2026-10-17T13:23:04Z"
+      },
       {
         "active_charter_version": 1,
         "completed_at": null,

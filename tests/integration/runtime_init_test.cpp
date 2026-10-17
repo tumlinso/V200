@@ -14,6 +14,7 @@ constexpr char kPair[] =
     "GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206";
 constexpr char kB01[] = "8426eab5-278d-4687-ab7d-f5ec937e46ec";
 constexpr std::uint64_t kMiB = 1024ull * 1024ull;
+constexpr std::uint64_t kGiB = 1024ull * 1024ull * 1024ull;
 
 struct Fake {
   std::array<CUdevice, 2> devices{{20, 10}};  // Enumeration order differs from owner order.
@@ -36,6 +37,9 @@ struct Fake {
   std::uintptr_t next_event{0x1000};
   std::uintptr_t next_memory_handle{0x2000};
   std::size_t mem_granularity{2 * 1024 * 1024};
+  std::array<std::size_t, 2> physical_free{{15 * kGiB, 15 * kGiB}};
+  std::size_t physical_total{16 * kGiB};
+  int memory_info_calls{};
   CUdeviceptr next_address{0x10000000};
 };
 
@@ -108,6 +112,15 @@ CUresult CUDAAPI fake_granularity(size_t *value, const CUmemAllocationProp *,
                                   CUmemAllocationGranularity_flags) {
   if (g_fake->granularity_result != CUDA_SUCCESS) return g_fake->granularity_result;
   *value = g_fake->mem_granularity;
+  return CUDA_SUCCESS;
+}
+CUresult CUDAAPI fake_memory_info(size_t *free, size_t *total) {
+  if (free == nullptr || total == nullptr) return CUDA_ERROR_INVALID_VALUE;
+  const auto context_value = reinterpret_cast<std::uintptr_t>(g_fake->current);
+  const std::size_t owner = context_value == 0xa0a ? 0u : 1u;
+  *free = g_fake->physical_free[owner];
+  *total = g_fake->physical_total;
+  ++g_fake->memory_info_calls;
   return CUDA_SUCCESS;
 }
 
@@ -211,6 +224,7 @@ v200::core::RuntimeInitApi make_api(Fake *state) {
   api.context_push = fake_push;
   api.context_pop = fake_pop;
   api.allocation_granularity = fake_granularity;
+  api.memory_info = fake_memory_info;
   api.execution.abi_version = V200_EXECUTION_ABI_VERSION;
   api.execution.struct_size = sizeof(api.execution);
   api.execution.user_data = state;
@@ -415,6 +429,41 @@ void test_success_maps_order_budgets_contexts_and_completion_bridge() {
   assert(state.current == reinterpret_cast<CUcontext>(0x777));
 }
 
+void test_startup_budgets_are_capped_by_live_headroom_after_reserve() {
+  Fake state{};
+  state.physical_free = {{8 * kGiB, 13 * kGiB}};
+  g_fake = &state;
+  v200::memory::MemoryManager manager;
+  {
+    v200::core::RuntimeInitializer initializer(manager);
+    auto api = make_api(&state);
+    assert(initializer.initialize(inputs("12288", "12288"), api) == CUDA_SUCCESS);
+    assert(state.memory_info_calls == 2);
+    v200_memory_pair_profile profile{};
+    profile.abi_version = V200_MEMORY_ABI_VERSION;
+    profile.struct_size = sizeof(profile);
+    assert(manager.get_profile(&profile) == CUDA_SUCCESS);
+    assert(profile.owner_budget_bytes[0] == 7 * kGiB);
+    assert(profile.owner_budget_bytes[1] == 12 * kGiB);
+  }
+  assert(state.retained_count == 0);
+}
+
+void test_pair_initialization_rejects_owner_without_reserve_headroom() {
+  Fake state{};
+  state.physical_free = {{kGiB, 15 * kGiB}};
+  g_fake = &state;
+  v200::memory::MemoryManager manager;
+  {
+    v200::core::RuntimeInitializer initializer(manager);
+    auto api = make_api(&state);
+    assert(initializer.initialize(inputs("12288", "12288"), api) ==
+           CUDA_ERROR_OUT_OF_MEMORY);
+    assert(!manager.is_configured());
+  }
+  assert(state.retained_count == 0);
+}
+
 }  // namespace
 
 int main() {
@@ -423,6 +472,8 @@ int main() {
   test_releases_first_context_if_second_retain_fails();
   test_attach_failure_rolls_back_contexts_and_execution();
   test_success_maps_order_budgets_contexts_and_completion_bridge();
+  test_startup_budgets_are_capped_by_live_headroom_after_reserve();
+  test_pair_initialization_rejects_owner_without_reserve_headroom();
   test_uncertain_context_restore_preserves_primary_contexts();
   test_pop_error_dominates_granularity_error_and_preserves_contexts();
   std::puts("runtime initializer host tests passed");

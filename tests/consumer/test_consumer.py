@@ -56,6 +56,12 @@ class FixtureTests(unittest.TestCase):
         self.assertTrue(facade["fits_static_preflight"])
         self.assertFalse(single["fits_static_preflight"])
         self.assertEqual(pair["owner_count_assumed"], 2)
+        self.assertEqual(facade["placement_policy"], "preferred_owner_with_peer_spill")
+        self.assertEqual(facade["estimated_bytes_by_owner"][0],
+                         facade["application_limit_bytes_per_owner"])
+        self.assertGreater(facade["estimated_bytes_by_owner"][1], 0)
+        self.assertGreater(facade["gpu_layer_tensor_bytes_total"],
+                           16 * 1024 * 1024 * 1024)
 
     def test_command_is_finite_fixed_and_does_not_duplicate_flags(self) -> None:
         argv = consumer._argv_for("native_single", self.fixture["workloads"]["smoke"],
@@ -68,6 +74,14 @@ class FixtureTests(unittest.TestCase):
         self.assertEqual(argv[argv.index("--threads") + 1], "4")
         self.assertEqual(argv[argv.index("--threads-batch") + 1], "4")
         self.assertEqual(argv[argv.index("--device") + 1], "CUDA0")
+
+    def test_resident_capacity_keeps_input_embedding_on_single_visible_device(self) -> None:
+        argv = consumer._argv_for(
+            "facade_owner", self.fixture["workloads"]["resident_capacity"],
+            self.fixture, "/fake/llama-server", 12345, "resident_capacity")
+        override_index = argv.index("--override-tensor")
+        self.assertEqual(argv[override_index + 1], r"^token_embd\.weight$=CUDA0")
+        self.assertEqual(argv[argv.index("--verbosity") + 1], "5")
 
     def test_controller_identity_validation_and_facade_modes(self) -> None:
         env = {"CUDA_VISIBLE_DEVICES": "GPU-a,GPU-b",
@@ -95,6 +109,26 @@ class FixtureTests(unittest.TestCase):
              mock.patch.object(consumer.subprocess, "run", return_value=completed):
             with self.assertRaisesRegex(consumer.ConsumerError, "not visible"):
                 consumer._verify_nvidia_smi_uuid_selection(["GPU-cccccccc"])
+
+    def test_live_headroom_uses_owner_first_spill_and_refuses_short_pair(self) -> None:
+        uuids = ["GPU-aaaaaaaa", "GPU-bbbbbbbb"]
+        preflight = consumer.memory_preflight(
+            "resident_capacity", "facade_owner", self.fixture, "pair")
+        enough = {uuid: {"total_bytes": 16 * 1024**3,
+                         "free_bytes": 15 * 1024**3,
+                         "total_mib": 16 * 1024,
+                         "free_mib": 15 * 1024} for uuid in uuids}
+        result = consumer._check_physical_headroom(
+            "resident_capacity", "facade_owner", self.fixture, preflight,
+            uuids, enough, "pair")
+        self.assertTrue(result["payload_exceeds_each_physical_gpu_capacity"])
+        self.assertEqual(result["status"], "PASS")
+        short = dict(enough)
+        short[uuids[1]] = {**enough[uuids[1]], "free_bytes": 5 * 1024**3}
+        with self.assertRaisesRegex(consumer.ConsumerError, "insufficient live pair headroom"):
+            consumer._check_physical_headroom(
+                "resident_capacity", "facade_owner", self.fixture, preflight,
+                uuids, short, "pair")
 
     def test_child_environment_clears_hidden_fit_and_keeps_controller_selection(self) -> None:
         env = {"PATH": "/bin", "CUDA_VISIBLE_DEVICES": "GPU-a,GPU-b",
@@ -143,16 +177,22 @@ class FixtureTests(unittest.TestCase):
         record = {"schema": "v200-frontdoor-ledger/v1", "event": "snapshot",
                   "mode": "pair", "anchor_uuid": "GPU-aaaaaaaa",
                   "peer_uuid": "GPU-bbbbbbbb", "qualification_id": "q-1",
-                  "owner_budget_bytes": [budget, budget], "owner_used_bytes": [100, 200],
+                  "owner_budget_bytes": [budget // 2, budget], "owner_used_bytes": [100, 200],
                   "live_allocation_count": 1, "live_reservation_count": 0,
                   "cleanup_pending_count": 0}
+        cleanup = dict(record, event="cuda_free", owner_used_bytes=[0, 0],
+                       live_allocation_count=0)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "profile.jsonl"
-            path.write_text(json.dumps(record) + "\n")
+            path.write_text(json.dumps(record) + "\n" + json.dumps(cleanup) + "\n")
             result = consumer._read_profile_log(path,
-                                                ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget)
+                                                ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget,
+                                                minimum_resident_bytes=250)
             self.assertEqual(result["status"], "PASS")
-            self.assertEqual(result["records"], [record])
+            self.assertEqual(result["records"], [record, cleanup])
+            self.assertEqual(result["peak_owner_used_bytes"], [100, 200])
+            self.assertEqual(result["peak_total_owner_used_bytes"], 300)
+            self.assertTrue(result["cleanup_accounting_zero"])
             self.assertTrue(consumer._is_sha(result["sha256"]))
             record["owner_used_bytes"] = [budget + 1, 200]
             path.write_text(json.dumps(record) + "\n")
@@ -166,6 +206,31 @@ class FixtureTests(unittest.TestCase):
             mismatch = consumer._read_profile_log(
                 path, ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget, "expected-evidence")
             self.assertEqual(mismatch["status"], "INVALID")
+
+    def test_profile_ledger_requires_real_pair_payload_and_final_zero_accounting(self) -> None:
+        budget = 12 * 1024 * 1024 * 1024
+        base = {"schema": "v200-frontdoor-ledger/v1", "event": "snapshot",
+                "mode": "pair", "anchor_uuid": "GPU-aaaaaaaa",
+                "peer_uuid": "GPU-bbbbbbbb", "qualification_id": "q-1",
+                "owner_budget_bytes": [budget, budget],
+                "owner_used_bytes": [1024, 0], "live_allocation_count": 1,
+                "live_reservation_count": 0, "cleanup_pending_count": 0}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "profile.jsonl"
+            path.write_text(json.dumps(base) + "\n")
+            insufficient = consumer._read_profile_log(
+                path, ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget,
+                minimum_resident_bytes=16 * 1024)
+            self.assertEqual(insufficient["status"], "LIVE_RESOURCES_AT_EXIT")
+            base["owner_used_bytes"] = [8 * 1024, 0]
+            peak = dict(base, event="peak", live_allocation_count=1)
+            cleanup = dict(base, event="cuda_free", owner_used_bytes=[0, 0],
+                           live_allocation_count=0)
+            path.write_text(json.dumps(peak) + "\n" + json.dumps(cleanup) + "\n")
+            insufficient = consumer._read_profile_log(
+                path, ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget,
+                minimum_resident_bytes=16 * 1024)
+            self.assertEqual(insufficient["status"], "INSUFFICIENT_RESIDENT_PAYLOAD")
 
 
 class LauncherPlanTests(unittest.TestCase):
@@ -211,6 +276,7 @@ class LauncherPlanTests(unittest.TestCase):
     def test_default_cli_selects_finite_serve_but_keeps_explicit_execution_gate(self) -> None:
         args = serve_launcher._parse_args([])
         self.assertEqual(args.mode, "serve")
+        self.assertEqual(args.workload, "smoke")
         self.assertFalse(args.execute)
         self.assertEqual(args.duration_seconds, None)
         self.assertEqual(args.port, None)
@@ -229,6 +295,20 @@ class LauncherPlanTests(unittest.TestCase):
                          str(serve_launcher.BOOTSTRAP_RUNNER))
         self.assertEqual([item["fits_static_preflight"]
                           for item in plan["static_memory_preflight"]], [True, True])
+
+    def test_capacity_preview_selects_full_resident_b04_workload(self) -> None:
+        plan = serve_launcher._make_plan(
+            "preview", self.uuids, "capacity-test", workload_name="resident_capacity")
+        self.assertEqual(plan["workload"], "resident_capacity")
+        self.assertEqual(plan["bundle"], "B04")
+        self.assertEqual(plan["controls"], ["native_pair", "facade_owner"])
+        self.assertEqual(plan["bounded_seconds"], 300)
+        self.assertEqual(plan["controller_timeout_seconds"], 315)
+        self.assertEqual(plan["controller_spec"]["argv"][1],
+                         str(serve_launcher.BOUNDED_ADAPTER))
+        self.assertIn("resident_capacity", plan["bounded_child_argv"])
+        self.assertTrue(all(item["fits_static_preflight"]
+                            for item in plan["static_memory_preflight"]))
 
     def test_service_duration_and_pair_overrides_fail_closed(self) -> None:
         with self.assertRaisesRegex(serve_launcher.LaunchError, "between 1 and 3000"):
@@ -260,6 +340,28 @@ class OracleTests(unittest.TestCase):
                          {"content": "2", "tokens_predicted": 9}):
             with self.subTest(response=response), self.assertRaises(consumer.ConsumerError):
                 consumer.validate_completion_response(response, self.oracle)
+
+    def test_resident_capacity_requires_all_llama_layers_in_gpu_log(self) -> None:
+        fixture, _ = consumer.load_documents()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "llama.log"
+            path.write_text("llama_model_load: offloaded 49/49 layers to GPU\n")
+            full = consumer._layer_offload_evidence(path, "resident_capacity", fixture)
+            self.assertEqual(full["status"], "PASS")
+            self.assertTrue(full["full_gpu_offload"])
+            path.write_text("llama_model_load: offloaded 28/49 layers to GPU\n")
+            partial = consumer._layer_offload_evidence(path, "resident_capacity", fixture)
+            self.assertEqual(partial["status"], "PARTIAL_OFFLOAD")
+
+    def test_input_embedding_override_must_be_observed_in_cuda_buffer(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "llama.log"
+            path.write_text("tensor token_embd.weight (256 MiB Q4_K) buffer type overridden to CUDA0\n")
+            gpu = consumer._input_embedding_evidence(path, "resident_capacity")
+            self.assertEqual(gpu["status"], "PASS")
+            path.write_text("tensor token_embd.weight (256 MiB Q4_K) buffer type overridden to CPU\n")
+            cpu = consumer._input_embedding_evidence(path, "resident_capacity")
+            self.assertEqual(cpu["status"], "WRONG_BUFFER_TYPE")
 
     def test_completion_request_has_total_wall_clock_deadline(self) -> None:
         def slow_request(*_args: object, **_kwargs: object) -> tuple[int, object]:
