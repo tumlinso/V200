@@ -1,0 +1,33 @@
+{
+  "returncode": 0,
+  "timed_out": false,
+  "interrupted": false,
+  "orphaned_children": false,
+  "termination_uncertain": false,
+  "wall_seconds": 217.15116713899988,
+  "stdout_sha256": "58344c94e6198de8196f3188b00bed1ffaaf1d15543041f304e34e16860a0b6a",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "bundle": "B05",
+  "argv": [
+    "env",
+    "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "python3",
+    "/home/tumlinson/V200/benchmarks/comparison/run_pair_comparison.py",
+    "--run",
+    "--execute",
+    "--output-dir",
+    "/home/tumlinson/V200/evidence/B05/pair-r1/comparison"
+  ],
+  "lease": {
+    "receipt": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/54025cbd-3e84-4366-a45a-23ca08e07b29/lease.json",
+    "owner_pid": 462649,
+    "visible_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ]
+  },
+  "allocation_cap_mib_per_gpu": 12288,
+  "memory_cap_enforcement": "fixture responsibility; not an OS hard quota",
+  "gpu_correctness": "read case-level fixture output; child exit alone is not GPU acceptance",
+  "status": "CHILD_COMPLETED"
+}

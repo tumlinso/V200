@@ -3,7 +3,7 @@
 <!-- todo-orchestrator:v2-managed:start -->
 # Todo Orchestrator v2 Projection
 
-Project revision: `103`
+Project revision: `109`
 
 ## Workstreams
 - `V200-Q01` | kind: task | status: done | parent: - | objective: Run the package existing B01 pair-memory probe on the approved V100 pair as soon as V200-01 is complete; record actual feasibility before consumer implementation concludes.
@@ -18,7 +18,7 @@ Project revision: `103`
 - `V200-09` | kind: task | status: done | parent: - | objective: Choose data ownership and communication that improve complete application work rather than merely saturating NVLink. Read planning/v200-bootstrap/tasks/V200-09.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-10` | kind: task | status: done | parent: - | objective: Extend the first profile only where actual consumer behavior or a chosen second fixture requires it, preserving ordinary CUDA semantics. Read planning/v200-bootstrap/tasks/V200-10.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-11` | kind: task | status: planned | parent: - | objective: Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
-- `V200-12` | kind: task | status: in_progress | parent: - | objective: Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-12` | kind: task | status: done | parent: - | objective: Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-13` | kind: task | status: planned | parent: - | objective: Deliver an opt-in application-scoped deployment with accurate identity, compatibility and rollback information. Read planning/v200-bootstrap/tasks/V200-13.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-14` | kind: integration | status: planned | parent: - | objective: Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-I01` | kind: integration | status: done | parent: - | objective: Wire accepted pair memory, completion and frontdoor ABI into a lazy native-context initializer and controller-mediated opt-in llama-server launch surface. Finish this setup while frontdoor closure completes; real consumer acceptance remains V200-06.

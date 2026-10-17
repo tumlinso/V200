@@ -1,0 +1,2041 @@
+{
+  "allocation_evidence": {
+    "application_limit_bytes_per_owner": 12884901888,
+    "facade_limit_enforcer": null,
+    "fixture_v200_owner_budget_caps": [],
+    "native_limit_enforcement": "descriptor-based preflight only; no native allocator ledger",
+    "v200_memory_api_receipt": "not exported by this consumer process launch contract"
+  },
+  "application_status": "PASS",
+  "argv": [
+    "/home/tumlinson/Software/llama.cpp/build/bin/llama-server",
+    "--model",
+    "/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "58631",
+    "--ctx-size",
+    "8192",
+    "--batch-size",
+    "64",
+    "--ubatch-size",
+    "64",
+    "--parallel",
+    "1",
+    "--threads",
+    "4",
+    "--threads-batch",
+    "4",
+    "--n-gpu-layers",
+    "999",
+    "--fit",
+    "off",
+    "--flash-attn",
+    "off",
+    "--cache-type-k",
+    "f16",
+    "--cache-type-v",
+    "f16",
+    "--alias",
+    "v200-qwen3-coder-30b",
+    "--device",
+    "CUDA0,CUDA1",
+    "--split-mode",
+    "layer",
+    "--tensor-split",
+    "1,1",
+    "--override-tensor",
+    "^token_embd\\.weight$=CUDA0",
+    "--verbosity",
+    "5"
+  ],
+  "backend": "native",
+  "capacity_claim": "native two-device split baseline; not a V200 capacity claim",
+  "cleanup": {
+    "no_live_group_members": true,
+    "owned_process_group": 462900,
+    "owned_session": 462900,
+    "remaining_members": [],
+    "sigkill_escalation": false,
+    "signaled_owned_group": true,
+    "zombie_members_only": false
+  },
+  "control": "native_pair",
+  "cuda_visible_devices": "0,2",
+  "elapsed_seconds": 71.15301759800059,
+  "expected_oracle": {
+    "expected_exact": "2",
+    "normalization": "strip surrounding Unicode whitespace only",
+    "response_field": "content",
+    "tokens_predicted_max": 8,
+    "tokens_predicted_min": 1
+  },
+  "failure": null,
+  "finished_unix_time": 1792247559.261693,
+  "fixture_id": "llama-server-qwen3-coder-30b-q4km-v1",
+  "gpu_qualification": "NATIVE_PAIR_BASELINE",
+  "identities": {
+    "binary": {
+      "path": "/home/tumlinson/Software/llama.cpp/build/bin/llama-server",
+      "sha256": "b42facfb93d85e1a581862c872615834223dc479871701c0b797aeee1fa11e9d"
+    },
+    "fixture_sha256": "4bbc9324556131939e2a23478ffc2feb7a523eefd32a3a7fe2191d91a7f90c8b",
+    "model": {
+      "file_signature": {
+        "ctime_ns": 1787554682536857474,
+        "mtime_ns": 1787554682536857474,
+        "resolved_path": "/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf",
+        "size": 18556689568,
+        "st_dev": 64512,
+        "st_ino": 2632101
+      },
+      "identity_provenance": "cached_stat_match",
+      "path": "/home/tumlinson/.local/share/core4/models/qwen3-coder-30b-a3b-instruct-q4-k-m/fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad/model.gguf",
+      "sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad"
+    },
+    "profile_sha256": "f6bb541df61c98d613cbd07e4519bf32b2300ef2a042ed6f844b0d00d2a14d65",
+    "runtime_closure": [
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-server-impl.so",
+        "sha256": "a176f2a62eeab92491cd112a09b12799961249be7c5341c59c415694cca0eaa0"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama-common.so.0.2.0",
+        "sha256": "628a832efc253d1da29ff09a225f74e98c3d0a7bda72ac0bd4f074c19f764e7b"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libmtmd.so.0.2.0",
+        "sha256": "4c980a736b41e0fbb7929c8bbe2dfbd188bba8ee3d9f5c716f1ac65f619d5bd1"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libllama.so.0.2.0",
+        "sha256": "d56c7c416032867451483a0b5b8a4563f3caeed725b39d924924fe11fcf7feb4"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml.so.0.21.0",
+        "sha256": "d76b41c497feced8853cc2c9d55352a382ab429e3de84ef94983dd914ebeb566"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cpu.so.0.21.0",
+        "sha256": "d2e3a5c6e3fb838f2c94ed3cb2d4b940c34838518f3f0233198aee22aee5c71c"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-cuda.so.0.21.0",
+        "sha256": "df90ec2ea474f130cc253a6c0776ff0e2d7fdd4d821bcc6be4bcc940b59767a9"
+      },
+      {
+        "path": "/home/tumlinson/Software/llama.cpp/build/bin/libggml-base.so.0.21.0",
+        "sha256": "3836344472b5092b77eaea16b3584f13028107ae44fa750d27183ba22628d345"
+      }
+    ],
+    "source": {
+      "commit": "f280b26983ad0fdb705a0d9ebf0503e76f2899b0",
+      "repository": "/home/tumlinson/Software/llama.cpp",
+      "tracked_worktree_clean": true
+    }
+  },
+  "input_embedding_evidence": {
+    "buffer_type": "CUDA0",
+    "path": "/home/tumlinson/V200/evidence/B05/pair-r1/comparison/native_pair/consumer/resident_capacity-native_pair-1792247488108675049.log",
+    "required_buffer_type": "CUDA0",
+    "status": "PASS",
+    "tensor": "token_embd.weight"
+  },
+  "layer_offload_evidence": {
+    "available_layers": 49,
+    "full_gpu_offload": true,
+    "offloaded_layers": 49,
+    "path": "/home/tumlinson/V200/evidence/B05/pair-r1/comparison/native_pair/consumer/resident_capacity-native_pair-1792247488108675049.log",
+    "required_layers": 49,
+    "status": "PASS"
+  },
+  "log_path": "/home/tumlinson/V200/evidence/B05/pair-r1/comparison/native_pair/consumer/resident_capacity-native_pair-1792247488108675049.log",
+  "memory_guard": {
+    "application_allocation_limit_mib": 12288,
+    "error": null,
+    "nvidia_smi_path": "/usr/bin/nvidia-smi",
+    "nvidia_smi_visible_gpu_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+      "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a"
+    ],
+    "over_limit": null,
+    "peak_owned_used_memory_bytes_by_uuid": {
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+    },
+    "physical_process_used_memory_guard_mib": 14336,
+    "samples": [
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 0,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 0
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 0,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 0
+        },
+        "rows": [],
+        "sampled_unix_time": 1792247488.210643
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 322961408,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 322961408
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 308,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 308
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 308
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 308
+          }
+        ],
+        "sampled_unix_time": 1792247489.8950987
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9911140352,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9288286208
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9452,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 8858
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9452
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 8858
+          }
+        ],
+        "sampled_unix_time": 1792247491.012928
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9911140352,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9288286208
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9452,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 8858
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9452
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 8858
+          }
+        ],
+        "sampled_unix_time": 1792247492.1338537
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9911140352,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9288286208
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9452,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 8858
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9452
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 8858
+          }
+        ],
+        "sampled_unix_time": 1792247493.2559397
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247494.3818283
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247495.5048773
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247496.631651
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247497.7512403
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247498.8740954
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247499.993089
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247501.1313186
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247502.2623365
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247503.4036624
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247504.5353124
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247505.668833
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247506.7962174
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247507.930364
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247509.0555706
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247510.1912122
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247511.3202202
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247512.4488559
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247513.5809705
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247514.7088788
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247515.833867
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247516.9691653
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247518.102832
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247519.2371159
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247520.3710535
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247521.496532
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247522.6294005
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247523.7576175
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247524.8914604
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247526.020114
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247527.1398914
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247528.2580378
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247529.3911583
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247530.522386
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247531.6601195
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247532.7934735
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247533.9290013
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247535.0596159
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247536.1948018
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247537.3051944
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247538.4384422
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247539.5642827
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247540.695554
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247541.827069
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247542.9579859
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247544.0854943
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247545.209862
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247546.3307717
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247547.4588823
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247548.5842
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247549.7127547
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247550.8406596
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247551.9700358
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247553.0966392
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247554.226107
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247555.3558908
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247556.4856174
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247557.616186
+      },
+      {
+        "owned_pids": [
+          462900
+        ],
+        "owned_used_memory_bytes_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10466885632,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9810477056
+        },
+        "owned_used_memory_mib_by_uuid": {
+          "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 9982,
+          "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 9356
+        },
+        "rows": [
+          {
+            "gpu_uuid": "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9982
+          },
+          {
+            "gpu_uuid": "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+            "owned_process_group": true,
+            "pid": 462900,
+            "used_memory_mib": 9356
+          }
+        ],
+        "sampled_unix_time": 1792247558.722969
+      }
+    ],
+    "telemetry_status": "PASS"
+  },
+  "partial_offload_preview": false,
+  "physical_gpu_memory_before_launch": {
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": {
+      "free_bytes": 16929259520,
+      "free_mib": 16145,
+      "total_bytes": 17179869184,
+      "total_mib": 16384
+    },
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206": {
+      "free_bytes": 16929259520,
+      "free_mib": 16145,
+      "total_bytes": 17179869184,
+      "total_mib": 16384
+    }
+  },
+  "physical_headroom_preflight": {
+    "maximum_selected_physical_capacity_bytes": 17179869184,
+    "payload_exceeds_each_physical_gpu_capacity": true,
+    "physical_reserve_bytes_per_owner": 1073741824,
+    "qualified_application_bytes_by_uuid": {
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 12884901888,
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 12884901888
+    },
+    "required_application_bytes_by_uuid": {
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8": 10966898693,
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206": 10536607748
+    },
+    "resident_payload_bytes": 18550716425,
+    "status": "PASS"
+  },
+  "preflight": {
+    "application_limit_bytes_per_owner": 12884901888,
+    "basis": "GGUF tensor descriptors + explicit f16 KV formula + workspace reserve, placed according to native split or V200 preferred-owner allocation with peer spill",
+    "control": "native_pair",
+    "effective_gpu_layers": 48,
+    "estimated_allocation_bytes_total": 21503506441,
+    "estimated_bytes_by_owner": [
+      10966898693,
+      10536607748
+    ],
+    "estimated_bytes_per_owner": 10966898693,
+    "estimated_mib_per_owner": 10458.85,
+    "fits_static_preflight": true,
+    "gpu_layer_tensor_bytes_total": 18120425481,
+    "kv_bytes_total": 805306368,
+    "non_block_tensor_bytes_total_assumed": 430290944,
+    "owner_count_assumed": 2,
+    "placement_policy": "native_layer_split_with_non_block_on_anchor",
+    "requested_gpu_layers": 999,
+    "workload": "resident_capacity",
+    "workspace_reserve_bytes_per_owner": 1073741824
+  },
+  "preview_environment": {
+    "GGML_CUDA_DISABLE_GRAPHS": null,
+    "V200_GRAPH_CAPTURE": null,
+    "cuda_graphs_enabled": true,
+    "policy": "CUDA graphs are disabled for both matched controls; this is a correctness/ownership preview, not a graph-enabled performance baseline."
+  },
+  "readiness_seconds": 5.569250845997885,
+  "request": {
+    "body": {
+      "cache_prompt": false,
+      "frequency_penalty": 0.0,
+      "n_predict": 8,
+      "presence_penalty": 0.0,
+      "prompt": "Answer with exactly one digit and no words. What is 1 + 1?\nAnswer:",
+      "repeat_penalty": 1.0,
+      "seed": 42,
+      "stop": [
+        "\n"
+      ],
+      "stream": false,
+      "temperature": 0.0,
+      "top_k": 1,
+      "top_p": 1.0
+    },
+    "method": "POST",
+    "path": "/completion"
+  },
+  "request_seconds": 0.16518533999987994,
+  "response": {
+    "content": " 2",
+    "exact_match": true,
+    "expected_exact": "2",
+    "normalized_content": "2",
+    "tokens_predicted": 3
+  },
+  "result_path": "/home/tumlinson/V200/evidence/B05/pair-r1/comparison/native_pair/consumer/resident_capacity-native_pair-1792247488108675049.json",
+  "run_id": "resident_capacity-native_pair-1792247488108675049",
+  "schema": "v200-consumer-result/v1",
+  "selected_gpu_uuids": [
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+  ],
+  "server_process": {
+    "exit_code": 0,
+    "pid": 462900,
+    "process_group": 462900,
+    "session": 462900
+  },
+  "service": {
+    "duration_observed_seconds": 65.00009471100202,
+    "duration_requested_seconds": 65,
+    "endpoint": "http://127.0.0.1:58631",
+    "status": "PASS"
+  },
+  "started_monotonic": 17624.911544799,
+  "started_unix_time": 1792247488.108673,
+  "v200_b01_evidence_id": null,
+  "v200_mode": null,
+  "v200_profile_telemetry": {
+    "path": null,
+    "status": "NOT_APPLICABLE"
+  },
+  "workload": "resident_capacity",
+  "workload_purpose": "Full-resident pair-capacity candidate; this is not run until the root authorizes it after the fitting smoke and allocator integration."
+}
