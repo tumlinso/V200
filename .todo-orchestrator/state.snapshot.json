@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T15:25:03Z",
+  "generated_at": "2026-10-17T15:27:28Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 131,
+  "project_revision": 132,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 131,
+    "project_revision": 132,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -1508,6 +1508,16 @@
         "revision": 131,
         "seq": 131,
         "timestamp": "2026-10-17T15:25:03Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-14",
+        "entity_type": "task",
+        "event_type": "workflow.task.handoff",
+        "payload_json": "{\"reason\": \"Usable restricted preview delivered; full V200 final acceptance remains open for performance and broader transparent CUDA execution.\"}",
+        "revision": 132,
+        "seq": 132,
+        "timestamp": "2026-10-17T15:27:28Z"
       }
     ],
     "evidence": [
@@ -2320,6 +2330,16 @@
         "payload_json": "{\"authority_commit\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-I01-READY\", \"reached_at\": \"2026-10-17T12:35:11Z\", \"state\": \"reached\"}], \"completion_commit\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"completion_gates\": [{\"evidence_id\": \"9b617037-45f4-411a-b988-7bdeabac6912\", \"evidence_revision\": 61, \"id\": \"V200-I01-INTEGRATED-CPU\", \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\"}], \"completion_revision\": 62, \"finalized_checkpoints\": [\"V200-I01-READY\"], \"gates\": [{\"id\": \"V200-I01-INTEGRATED-CPU\", \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"last_run_at\": \"2026-10-17T12:35:11Z\", \"revision\": 61, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \"\", \"git_head\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Integrated lazy pair initializer + controller-mediated foreground/preview launcher, reviewed rollback fail-stop fix. CPU gate passes all9CTest groups (consumer23 tests). B02 frontdoor evidence2c6cad1b-d526-4c1f-837b-a1a66b8d13ba; production96MiB both-owner full-range/zero-ledger evidence63a510fd-21c4-4960-84ca-572232fea914; owner completionf9e1d6eb-599e-41f0-ab7e-54ce164b9c05. Native llama baselinef2b89fd2-0a43-4dc4-82e8-56fade091835 only; facade app acceptance remains06. Failed attempts retained. All leasesreleased.\", \"producer_commit\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-I01\"}",
         "revision": 62,
         "task_id": "V200-I01"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T15:27:28Z",
+        "id": "b5d41020-1c41-4244-ab31-d49e3f4d48ec",
+        "kind": "handoff",
+        "note": "Preview checkpoint 16f756b plus release/evidence-verifier commit. docs/v200/release.md records working18.55GB one-logical-device GPU payload, Q4/Q6 peer expert execution and bitwise checks, singlepairgraph68nodes, two logicaldevices across4owners, finiteHTTPsmoke, reproducedDSOidentity and exactremaininglimits. python3 tests/release/verify_preview.py PASS CPU-only; packagebuild13CTests,20multipair,11comparison,4deploymentchecks pass. B07 descriptive64.095V200vs124.951nativeTPS: do not claim native-competitive throughput. Final acceptance is NOT complete. Continue with bounded diagnosis and implementation of dominant decode/prefill locality/launch bottleneck, then same native comparison; expand actual-needed paths without replacing transparentpair interface. All admittedhostowners released, finalGPUprocessqueryempty; optionalPCinferenceservice stopped supportedlifecycle,observerpreserved. No userdecision or lease is pending.",
+        "payload_json": "{\"authority_commit\": \"d4cdecfea17ea37b765dd7dbfff3102cf3ce71a6\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-14-READY\", \"reached_at\": null, \"state\": \"pending\"}], \"gates\": [], \"git_diffstat\": \"\", \"git_head\": \"d4cdecfea17ea37b765dd7dbfff3102cf3ce71a6\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Preview checkpoint 16f756b plus release/evidence-verifier commit. docs/v200/release.md records working18.55GB one-logical-device GPU payload, Q4/Q6 peer expert execution and bitwise checks, singlepairgraph68nodes, two logicaldevices across4owners, finiteHTTPsmoke, reproducedDSOidentity and exactremaininglimits. python3 tests/release/verify_preview.py PASS CPU-only; packagebuild13CTests,20multipair,11comparison,4deploymentchecks pass. B07 descriptive64.095V200vs124.951nativeTPS: do not claim native-competitive throughput. Final acceptance is NOT complete. Continue with bounded diagnosis and implementation of dominant decode/prefill locality/launch bottleneck, then same native comparison; expand actual-needed paths without replacing transparentpair interface. All admittedhostowners released, finalGPUprocessqueryempty; optionalPCinferenceservice stopped supportedlifecycle,observerpreserved. No userdecision or lease is pending.\", \"producer_commit\": \"d4cdecfea17ea37b765dd7dbfff3102cf3ce71a6\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-14\"}",
+        "revision": 132,
+        "task_id": "V200-14"
       },
       {
         "claim_id": null,
@@ -4288,7 +4308,7 @@
         "version": 5
       },
       {
-        "attention_reason": null,
+        "attention_reason": "Usable restricted preview delivered; full V200 final acceptance remains open for performance and broader transparent CUDA execution.",
         "completion_commit": null,
         "completion_git_head": null,
         "completion_revision": null,
@@ -4309,8 +4329,8 @@
         "status": "in_progress",
         "tags_json": "[]",
         "title": "Integrate and hand off the accepted V200 release",
-        "updated_at": "2026-10-17T15:25:03Z",
-        "version": 4
+        "updated_at": "2026-10-17T15:27:28Z",
+        "version": 5
       },
       {
         "attention_reason": null,
@@ -5350,13 +5370,13 @@
         "task_id": "V200-13"
       },
       {
-        "activated_at": "2026-10-17T15:25:03Z",
+        "activated_at": null,
         "completed_at": null,
         "enqueued_at": "2026-10-17T15:16:35Z",
         "lane_id": "V200-DELIVERY-1-MAIN",
         "position": 1,
-        "revision": 131,
-        "state": "active",
+        "revision": 132,
+        "state": "queued",
         "task_id": "V200-14"
       },
       {
@@ -5628,11 +5648,11 @@
         "created_at": "2026-10-17T15:16:35Z",
         "id": "V200-DELIVERY-1-MAIN",
         "parent_lane_id": null,
-        "revision": 131,
+        "revision": 132,
         "role": "integrator",
         "run_id": "V200-DELIVERY-1",
-        "state": "active",
-        "updated_at": "2026-10-17T15:25:03Z",
+        "state": "ready",
+        "updated_at": "2026-10-17T15:27:28Z",
         "workspace_mode": "exclusive"
       },
       {
