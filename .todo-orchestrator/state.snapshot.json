@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T14:09:41Z",
+  "generated_at": "2026-10-17T14:14:51Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 88,
+  "project_revision": 95,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 88,
+    "project_revision": 95,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -119,10 +119,10 @@
       {
         "id": "V200-09-READY",
         "metadata_json": "{}",
-        "reached_at": null,
-        "revision": 86,
+        "reached_at": "2026-10-17T14:10:07Z",
+        "revision": 93,
         "revoked_at": null,
-        "state": "pending",
+        "state": "reached",
         "task_id": "V200-09",
         "title": "V200-09-READY"
       },
@@ -1078,6 +1078,76 @@
         "revision": 88,
         "seq": 88,
         "timestamp": "2026-10-17T14:09:41Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-09-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-09-CPU\"}",
+        "revision": 89,
+        "seq": 89,
+        "timestamp": "2026-10-17T14:10:03Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-09-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"f033dc10-6450-41bf-aa2e-c1d16fa5f4b0\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 90,
+        "seq": 90,
+        "timestamp": "2026-10-17T14:10:07Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-09-LOCALITY",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-09-LOCALITY\"}",
+        "revision": 91,
+        "seq": 91,
+        "timestamp": "2026-10-17T14:10:07Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-09-LOCALITY",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"0631aaec-5e9a-4e19-a34b-fc92ae5a4c31\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 92,
+        "seq": 92,
+        "timestamp": "2026-10-17T14:10:07Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-09",
+        "entity_type": "task",
+        "event_type": "task.completed",
+        "payload_json": "{\"completion_revision\": 93, \"disposition\": \"implemented\", \"reached_checkpoints\": [\"V200-09-READY\"]}",
+        "revision": 93,
+        "seq": 93,
+        "timestamp": "2026-10-17T14:10:07Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-LOCALITY-COMPAT-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-LOCALITY-COMPAT-1-MAIN\", \"run_id\": \"V200-LOCALITY-COMPAT-1\", \"status\": \"claimed\", \"task_id\": \"V200-10\"}",
+        "revision": 94,
+        "seq": 94,
+        "timestamp": "2026-10-17T14:10:07Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "ab86a2e7-e878-4409-b1ff-14b56b3e33d7",
+        "entity_type": "gate_binding",
+        "event_type": "workflow.gates.bound",
+        "payload_json": "{\"gate_count\": 2}",
+        "revision": 95,
+        "seq": 95,
+        "timestamp": "2026-10-17T14:14:51Z"
       }
     ],
     "evidence": [
@@ -1105,6 +1175,19 @@
         "metadata_json": "{\"argv\": [\"bash\", \"-lc\", \"cmake -S src/execution -B build-execution -DBUILD_TESTING=ON -DCUDAToolkit_ROOT=/usr/local/cuda && cmake --build build-execution -j2 && ctest --test-dir build-execution --output-on-failure\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"11628b55e50fc5367f33ed1db135560384063322ab9a085113d578e294df6283\", \"inputs\": {\"command_contract\": {\"argv\": [\"bash\", \"-lc\", \"cmake -S src/execution -B build-execution -DBUILD_TESTING=ON -DCUDAToolkit_ROOT=/usr/local/cuda && cmake --build build-execution -j2 && ctest --test-dir build-execution --output-on-failure\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"8c52f0ef897eea4f5a5e00edb8af9fb656e08260c0d65aabd7069cfc8a649e0a\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"docs/v200/memory-contract.md\", \"include/v200/frontdoor/abi_profile.hpp\", \"include/v200/frontdoor/runtime.h\", \"include/v200/memory/api.h\", \"include/v200/memory/manager.hpp\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/abi_profile.cpp\", \"src/frontdoor/audit.cpp\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/runtime_state.cpp\", \"src/frontdoor/runtime_state.hpp\", \"src/memory/CMakeLists.txt\", \"src/memory/manager.cpp\", \"src/memory/planner.cpp\", \"tests/abi/abi_profile_test.cpp\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/memory/CMakeLists.txt\", \"tests/memory/run_cpu_gate.py\", \"tests/memory/test_memory.cpp\", \"todo-status.md\", \"todos.md\", \"todos/v200-01.md\", \"todos/v200-02.md\", \"todos/v200-03.md\", \"todos/v200-04.md\", \"todos/v200-05.md\", \"todos/v200-06.md\", \"todos/v200-07.md\", \"todos/v200-08.md\", \"todos/v200-09.md\", \"todos/v200-10.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\", \"todos/v200-q01.md\"], \"files\": [{\"path\": \"docs/v200/completion-contract.md\", \"sha256\": \"69a087b5cdc467ff77704fa7b93c0f08ddf477e813dd0e2568582ab2bf9f3e7a\"}, {\"path\": \"include/v200/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"tests/execution\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"7f60a68a596797c7a51360bcaced199113eaf24e\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 36}",
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/01a658c3-0267-4762-98a2-de84f4c8a31a",
         "revision": 37,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T14:10:07Z",
+        "gate_id": "V200-09-LOCALITY",
+        "id": "0631aaec-5e9a-4e19-a34b-fc92ae5a4c31",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/locality-r1\", \"--require-experts\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"a0f71d6f114e6ba71d9bb1e94f3c9b585e79e2edaca1a7299bb80e61d0a1cafe\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/locality-r1\", \"--require-experts\"], \"cwd\": \".\", \"timeout\": 30}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/locality-r1\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/locality-r1.controller-evidence.json\", \"sha256\": \"0d0a933199acbad358423f4bd0625fb5d0dbe397eb08e8406c3c70c3988765e2\"}, {\"path\": \"evidence/B03/locality-r1.controller-result.json\", \"sha256\": \"9f7090c867a341cbf486d574ab36f3db7453dc6cdd07cb8edc5553565aa8a286\"}, {\"path\": \"evidence/B03/locality-r1.host-release.json\", \"sha256\": \"3e070653791bff7ff1c929b19984651d718f53bc28deb807016369b00828dd12\"}, {\"path\": \"tests/capacity\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/verify_consumer.py\", \"sha256\": \"bcae553d37b6a1bbf52e37ae21a77ed8d12b548f9a7f01b7df5abe296637109e\"}], \"interfaces\": [], \"recorded_git_head\": \"8ffe5923738989af718d02789997b7df68c80345\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 91}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/0631aaec-5e9a-4e19-a34b-fc92ae5a4c31",
+        "revision": 92,
         "status": "passed"
       },
       {
@@ -1345,6 +1428,19 @@
         "checkpoint_id": null,
         "claim_id": null,
         "content_hash": null,
+        "created_at": "2026-10-17T14:10:07Z",
+        "gate_id": "V200-09-CPU",
+        "id": "f033dc10-6450-41bf-aa2e-c1d16fa5f4b0",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu|abi_profile|frontdoor_export_closure)$','--output-on-failure'],check=True); subprocess.run(['python3','-m','unittest','discover','-s','tests/consumer','-p','test_model_identity.py'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"4b935c4048bdc20f07bb0e7cec0a06d9425d4e659611f890bec9744edc79a85a\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu|abi_profile|frontdoor_export_closure)$','--output-on-failure'],check=True); subprocess.run(['python3','-m','unittest','discover','-s','tests/consumer','-p','test_model_identity.py'],check=True)\"], \"cwd\": \".\", \"timeout\": 180}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"5598a4fab1eb1ee9d2cdeffbfb22ebbe2a816098732126dfe3cb022c023b4675\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/operators\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"src/operators\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/test_mmvq_plan.cpp\", \"sha256\": \"05cc1e16d47cce3f9e761d6a4d73803c77b6765f3de03f58e9f4967fb95e5f1a\"}], \"interfaces\": [], \"recorded_git_head\": \"8ffe5923738989af718d02789997b7df68c80345\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 89}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/f033dc10-6450-41bf-aa2e-c1d16fa5f4b0",
+        "revision": 90,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
         "created_at": "2026-10-17T12:12:21Z",
         "gate_id": "V200-03-MEMORY-CPU-GATE",
         "id": "f5616733-c898-4ef8-b8a0-282a423be879",
@@ -1516,25 +1612,51 @@
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu|abi_profile|frontdoor_export_closure)$','--output-on-failure'],check=True); subprocess.run(['python3','-m','unittest','discover','-s','tests/consumer','-p','test_model_identity.py'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"CMakeLists.txt\", \"src/frontdoor\", \"src/memory\", \"src/operators\", \"include/v200/memory\", \"include/v200/operators\", \"tests/abi\", \"tests/memory\", \"tests/operators/test_mmvq_plan.cpp\", \"tests/consumer\", \"scripts/v200\"], \"timeout\": 180}",
         "id": "V200-09-CPU",
-        "input_fingerprint": null,
-        "last_run_at": null,
+        "input_fingerprint": "4b935c4048bdc20f07bb0e7cec0a06d9425d4e659611f890bec9744edc79a85a",
+        "last_run_at": "2026-10-17T14:10:07Z",
         "required": 1,
-        "revision": 88,
-        "status": "pending",
+        "revision": 90,
+        "status": "passed",
         "task_id": "V200-09",
         "type": "command",
-        "valid": 0
+        "valid": 1
       },
       {
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/locality-r1\", \"--require-experts\"], \"cwd\": \".\", \"input_paths\": [\"tests/operators/verify_consumer.py\", \"tests/capacity\", \"tests/consumer\", \"benchmarks/fixtures\", \"evidence/B03/locality-r1\", \"evidence/B03/locality-r1.controller-result.json\", \"evidence/B03/locality-r1.controller-evidence.json\", \"evidence/B03/locality-r1.host-release.json\"], \"timeout\": 30}",
         "id": "V200-09-LOCALITY",
+        "input_fingerprint": "a0f71d6f114e6ba71d9bb1e94f3c9b585e79e2edaca1a7299bb80e61d0a1cafe",
+        "last_run_at": "2026-10-17T14:10:07Z",
+        "required": 1,
+        "revision": 92,
+        "status": "passed",
+        "task_id": "V200-09",
+        "type": "command",
+        "valid": 1
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"src/frontdoor\", \"src/operators\", \"include/v200/operators\", \"tests/abi\", \"tests/consumer\", \"scripts/v200\", \"docs/v200/abi-profile.json\"], \"timeout\": 180}",
+        "id": "V200-10-CPU",
         "input_fingerprint": null,
         "last_run_at": null,
         "required": 1,
-        "revision": 88,
+        "revision": 95,
         "status": "pending",
-        "task_id": "V200-09",
+        "task_id": "V200-10",
+        "type": "command",
+        "valid": 0
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/graphs-r1\", \"--require-experts\", \"--require-graphs\"], \"cwd\": \".\", \"input_paths\": [\"tests/operators/verify_consumer.py\", \"tests/capacity\", \"tests/consumer\", \"benchmarks/fixtures\", \"evidence/B03/graphs-r1\", \"evidence/B03/graphs-r1.controller-result.json\", \"evidence/B03/graphs-r1.controller-evidence.json\", \"evidence/B03/graphs-r1.host-release.json\"], \"timeout\": 30}",
+        "id": "V200-10-GRAPHS",
+        "input_fingerprint": null,
+        "last_run_at": null,
+        "required": 1,
+        "revision": 95,
+        "status": "pending",
+        "task_id": "V200-10",
         "type": "command",
         "valid": 0
       },
@@ -1602,6 +1724,16 @@
         "payload_json": "{\"authority_commit\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-05-READY\", \"reached_at\": \"2026-10-17T12:06:42Z\", \"state\": \"reached\"}], \"completion_commit\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\", \"completion_gates\": [{\"evidence_id\": \"dae5f7fa-1cd2-43e3-809d-27217789ed3a\", \"evidence_revision\": 30, \"id\": \"V200-05-CONSUMER-CPU\", \"input_fingerprint\": \"8caa262fb8d352ec87c7bd116fe3574d3288020a5447e74f04312644dca72891\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\"}], \"completion_revision\": 31, \"finalized_checkpoints\": [\"V200-05-READY\"], \"gates\": [{\"id\": \"V200-05-CONSUMER-CPU\", \"input_fingerprint\": \"8caa262fb8d352ec87c7bd116fe3574d3288020a5447e74f04312644dca72891\", \"last_run_at\": \"2026-10-17T12:06:42Z\", \"revision\": 30, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \".todo-orchestrator/state.snapshot.json | 1268 ++++++++++++++++++++++++++++----\\n todo-status.md                         |   13 +-\\n todos.md                               |   13 +-\\n todos/v200-01.md                       |   10 +-\\n todos/v200-02.md                       |   17 +-\\n todos/v200-03.md                       |   17 +-\\n todos/v200-04.md                       |   17 +-\\n todos/v200-05.md                       |   17 +-\\n todos/v200-06.md                       |   14 +-\\n todos/v200-07.md                       |    2 +\\n todos/v200-08.md                       |    2 +\\n todos/v200-09.md                       |    2 +\\n todos/v200-10.md                       |    2 +\\n todos/v200-11.md                       |    2 +\\n todos/v200-12.md                       |    2 +\\n todos/v200-13.md                       |    2 +\\n todos/v200-14.md                       |    2 +\\n 17 files changed, 1212 insertions(+), 190 deletions(-)\", \"git_head\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"V200-05 CPU-ready consumer fixture: existingQwen3Coder30Bmodelhashverified, exactbinary+8DSOschecked; explicit28GPUlayers/ctx2048fittingoffload vs all-layercapacity fixture, fixedCPU4 andsettings. FiniteownedprocessHTTP/cleanup/memoryguard harness, repeatedpreloadDSOs+exactbudget/profileJSONLreceipt, deterministicexactoracle and matchednative/facadecontrols. Rootreviewed lifetime/identity/memoryguardcode;16CPUtests passed inrequiredgate evidence61c4b7bd-ddd7-4b90-b667-f748bb6ad7d9. No application/GPUrun; runtime proofremains06.\", \"producer_commit\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-05\"}",
         "revision": 31,
         "task_id": "V200-05"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T14:10:07Z",
+        "id": "886b89ad-43d1-4cc0-9859-d9de0fbde9ee",
+        "kind": "complete",
+        "note": "Commit8ffe592: real full-resident consumer now executes71 gate-fused expert calls/436224rows on peer plus26anchor expert calls and prior68anchor+174peer ordinarymatvecs. First6144expertoutputs bitwiseequal nativekernel; IDsroutingremainGPUresident; sameunchangedABI/grid/arithmetic, noCPUoffload/replica. B03 evidence7d72d5a0-cb5b-4b2b-b64b-17fd45ba5f06; all49layers+embedding,18.55GBtensorpayload,answer2,zerobackingledger/cleanprocess/releasedhostresources. Actualextent-orderflags remove placementassumption. Expertpeerthreshold4MiB+activation/output estimatefromatlas, notreportedmeasuredcrossover; B05comparisonprepared docs/v200/placement.md. Cachedmodelidentity freshhashverifiedoutsidelease thenstablemetadatahit reducedchildwall50.05s->7.04s; no inference speedup claim. Plainexpertfamily notobserved; graphcapture/peerrewrite code is CPUcandidate behindexplicit--cuda-graphs, pending10hardwareacceptance. Continue10now.",
+        "payload_json": "{\"authority_commit\": \"8ffe5923738989af718d02789997b7df68c80345\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-09-READY\", \"reached_at\": \"2026-10-17T14:10:07Z\", \"state\": \"reached\"}], \"completion_commit\": \"8ffe5923738989af718d02789997b7df68c80345\", \"completion_gates\": [{\"evidence_id\": \"f033dc10-6450-41bf-aa2e-c1d16fa5f4b0\", \"evidence_revision\": 90, \"id\": \"V200-09-CPU\", \"input_fingerprint\": \"4b935c4048bdc20f07bb0e7cec0a06d9425d4e659611f890bec9744edc79a85a\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"8ffe5923738989af718d02789997b7df68c80345\"}, {\"evidence_id\": \"0631aaec-5e9a-4e19-a34b-fc92ae5a4c31\", \"evidence_revision\": 92, \"id\": \"V200-09-LOCALITY\", \"input_fingerprint\": \"a0f71d6f114e6ba71d9bb1e94f3c9b585e79e2edaca1a7299bb80e61d0a1cafe\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"8ffe5923738989af718d02789997b7df68c80345\"}], \"completion_revision\": 93, \"finalized_checkpoints\": [\"V200-09-READY\"], \"gates\": [{\"id\": \"V200-09-CPU\", \"input_fingerprint\": \"4b935c4048bdc20f07bb0e7cec0a06d9425d4e659611f890bec9744edc79a85a\", \"last_run_at\": \"2026-10-17T14:10:07Z\", \"revision\": 90, \"status\": \"passed\", \"valid\": 1}, {\"id\": \"V200-09-LOCALITY\", \"input_fingerprint\": \"a0f71d6f114e6ba71d9bb1e94f3c9b585e79e2edaca1a7299bb80e61d0a1cafe\", \"last_run_at\": \"2026-10-17T14:10:07Z\", \"revision\": 92, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \"\", \"git_head\": \"8ffe5923738989af718d02789997b7df68c80345\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Commit8ffe592: real full-resident consumer now executes71 gate-fused expert calls/436224rows on peer plus26anchor expert calls and prior68anchor+174peer ordinarymatvecs. First6144expertoutputs bitwiseequal nativekernel; IDsroutingremainGPUresident; sameunchangedABI/grid/arithmetic, noCPUoffload/replica. B03 evidence7d72d5a0-cb5b-4b2b-b64b-17fd45ba5f06; all49layers+embedding,18.55GBtensorpayload,answer2,zerobackingledger/cleanprocess/releasedhostresources. Actualextent-orderflags remove placementassumption. Expertpeerthreshold4MiB+activation/output estimatefromatlas, notreportedmeasuredcrossover; B05comparisonprepared docs/v200/placement.md. Cachedmodelidentity freshhashverifiedoutsidelease thenstablemetadatahit reducedchildwall50.05s->7.04s; no inference speedup claim. Plainexpertfamily notobserved; graphcapture/peerrewrite code is CPUcandidate behindexplicit--cuda-graphs, pending10hardwareacceptance. Continue10now.\", \"producer_commit\": \"8ffe5923738989af718d02789997b7df68c80345\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-09\"}",
+        "revision": 93,
+        "task_id": "V200-09"
       },
       {
         "claim_id": null,
@@ -2819,6 +2951,32 @@
         "validation_git_head": "a22190c8ae13c3435b1363069702d689e297cc6e"
       },
       {
+        "completion_git_head": "8ffe5923738989af718d02789997b7df68c80345",
+        "completion_revision": 93,
+        "evidence_id": "f033dc10-6450-41bf-aa2e-c1d16fa5f4b0",
+        "evidence_revision": 90,
+        "gate_id": "V200-09-CPU",
+        "input_fingerprint": "4b935c4048bdc20f07bb0e7cec0a06d9425d4e659611f890bec9744edc79a85a",
+        "provenance_json": "{\"claim_id\": \"7ebebcc3-bdbb-46b8-b462-1b4e81418a20\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu|abi_profile|frontdoor_export_closure)$','--output-on-failure'],check=True); subprocess.run(['python3','-m','unittest','discover','-s','tests/consumer','-p','test_model_identity.py'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"4b935c4048bdc20f07bb0e7cec0a06d9425d4e659611f890bec9744edc79a85a\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu|abi_profile|frontdoor_export_closure)$','--output-on-failure'],check=True); subprocess.run(['python3','-m','unittest','discover','-s','tests/consumer','-p','test_model_identity.py'],check=True)\"], \"cwd\": \".\", \"timeout\": 180}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"5598a4fab1eb1ee9d2cdeffbfb22ebbe2a816098732126dfe3cb022c023b4675\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/operators\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"src/operators\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/test_mmvq_plan.cpp\", \"sha256\": \"05cc1e16d47cce3f9e761d6a4d73803c77b6765f3de03f58e9f4967fb95e5f1a\"}], \"interfaces\": [], \"recorded_git_head\": \"8ffe5923738989af718d02789997b7df68c80345\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 89}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/f033dc10-6450-41bf-aa2e-c1d16fa5f4b0\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-09",
+        "valid": 1,
+        "validation_git_head": "8ffe5923738989af718d02789997b7df68c80345"
+      },
+      {
+        "completion_git_head": "8ffe5923738989af718d02789997b7df68c80345",
+        "completion_revision": 93,
+        "evidence_id": "0631aaec-5e9a-4e19-a34b-fc92ae5a4c31",
+        "evidence_revision": 92,
+        "gate_id": "V200-09-LOCALITY",
+        "input_fingerprint": "a0f71d6f114e6ba71d9bb1e94f3c9b585e79e2edaca1a7299bb80e61d0a1cafe",
+        "provenance_json": "{\"claim_id\": \"7ebebcc3-bdbb-46b8-b462-1b4e81418a20\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/locality-r1\", \"--require-experts\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"a0f71d6f114e6ba71d9bb1e94f3c9b585e79e2edaca1a7299bb80e61d0a1cafe\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/locality-r1\", \"--require-experts\"], \"cwd\": \".\", \"timeout\": 30}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/locality-r1\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/locality-r1.controller-evidence.json\", \"sha256\": \"0d0a933199acbad358423f4bd0625fb5d0dbe397eb08e8406c3c70c3988765e2\"}, {\"path\": \"evidence/B03/locality-r1.controller-result.json\", \"sha256\": \"9f7090c867a341cbf486d574ab36f3db7453dc6cdd07cb8edc5553565aa8a286\"}, {\"path\": \"evidence/B03/locality-r1.host-release.json\", \"sha256\": \"3e070653791bff7ff1c929b19984651d718f53bc28deb807016369b00828dd12\"}, {\"path\": \"tests/capacity\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/verify_consumer.py\", \"sha256\": \"bcae553d37b6a1bbf52e37ae21a77ed8d12b548f9a7f01b7df5abe296637109e\"}], \"interfaces\": [], \"recorded_git_head\": \"8ffe5923738989af718d02789997b7df68c80345\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 91}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/0631aaec-5e9a-4e19-a34b-fc92ae5a4c31\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-09",
+        "valid": 1,
+        "validation_git_head": "8ffe5923738989af718d02789997b7df68c80345"
+      },
+      {
         "completion_git_head": "8b6b9a80bcea6edc2eace40e87198b49184bad59",
         "completion_revision": 62,
         "evidence_id": "9b617037-45f4-411a-b988-7bdeabac6912",
@@ -3237,9 +3395,9 @@
       },
       {
         "attention_reason": null,
-        "completion_commit": null,
-        "completion_git_head": null,
-        "completion_revision": null,
+        "completion_commit": "8ffe5923738989af718d02789997b7df68c80345",
+        "completion_git_head": "8ffe5923738989af718d02789997b7df68c80345",
+        "completion_revision": 93,
         "created_at": "2026-10-17T11:40:58Z",
         "id": "V200-09",
         "kind": "task",
@@ -3251,14 +3409,14 @@
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
-        "result": null,
+        "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 87,
-        "status": "in_progress",
+        "revision": 93,
+        "status": "done",
         "tags_json": "[]",
         "title": "Optimize pair locality and NVLink use with a small cost policy",
-        "updated_at": "2026-10-17T13:51:09Z",
-        "version": 3
+        "updated_at": "2026-10-17T14:10:07Z",
+        "version": 4
       },
       {
         "attention_reason": null,
@@ -3278,12 +3436,12 @@
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 86,
-        "status": "planned",
+        "revision": 94,
+        "status": "in_progress",
         "tags_json": "[]",
         "title": "Close the observed compatibility profile and targeted regressions",
-        "updated_at": "2026-10-17T13:51:05Z",
-        "version": 2
+        "updated_at": "2026-10-17T14:10:07Z",
+        "version": 3
       },
       {
         "attention_reason": null,
@@ -4288,22 +4446,22 @@
       },
       {
         "activated_at": "2026-10-17T13:51:09Z",
-        "completed_at": null,
+        "completed_at": "2026-10-17T14:10:07Z",
         "enqueued_at": "2026-10-17T13:51:05Z",
         "lane_id": "V200-LOCALITY-COMPAT-1-MAIN",
         "position": 0,
-        "revision": 87,
-        "state": "active",
+        "revision": 93,
+        "state": "completed",
         "task_id": "V200-09"
       },
       {
-        "activated_at": null,
+        "activated_at": "2026-10-17T14:10:07Z",
         "completed_at": null,
         "enqueued_at": "2026-10-17T13:51:05Z",
         "lane_id": "V200-LOCALITY-COMPAT-1-MAIN",
         "position": 1,
-        "revision": 86,
-        "state": "queued",
+        "revision": 94,
+        "state": "active",
         "task_id": "V200-10"
       },
       {
@@ -4537,11 +4695,11 @@
         "created_at": "2026-10-17T13:51:05Z",
         "id": "V200-LOCALITY-COMPAT-1-MAIN",
         "parent_lane_id": null,
-        "revision": 87,
+        "revision": 94,
         "role": "implementer",
         "run_id": "V200-LOCALITY-COMPAT-1",
         "state": "active",
-        "updated_at": "2026-10-17T13:51:09Z",
+        "updated_at": "2026-10-17T14:10:07Z",
         "workspace_mode": "exclusive"
       },
       {

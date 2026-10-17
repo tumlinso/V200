@@ -290,7 +290,7 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
     if cuda_graphs_enabled:
         # The native and facade controls must exercise the same llama graph
         # path. Only the pair facade receives V200's explicit capture opt-in.
-        child["GGML_CUDA_DISABLE_GRAPHS"] = "0"
+        child.pop("GGML_CUDA_DISABLE_GRAPHS", None)
     if control_name == "facade_owner":
         if not preloads:
             raise ConsumerError("facade_owner requires at least one --preload-library")

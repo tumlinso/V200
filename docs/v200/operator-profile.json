@@ -100,7 +100,7 @@
     "cleanup_accounting_zero": true,
     "host_resources_released": true,
     "plain_expert_family": "BUILD_CHECKED_NOT_OBSERVED",
-    "graph_rewrite": "CPU_CANDIDATE_NOT_YET_GPU_QUALIFIED",
+    "graph_rewrite": "GPU_PASS: controller797dc352-ff64-40cf-ae18-3dcfc29874f2, maximum34peer nodes pergraph and2successfulreplay samples",
     "speedup": "NOT_ESTABLISHED"
   }
 }

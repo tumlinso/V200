@@ -196,7 +196,7 @@ class FixtureTests(unittest.TestCase):
             "native_pair", self.fixture, None, env,
             selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"],
             cuda_graphs_enabled=True)
-        self.assertEqual(native["GGML_CUDA_DISABLE_GRAPHS"], "0")
+        self.assertNotIn("GGML_CUDA_DISABLE_GRAPHS", native)
         self.assertNotIn("V200_GRAPH_CAPTURE", native)
         with tempfile.TemporaryDirectory() as directory:
             preloads = [Path(directory) / name for name in
@@ -207,7 +207,7 @@ class FixtureTests(unittest.TestCase):
                 "facade_owner", self.fixture, preloads, env,
                 facade_mode="pair", selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"],
                 cuda_graphs_enabled=True)
-            self.assertEqual(facade["GGML_CUDA_DISABLE_GRAPHS"], "0")
+            self.assertNotIn("GGML_CUDA_DISABLE_GRAPHS", facade)
             self.assertEqual(facade["V200_GRAPH_CAPTURE"], "1")
 
     def test_graph_records_remain_inside_the_strict_memory_ledger_contract(self) -> None:

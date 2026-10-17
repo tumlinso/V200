@@ -21,57 +21,116 @@
   },
   "observed_driver_imports": {
     "wrapped": [
-      "cuDeviceGet", "cuDeviceGetCount", "cuMemAddressReserve", "cuMemAddressFree",
-      "cuMemCreate", "cuMemGetAllocationGranularity", "cuMemMap", "cuMemRelease",
-      "cuMemSetAccess", "cuMemUnmap"
+      "cuDeviceGet",
+      "cuDeviceGetCount",
+      "cuMemAddressReserve",
+      "cuMemAddressFree",
+      "cuMemCreate",
+      "cuMemGetAllocationGranularity",
+      "cuMemMap",
+      "cuMemRelease",
+      "cuMemSetAccess",
+      "cuMemUnmap"
     ],
     "qualified_entrypoints_additionally_wrapped": [
-      "cuMemcpyHtoDAsync_v2", "cuMemcpyDtoHAsync_v2", "cuMemcpyDtoDAsync_v2",
-      "cuLaunchKernel", "cuStreamSynchronize", "cuStreamWaitEvent"
+      "cuMemcpyHtoDAsync_v2",
+      "cuMemcpyDtoHAsync_v2",
+      "cuMemcpyDtoDAsync_v2",
+      "cuLaunchKernel",
+      "cuStreamSynchronize",
+      "cuStreamWaitEvent"
     ],
     "native_anchor_passthrough": [
-      "cuDeviceGetAttribute", "cuDeviceGetUuid_v2", "cuGetErrorString"
+      "cuDeviceGetAttribute",
+      "cuDeviceGetUuid_v2",
+      "cuGetErrorString"
     ]
   },
   "observed_runtime_imports": {
     "wrapped": [
-      "cudaDeviceCanAccessPeer", "cudaDeviceEnablePeerAccess", "cudaDeviceGetAttribute",
-      "cudaDeviceGetPCIBusId", "cudaDeviceSynchronize", "cudaGetDevice",
-      "cudaGetDeviceCount", "cudaGetDeviceProperties_v2", "cudaSetDevice",
-      "cudaMalloc", "cudaFree", "cudaMemGetInfo", "cudaMemset",
-      "cudaMemcpy2DAsync", "cudaMemcpyAsync", "cudaMemcpyPeerAsync", "cudaMemsetAsync",
-      "cudaStreamCreateWithFlags", "cudaStreamDestroy", "cudaStreamSynchronize",
-      "cudaStreamWaitEvent", "cudaEventRecord", "cudaEventSynchronize",
-      "cudaLaunchKernel", "cudaLaunchKernelExC", "cudaLaunchCooperativeKernel",
-      "cudaGraphInstantiate", "cudaGraphLaunch", "cudaGraphExecUpdate",
-      "cudaGraphDestroy", "cudaGraphExecDestroy", "cudaStreamBeginCapture",
-      "cudaStreamEndCapture", "cudaStreamIsCapturing"
+      "cudaDeviceCanAccessPeer",
+      "cudaDeviceEnablePeerAccess",
+      "cudaDeviceGetAttribute",
+      "cudaDeviceGetPCIBusId",
+      "cudaDeviceSynchronize",
+      "cudaGetDevice",
+      "cudaGetDeviceCount",
+      "cudaGetDeviceProperties_v2",
+      "cudaSetDevice",
+      "cudaMalloc",
+      "cudaFree",
+      "cudaMemGetInfo",
+      "cudaMemset",
+      "cudaMemcpy2DAsync",
+      "cudaMemcpyAsync",
+      "cudaMemcpyPeerAsync",
+      "cudaMemsetAsync",
+      "cudaStreamCreateWithFlags",
+      "cudaStreamDestroy",
+      "cudaStreamSynchronize",
+      "cudaStreamWaitEvent",
+      "cudaEventRecord",
+      "cudaEventSynchronize",
+      "cudaLaunchKernel",
+      "cudaLaunchKernelExC",
+      "cudaLaunchCooperativeKernel",
+      "cudaGraphInstantiate",
+      "cudaGraphLaunch",
+      "cudaGraphExecUpdate",
+      "cudaGraphDestroy",
+      "cudaGraphExecDestroy",
+      "cudaStreamBeginCapture",
+      "cudaStreamEndCapture",
+      "cudaStreamIsCapturing"
     ],
     "unsupported_in_pair_mode": [
       "cudaMallocManaged"
     ],
     "anchor_native_passthrough": [
-      "cudaEventCreateWithFlags", "cudaEventDestroy", "cudaGraphDestroy",
-      "cudaGraphExecDestroy", "cudaHostAlloc", "cudaMallocHost", "cudaFreeHost",
-      "cudaHostRegister", "cudaHostUnregister", "cudaHostGetDevicePointer",
-      "cudaFuncGetAttributes", "cudaFuncSetAttribute",
-      "cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags", "cudaSetDeviceFlags",
-      "cudaGetErrorString", "cudaGetLastError", "cudaPeekAtLastError"
+      "cudaEventCreateWithFlags",
+      "cudaEventDestroy",
+      "cudaGraphDestroy",
+      "cudaGraphExecDestroy",
+      "cudaHostAlloc",
+      "cudaMallocHost",
+      "cudaFreeHost",
+      "cudaHostRegister",
+      "cudaHostUnregister",
+      "cudaHostGetDevicePointer",
+      "cudaFuncGetAttributes",
+      "cudaFuncSetAttribute",
+      "cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags",
+      "cudaSetDeviceFlags",
+      "cudaGetErrorString",
+      "cudaGetLastError",
+      "cudaPeekAtLastError"
     ]
   },
   "unqualified_native_libraries": [
-    "cublasCreate_v2", "cublasDestroy_v2", "cublasGemmEx", "cublasGemmBatchedEx",
-    "cublasGemmStridedBatchedEx", "cublasSgemm_v2", "cublasSgemmBatched",
-    "cublasSgemmStridedBatched", "cublasStrsmBatched", "cublasSetMathMode",
-    "cublasSetStream_v2", "cublasSetWorkspace_v2", "cublasGetStatusString",
+    "cublasCreate_v2",
+    "cublasDestroy_v2",
+    "cublasGemmEx",
+    "cublasGemmBatchedEx",
+    "cublasGemmStridedBatchedEx",
+    "cublasSgemm_v2",
+    "cublasSgemmBatched",
+    "cublasSgemmStridedBatched",
+    "cublasStrsmBatched",
+    "cublasSetMathMode",
+    "cublasSetStream_v2",
+    "cublasSetWorkspace_v2",
+    "cublasGetStatusString",
     "nccl*"
   ],
   "graph_capture": {
-    "opt_in": "--cuda-graphs sets GGML_CUDA_DISABLE_GRAPHS=0 for matched controls and V200_GRAPH_CAPTURE=1 only for the pair facade.",
+    "opt_in": "--cuda-graphs removes GGML_CUDA_DISABLE_GRAPHS from matched controls and sets V200_GRAPH_CAPTURE=1 only for the pair facade.",
     "pair_execution": "During capture, native anchor launches are recorded without inserting ledger events or invoking the non-capture-safe pair operator. After EndCapture, exact eligible Q4_K MMVQ kernel nodes may be rewritten to peer-context functions. Graph replay is tracked as one asynchronous submission.",
     "telemetry": "The pair frontdoor ledger records capture, instantiate, update, and a bounded sample of graph replays with matched/re-written node counts.",
-    "other_graph_apis_not_qualified": ["cudaGraphInstantiateWithFlags", "graph node creation/update APIs"],
-    "status": "Implementation candidate pending controller-backed graph qualification."
+    "other_graph_apis_not_qualified": [
+      "cudaGraphInstantiateWithFlags",
+      "graph node creation/update APIs"
+    ],
+    "status": "GPU_PASS for pinned full-resident llama: controller797dc352-ff64-40cf-ae18-3dcfc29874f2, captured/replayed34 peer-context expert nodes, exactoutput and cleanrelease."
   },
   "semantic_limits": [
     "Graph support is explicit opt-in and limited to the pinned llama runtime capture/instantiate/update/replay path; only exact qualified Q4_K MMVQ graph nodes are peer-rewritten. Other captured operations remain anchor-side.",

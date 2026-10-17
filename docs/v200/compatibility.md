@@ -9,8 +9,7 @@ state on each launch.
 In pair mode, capture records the application's ordinary anchor-side CUDA
 operations. While a stream is actively capturing, V200 bypasses its normal
 per-operation completion-event insertion and skips the pair operator hook,
-which uses peer streams and cross-context event joins that cannot be captured
-safely. After `cudaStreamEndCapture`, the opt-in pair-compute path asks the
+which uses peer streams and cross-context event joins that are not capture-aware. After `cudaStreamEndCapture`, the opt-in pair-compute path asks the
 operator library to rewrite only recognized Q4_K MMVQ kernel nodes whose
 arguments, weight-bank ownership, and peer function are qualified. All other
 nodes remain as captured. The launcher keeps the captured graph's dependencies
@@ -34,8 +33,7 @@ must keep device allocations referenced by a graph alive for the graph's
 lifetime and until its replays complete; V200 tracks each replay but does not
 own the entire graph-exec lifetime.
 
-This graph path is an implementation candidate until the bounded controller
-qualification completes. A zero `graph_rewritten_nodes` count means capture
+The full-resident graph path passed the bounded controller check `797dc352-ff64-40cf-ae18-3dcfc29874f2` in `evidence/B03/graphs-r1`: two capture/replay samples, with up to 34 peer-context expert nodes in the inference graph, exact answer `2`, and zero final managed allocations. The graph-off path separately compared 6,144 routed expert outputs bitwise with the original kernel; graph replay retains that kernel and its arguments. This does not qualify arbitrary graph APIs or establish steady-state speedup. A zero `graph_rewritten_nodes` count means capture
 and replay used the anchor fallback for that graph; it does not demonstrate
 peer compute. Graph rewrite counts are reported in the existing
 `v200-frontdoor-ledger/v1` profile records so they can be read alongside

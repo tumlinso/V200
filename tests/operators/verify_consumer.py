@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT / "tests/capacity"))
 import verify_capacity as capacity
 
 
-def verify(run, require_experts=False):
+def verify(run, require_experts=False, require_graphs=False):
     read = capacity._json
     require = capacity._require
     controller = read(run.with_name(run.name + ".controller-result.json"))
@@ -74,9 +74,25 @@ def verify(run, require_experts=False):
                                         r.get("expert_verified_outputs", 0) > 0
                                         for r in expert_verified),
                 "expert route lacks a completed exact native-output comparison")
-    return {"status": "PASS_V200_09" if require_experts else "PASS_V200_08", "controller_evidence_id": evidence["id"],
+    graph_records = [r for r in records if r.get("event", "").startswith("graph_")]
+    graph_replays = [r for r in graph_records if r["event"] == "graph_replay" and
+                     r.get("graph_rewritten_nodes", 0) > 0]
+    if require_graphs:
+        require(case.get("graph_capture_evidence", {}).get("status") == "PASS_CAPTURE_AND_REPLAY",
+                "consumer did not exercise graph capture and replay")
+        require(graph_records and all(r.get("graph_status") == 0 for r in graph_records),
+                "graph capture, rewrite, instantiate or replay failed")
+        require(graph_replays, "no replay of a graph with peer-context kernel nodes")
+        for replay in graph_replays:
+            require(any(r["event"] in ("graph_instantiate", "graph_exec_update") and
+                        r["graph_handle"] == replay["graph_handle"] and
+                        r["graph_rewritten_nodes"] == replay["graph_rewritten_nodes"]
+                        for r in graph_records), "peer replay lacks executable provenance")
+    return {"status": "PASS_V200_10" if require_graphs else "PASS_V200_09" if require_experts else "PASS_V200_08", "controller_evidence_id": evidence["id"],
             "physical_uuids": pair, "capacity": result, "operator": totals,
             "verified_routes": [r["route"] for r in verified + expert_verified],
+            "peer_graph_replay_samples": len(graph_replays),
+            "maximum_peer_nodes_per_graph": max((r["graph_rewritten_nodes"] for r in graph_replays), default=0),
             "host_resources_released": True, "speedup": "NOT_ESTABLISHED"}
 
 
@@ -84,9 +100,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-dir", type=Path, default=ROOT / "evidence/B03/operator-r2")
     parser.add_argument("--require-experts", action="store_true")
+    parser.add_argument("--require-graphs", action="store_true")
     args = parser.parse_args()
     try:
-        print(json.dumps(verify(args.run_dir.resolve(), args.require_experts), indent=2))
+        print(json.dumps(verify(args.run_dir.resolve(), args.require_experts, args.require_graphs), indent=2))
     except (KeyError, OSError, TypeError, ValueError) as error:
         print(json.dumps({"status": "FAIL", "error": str(error)}), file=sys.stderr)
         sys.exit(1)
