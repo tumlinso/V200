@@ -3,14 +3,15 @@
 <!-- todo-orchestrator:v2-managed:start -->
 # Todo Status v2 Projection
 
-Project revision: `2`
+Project revision: `59`
 
 ## Workstreams
-- `V200-01` | status: planned | execution: ready | next: Create the authorized V200 working foundation with source-bound contracts and a CPU-first build, without consuming GPU time. Read planning/v200-bootstrap/tasks/V200-01.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
-- `V200-02` | status: planned | execution: ready | next: Produce the smallest consistent device/ABI boundary for the actual first consumer, ready for an early hardware closure test. Read planning/v200-bootstrap/tasks/V200-02.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
-- `V200-03` | status: planned | execution: ready | next: Provide a pair-backed canonical allocation model and consumer VMM lifecycle candidate with correct accounting and rollback. Read planning/v200-bootstrap/tasks/V200-03.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
-- `V200-04` | status: planned | execution: ready | next: Provide stream/context/module ownership and completion semantics that can safely join both physical workers. Read planning/v200-bootstrap/tasks/V200-04.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
-- `V200-05` | status: planned | execution: ready | next: Create one reproducible application fixture and truthful compatibility/performance controls, without a broad model benchmark collection. Read planning/v200-bootstrap/tasks/V200-05.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-Q01` | status: done | execution: closed | next: Run the package existing B01 pair-memory probe on the approved V100 pair as soon as V200-01 is complete; record actual feasibility before consumer implementation concludes.
+- `V200-01` | status: done | execution: closed | next: Create the authorized V200 working foundation with source-bound contracts and a CPU-first build, without consuming GPU time. Read planning/v200-bootstrap/tasks/V200-01.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-02` | status: done | execution: closed | next: Produce the smallest consistent device/ABI boundary for the actual first consumer, ready for an early hardware closure test. Read planning/v200-bootstrap/tasks/V200-02.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-03` | status: done | execution: closed | next: Provide a pair-backed canonical allocation model and consumer VMM lifecycle candidate with correct accounting and rollback. Read planning/v200-bootstrap/tasks/V200-03.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-04` | status: done | execution: closed | next: Provide stream/context/module ownership and completion semantics that can safely join both physical workers. Read planning/v200-bootstrap/tasks/V200-04.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-05` | status: done | execution: closed | next: Create one reproducible application fixture and truthful compatibility/performance controls, without a broad model benchmark collection. Read planning/v200-bootstrap/tasks/V200-05.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-06` | status: planned | execution: ready | next: Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-07` | status: planned | execution: ready | next: Prove genuinely resident aggregate HBM with live application data that does not fit on either constituent alone. Read planning/v200-bootstrap/tasks/V200-07.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-08` | status: planned | execution: ready | next: Make both V100s perform meaningful selected application work under the unchanged outward interface. Read planning/v200-bootstrap/tasks/V200-08.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
@@ -20,4 +21,5 @@ Project revision: `2`
 - `V200-12` | status: planned | execution: ready | next: Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-13` | status: planned | execution: ready | next: Deliver an opt-in application-scoped deployment with accurate identity, compatibility and rollback information. Read planning/v200-bootstrap/tasks/V200-13.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-14` | status: planned | execution: ready | next: Close the implementation with an inspectable outcome: accepted application behavior, capacity, useful dual compute, two logical devices and explicit remaining limits. Read planning/v200-bootstrap/tasks/V200-14.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-I01` | status: in_progress | execution: claimed | next: Wire accepted pair memory, completion and frontdoor ABI into a lazy native-context initializer and controller-mediated opt-in llama-server launch surface. Finish this setup while frontdoor closure completes; real consumer acceptance remains V200-06.
 <!-- todo-orchestrator:v2-managed:end -->

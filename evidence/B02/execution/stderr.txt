@@ -1,0 +1,2 @@
+cleanup failure: cuMemFreeHost (1)
+preserving retained primary contexts after unsafe cleanup

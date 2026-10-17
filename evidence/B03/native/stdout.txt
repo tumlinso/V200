@@ -1,0 +1,1 @@
+{"application_status": "PASS", "control": "native_single", "gpu_qualification": "NOT_CLAIMED", "log_path": "/home/tumlinson/V200/evidence/B03/native/consumer/smoke-native_single-1792239954218618376.log", "result_path": "/home/tumlinson/V200/evidence/B03/native/consumer/smoke-native_single-1792239954218618376.json", "workload": "smoke"}

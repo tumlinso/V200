@@ -36,6 +36,8 @@ FIXTURE_SCHEMA = "v200-llama-server-fixture/v1"
 STARTUP_TIMEOUT_S = 600.0
 REQUEST_TIMEOUT_S = 120.0
 SHUTDOWN_TIMEOUT_S = 15.0
+MAX_SERVE_DURATION_S = 3000
+DEFAULT_SERVE_DURATION_S = 1800
 PROC_POLL_S = 0.10
 UUID_RE = re.compile(r"^GPU-[A-Za-z0-9-]+$")
 
@@ -99,6 +101,15 @@ def validate_documents(fixture: dict[str, Any], profile: dict[str, Any]) -> None
         raise ConsumerError("application allocation limit must be the authorized 12,288 MiB")
     if int(guard.get("physical_process_used_memory_guard_mib", 0)) <= 12288:
         raise ConsumerError("physical process-memory guard must include explicit context overhead")
+    preview_environment = fixture.get("server", {}).get("environment", {})
+    if preview_environment.get("GGML_CUDA_DISABLE_GRAPHS") != "1":
+        raise ConsumerError("matched preview must explicitly disable CUDA graphs")
+    if not fixture.get("server", {}).get("preview_policy"):
+        raise ConsumerError("fixture must disclose the graph-off preview limitation")
+    evidence_id = fixture.get("controls", {}).get("facade_owner", {}).get("required_b01_evidence_id")
+    if (not isinstance(evidence_id, str)
+            or re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", evidence_id) is None):
+        raise ConsumerError("pair facade must pin its required B01 setup evidence id")
     for workload_name, workload in workloads.items():
         oracle = workload.get("oracle", {})
         request = workload.get("request", {}).get("body", {})
@@ -246,6 +257,9 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
     child.pop("V200_MODE", None)
     child.pop("V200_DEVICE_UUIDS", None)
     child.pop("V200_PROFILE_LOG", None)
+    child.pop("V200_B01_EVIDENCE_ID", None)
+    for key, value in fixture["server"].get("environment", {}).items():
+        child[str(key)] = str(value)
     if control_name == "facade_owner":
         if not preloads:
             raise ConsumerError("facade_owner requires at least one --preload-library")
@@ -259,6 +273,8 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
         child["V200_MODE"] = mode
         child["V200_DEVICE_UUIDS"] = selected
         child["LD_PRELOAD"] = ":".join([*(str(path) for path in preloads), *inherited])
+        if mode == "pair":
+            child["V200_B01_EVIDENCE_ID"] = str(control["required_b01_evidence_id"])
         if profile_log_path is not None:
             child["V200_PROFILE_LOG"] = str(profile_log_path.resolve())
     elif inherited:
@@ -595,7 +611,8 @@ def _write_json_atomic(path: Path, value: dict[str, Any]) -> None:
 
 
 def _read_profile_log(path: Path, selected_uuids: list[str],
-                      expected_budget_bytes: int) -> dict[str, Any]:
+                      expected_budget_bytes: int,
+                      expected_qualification_id: str | None = None) -> dict[str, Any]:
     if not path.exists():
         return {"status": "MISSING", "path": str(path), "records": []}
     try:
@@ -618,6 +635,9 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
                 raise ValueError(f"line {line_number} has unexpected ledger schema or mode")
             if value["anchor_uuid"] != selected_uuids[0] or value["peer_uuid"] != selected_uuids[1]:
                 raise ValueError(f"line {line_number} UUID ordering differs from controller selection")
+            if (expected_qualification_id is not None
+                    and value["qualification_id"] != expected_qualification_id):
+                raise ValueError(f"line {line_number} qualification id differs from the fixture-pinned B01 evidence")
             budgets = value["owner_budget_bytes"]
             usage = value["owner_used_bytes"]
             if (not isinstance(budgets, list) or len(budgets) != 2
@@ -642,7 +662,9 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
                 "sha256": hashlib.sha256(raw).hexdigest() if "raw" in locals() else None,
                 "records": records if "records" in locals() else [], "error": str(exc)}
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
-        return {"status": "INVALID", "path": str(path), "records": [],
+        return {"status": "INVALID", "path": str(path),
+                "sha256": hashlib.sha256(raw).hexdigest() if "raw" in locals() else None,
+                "records": records if "records" in locals() else [],
                 "error": f"{type(exc).__name__}: {exc}"}
 
 
@@ -654,7 +676,9 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
              environ: dict[str, str] | None = None,
              popen_factory: Callable[..., Any] = subprocess.Popen,
              nvidia_smi_path: str | None = None,
-             visible_gpu_uuids: list[str] | None = None) -> dict[str, Any]:
+             visible_gpu_uuids: list[str] | None = None,
+             server_port: int | None = None,
+             serve_duration_seconds: int = 0) -> dict[str, Any]:
     workload = fixture["workloads"][workload_name]
     preflight = memory_preflight(workload_name, control_name, fixture, facade_mode)
     if not preflight["fits_static_preflight"]:
@@ -662,7 +686,11 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
             f"static preflight estimates {preflight['estimated_mib_per_owner']} MiB/owner, "
             f"over {preflight['application_limit_bytes_per_owner'] / (1024 * 1024):.0f} MiB"
         )
-    port = _free_loopback_port()
+    if isinstance(serve_duration_seconds, bool) or not 0 <= serve_duration_seconds <= MAX_SERVE_DURATION_S:
+        raise ConsumerError(f"serve duration must be between 0 and {MAX_SERVE_DURATION_S} seconds")
+    port = _free_loopback_port() if server_port is None else int(server_port)
+    if not 1 <= port <= 65535:
+        raise ConsumerError("server port must be between 1 and 65535")
     argv = _argv_for(control_name, workload, fixture, profile["binary"]["path"], port)
     started = time.time()
     monotonic_start = time.monotonic()
@@ -690,6 +718,11 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
         "selected_gpu_uuids": selected_uuids,
         "cuda_visible_devices": child_env.get("CUDA_VISIBLE_DEVICES"),
         "v200_mode": child_env.get("V200_MODE"),
+        "v200_b01_evidence_id": child_env.get("V200_B01_EVIDENCE_ID"),
+        "preview_environment": {
+            "GGML_CUDA_DISABLE_GRAPHS": child_env.get("GGML_CUDA_DISABLE_GRAPHS"),
+            "policy": fixture["server"]["preview_policy"],
+        },
         "preflight": preflight,
         "allocation_evidence": {
             "application_limit_bytes_per_owner": preflight["application_limit_bytes_per_owner"],
@@ -720,6 +753,10 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
         "readiness_seconds": None,
         "request_seconds": None,
         "response": None,
+        "service": ({"endpoint": f"http://127.0.0.1:{port}",
+                     "duration_requested_seconds": serve_duration_seconds,
+                     "duration_observed_seconds": None,
+                     "status": "PENDING"} if serve_duration_seconds else None),
         "application_status": "FAIL",
         "gpu_qualification": "NOT_CLAIMED",
         "failure": None,
@@ -732,11 +769,26 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
     try:
         output_dir.mkdir(parents=True, exist_ok=True)
         with log_path.open("wb") as log:
-            process = popen_factory(argv, cwd=str(profile["source"]["repository"]), env=child_env,
-                                    stdout=log, stderr=subprocess.STDOUT,
-                                    start_new_session=True)
-            result["server_process"] = {"pid": process.pid, "process_group": process.pid,
-                                        "session": process.pid}
+            old_mask = None
+            if hasattr(signal, "pthread_sigmask"):
+                old_mask = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGTERM})
+            try:
+                popen_options: dict[str, Any] = {}
+                if old_mask is not None:
+                    # Popen children inherit the calling thread's signal mask
+                    # across exec. Unblock SIGTERM in the child before exec so
+                    # its owned-process cleanup remains effective while the
+                    # parent closes the Popen assignment race.
+                    popen_options["preexec_fn"] = lambda: signal.pthread_sigmask(
+                        signal.SIG_UNBLOCK, {signal.SIGTERM})
+                process = popen_factory(argv, cwd=str(profile["source"]["repository"]), env=child_env,
+                                        stdout=log, stderr=subprocess.STDOUT,
+                                        start_new_session=True, **popen_options)
+                result["server_process"] = {"pid": process.pid, "process_group": process.pid,
+                                            "session": process.pid}
+            finally:
+                if old_mask is not None:
+                    signal.pthread_sigmask(signal.SIG_SETMASK, old_mask)
             if monitor:
                 memory_guard = ProcessMemoryGuard(
                     process, selected_uuids,
@@ -762,42 +814,63 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
             result["response"] = validate_completion_response(response, workload["oracle"])
             if memory_guard and (memory_guard.error or memory_guard.over_limit):
                 raise ConsumerError(f"memory guard stopped server: {memory_guard.error or memory_guard.over_limit}")
+            if serve_duration_seconds:
+                print(f"V200_SERVER_READY http://127.0.0.1:{port}", flush=True)
+                service_start = time.monotonic()
+                service_deadline = service_start + serve_duration_seconds
+                while time.monotonic() < service_deadline:
+                    if process.poll() is not None:
+                        raise ConsumerError(
+                            f"server exited during foreground service with status {process.returncode}")
+                    if memory_guard and (memory_guard.error or memory_guard.over_limit):
+                        raise ConsumerError(
+                            f"memory guard stopped server: {memory_guard.error or memory_guard.over_limit}")
+                    time.sleep(min(0.25, service_deadline - time.monotonic()))
+                result["service"]["duration_observed_seconds"] = time.monotonic() - service_start
+                result["service"]["status"] = "PASS"
             result["application_status"] = "PASS"
     except BaseException as exc:
         result["failure"] = f"{type(exc).__name__}: {exc}"
         if isinstance(exc, (KeyboardInterrupt, SystemExit)):
             raise
     finally:
-        if memory_guard is not None:
-            memory_guard.finish()
-            result["memory_guard"]["samples"] = memory_guard.samples
-            result["memory_guard"]["telemetry_status"] = (
-                "FAIL" if memory_guard.error or memory_guard.over_limit else "PASS")
-            result["memory_guard"]["error"] = memory_guard.error
-            result["memory_guard"]["over_limit"] = memory_guard.over_limit
-            if memory_guard.error or memory_guard.over_limit:
-                result["application_status"] = "FAIL"
-                result["failure"] = result["failure"] or str(memory_guard.error or memory_guard.over_limit)
-        if process is not None:
-            cleanup = cleanup_owned_group(
-                process, float(fixture["server"]["timeouts_seconds"]["shutdown"]))
-            result["server_process"]["exit_code"] = process.returncode
-            result["cleanup"] = cleanup
-            if not cleanup["no_live_group_members"]:
-                result["application_status"] = "FAIL"
-                result["failure"] = result["failure"] or "owned process group did not terminate cleanly"
-        if profile_log_path is not None:
-            budget = int(fixture["memory_guard"]["per_physical_gpu_application_limit_mib"]) * 1024 * 1024
-            profile_info = _read_profile_log(profile_log_path, selected_uuids, budget)
-            result["v200_profile_telemetry"] = profile_info
-            result["allocation_evidence"]["v200_memory_api_receipt"] = profile_info["status"]
-            if profile_info["status"] != "PASS":
-                result["application_status"] = "FAIL"
-                result["failure"] = result["failure"] or (
-                    f"pair facade owner-ledger receipt is {profile_info['status']}")
-        result["elapsed_seconds"] = time.monotonic() - monotonic_start
-        result["finished_unix_time"] = time.time()
-        _write_json_atomic(result_path, result)
+        prior_term = signal.getsignal(signal.SIGTERM)
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
+        try:
+            if memory_guard is not None:
+                memory_guard.finish()
+                result["memory_guard"]["samples"] = memory_guard.samples
+                result["memory_guard"]["telemetry_status"] = (
+                    "FAIL" if memory_guard.error or memory_guard.over_limit else "PASS")
+                result["memory_guard"]["error"] = memory_guard.error
+                result["memory_guard"]["over_limit"] = memory_guard.over_limit
+                if memory_guard.error or memory_guard.over_limit:
+                    result["application_status"] = "FAIL"
+                    result["failure"] = result["failure"] or str(memory_guard.error or memory_guard.over_limit)
+            if process is not None:
+                cleanup = cleanup_owned_group(
+                    process, float(fixture["server"]["timeouts_seconds"]["shutdown"]))
+                result["server_process"]["exit_code"] = process.returncode
+                result["cleanup"] = cleanup
+                if not cleanup["no_live_group_members"]:
+                    result["application_status"] = "FAIL"
+                    result["failure"] = result["failure"] or "owned process group did not terminate cleanly"
+            if profile_log_path is not None:
+                budget = int(fixture["memory_guard"]["per_physical_gpu_application_limit_mib"]) * 1024 * 1024
+                profile_info = _read_profile_log(
+                    profile_log_path, selected_uuids, budget,
+                    str(fixture["controls"]["facade_owner"]["required_b01_evidence_id"]))
+                result["v200_profile_telemetry"] = profile_info
+                result["allocation_evidence"]["v200_memory_api_receipt"] = profile_info["status"]
+                if profile_info["status"] != "PASS":
+                    result["application_status"] = "FAIL"
+                    result["failure"] = result["failure"] or (
+                        f"pair facade owner-ledger receipt is {profile_info['status']}")
+            result["elapsed_seconds"] = time.monotonic() - monotonic_start
+            result["finished_unix_time"] = time.time()
+            _write_json_atomic(result_path, result)
+        finally:
+            signal.signal(signal.SIGTERM, prior_term)
     return result
 
 
@@ -806,7 +879,9 @@ def run_matrix(workload_name: str, controls: list[str], output_dir: Path,
                profile_path: Path = PROFILE_PATH,
                environ: dict[str, str] | None = None,
                monitor: bool = True,
-               facade_mode: str | None = None) -> list[dict[str, Any]]:
+               facade_mode: str | None = None,
+               server_port: int | None = None,
+               serve_duration_seconds: int = 0) -> list[dict[str, Any]]:
     fixture, profile = load_documents(fixture_path, profile_path)
     if workload_name not in fixture["workloads"]:
         raise ConsumerError(f"unknown workload {workload_name!r}")
@@ -820,6 +895,13 @@ def run_matrix(workload_name: str, controls: list[str], output_dir: Path,
             raise ConsumerError(f"{control} fails static per-owner memory preflight")
     if len(set(controls)) != len(controls):
         raise ConsumerError("matched matrix controls must be unique")
+    if serve_duration_seconds:
+        if workload_name != "smoke" or controls != ["facade_owner"]:
+            raise ConsumerError("finite service mode requires only the smoke facade control")
+        if server_port is None:
+            raise ConsumerError("finite service mode requires a launcher-selected loopback port")
+        if not 1 <= serve_duration_seconds <= MAX_SERVE_DURATION_S:
+            raise ConsumerError(f"serve duration must be in [1, {MAX_SERVE_DURATION_S}] seconds")
     env = dict(os.environ if environ is None else environ)
     uuid_map: dict[str, list[str]] = {}
     for control in controls:
@@ -844,7 +926,9 @@ def run_matrix(workload_name: str, controls: list[str], output_dir: Path,
         result = _run_one(workload_name, control, fixture, profile, identities,
                           uuid_map[control], output_dir, preloads, monitor,
                           facade_mode, env, nvidia_smi_path=nvidia_smi_path,
-                          visible_gpu_uuids=visible_gpu_uuids)
+                          visible_gpu_uuids=visible_gpu_uuids,
+                          server_port=server_port,
+                          serve_duration_seconds=serve_duration_seconds)
         results.append(result)
         if result["application_status"] != "PASS":
             break
@@ -862,6 +946,10 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--facade-mode", choices=("anchor", "pair"), default=None,
                         help="override the fixture's facade mode; default is pair for integrated proof")
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--server-port", type=int,
+                        help="launcher-selected loopback port, used only by finite serve mode")
+    parser.add_argument("--serve-duration-seconds", type=int, default=0,
+                        help=f"keep the smoke facade available after its exact self-check (max {MAX_SERVE_DURATION_S}s)")
     parser.add_argument("--execute", action="store_true",
                         help="required explicit confirmation for the live app process")
     parser.add_argument("--cpu-fake-no-memory-guard", action="store_true", help=argparse.SUPPRESS)
@@ -878,11 +966,24 @@ def main(argv: list[str] | None = None) -> int:
         print("The CPU-only guard bypass is available only to in-process unit tests.", file=sys.stderr)
         return 2
     try:
+        if args.serve_duration_seconds < 0 or args.serve_duration_seconds > MAX_SERVE_DURATION_S:
+            raise ConsumerError(f"serve duration must be in [0, {MAX_SERVE_DURATION_S}] seconds")
+        prior_sigterm = signal.getsignal(signal.SIGTERM)
+
+        def _handle_sigterm(_signum: int, _frame: Any) -> None:
+            raise ConsumerError("foreground runner received SIGTERM; cleaning up the owned server")
+
+        signal.signal(signal.SIGTERM, _handle_sigterm)
         results = run_matrix(args.workload, args.controls, args.output_dir,
-                             args.preloads, facade_mode=args.facade_mode)
+                             args.preloads, facade_mode=args.facade_mode,
+                             server_port=args.server_port,
+                             serve_duration_seconds=args.serve_duration_seconds)
     except ConsumerError as exc:
         print(f"consumer run refused: {exc}", file=sys.stderr)
         return 2
+    finally:
+        if "prior_sigterm" in locals():
+            signal.signal(signal.SIGTERM, prior_sigterm)
     for result in results:
         print(json.dumps({"workload": result["workload"], "control": result["control"],
                           "application_status": result["application_status"],

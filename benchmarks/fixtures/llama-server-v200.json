@@ -41,6 +41,10 @@
   "server": {
     "bind_host": "127.0.0.1",
     "port": "ephemeral-loopback-port",
+    "environment": {
+      "GGML_CUDA_DISABLE_GRAPHS": "1"
+    },
+    "preview_policy": "CUDA graphs are disabled for both matched controls; this is a correctness/ownership preview, not a graph-enabled performance baseline.",
     "fixed_arguments": [
       "--model", "{model}",
       "--host", "127.0.0.1",
@@ -93,6 +97,7 @@
       "arguments": ["--device", "CUDA0", "--split-mode", "none"],
       "v200_mode": "pair",
       "supported_modes": ["anchor", "pair"],
+      "required_b01_evidence_id": "8426eab5-278d-4687-ab7d-f5ec937e46ec",
       "role": "one application-visible V200 device backed by the admitted physical pair",
       "requires_preload_library": true
     }

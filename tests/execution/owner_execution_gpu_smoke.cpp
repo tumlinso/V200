@@ -233,7 +233,8 @@ class OwnerResources {
 
 class PinnedBuffer {
  public:
-  PinnedBuffer(CUcontext context, std::size_t bytes) : size_(bytes) {
+  PinnedBuffer(CUcontext context, std::size_t bytes)
+      : context_(context), size_(bytes) {
     ContextScope scope(context);
     check(cuMemHostAlloc(reinterpret_cast<void**>(&data_), size_,
                          CU_MEMHOSTALLOC_PORTABLE),
@@ -241,7 +242,7 @@ class PinnedBuffer {
     scope.finish();
   }
   ~PinnedBuffer() {
-    if (data_ != nullptr) cleanup(cuMemFreeHost(data_), "cuMemFreeHost");
+    release();
   }
   PinnedBuffer(const PinnedBuffer&) = delete;
   PinnedBuffer& operator=(const PinnedBuffer&) = delete;
@@ -249,7 +250,24 @@ class PinnedBuffer {
   unsigned char* data() const { return data_; }
   std::size_t size() const { return size_; }
 
+  void release() noexcept {
+    if (data_ == nullptr) return;
+    const CUresult push = cuCtxPushCurrent(context_);
+    if (push != CUDA_SUCCESS) {
+      cleanup(push, "pinned staging context push");
+      return;
+    }
+    const CUresult free_result = cuMemFreeHost(data_);
+    cleanup(free_result, "cuMemFreeHost");
+    if (free_result == CUDA_SUCCESS) data_ = nullptr;
+    CUcontext popped = nullptr;
+    const CUresult pop_result = cuCtxPopCurrent(&popped);
+    cleanup(pop_result, "pinned staging context pop");
+    if (pop_result == CUDA_SUCCESS && popped != context_) ++cleanup_failures;
+  }
+
  private:
+  CUcontext context_{};
   unsigned char* data_{nullptr};
   std::size_t size_{};
 };
@@ -462,10 +480,10 @@ int main(int argc, char** argv) {
     if (!std::all_of(bytes_a.begin(), bytes_a.end(),
                      [](unsigned char value) { return value == 0x2a; }) ||
         !std::all_of(bytes_b.begin(), bytes_b.end(),
-                     [](unsigned char value) { return value == 0x5b; })) {
+                     [](unsigned char value) { return value == 0x2a; })) {
       (void)execution.release(joined.completion);
       if (anchor.value.valid()) (void)execution.release(anchor.value);
-      throw std::runtime_error("per-owner memset/copy verification failed");
+      throw std::runtime_error("owner A fill or owner B staged-copy verification failed");
     }
     require_ambient_context(ambient, "owner data verification");
 
@@ -479,6 +497,7 @@ int main(int argc, char** argv) {
     if (!execution.shutdown().ok()) throw std::runtime_error("execution shutdown failed");
     require_ambient_context(ambient, "execution shutdown");
     resources.release();
+    staging.release();
     contexts.release();
     if (cleanup_failures != 0) throw std::runtime_error("owned CUDA cleanup failed");
 

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "project_root": "/home/tumlinson/V200",
+  "command_cwd": "/home/tumlinson/V200",
+  "recipe": "baseline",
+  "toolchain": {
+    "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9",
+    "require_sanitizer": false
+  },
+  "resources": {
+    "gpu_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ],
+    "gpus": 2,
+    "cpu_threads": 4,
+    "ram_bytes": 4294967296,
+    "isolate_nvlink_domain": true,
+    "isolate_pcie_root": false
+  },
+  "argv": [
+    "python3",
+    "/home/tumlinson/V200/planning/v200-bootstrap/tools/run_bounded.py",
+    "--project-root",
+    "/home/tumlinson/V200",
+    "--seconds",
+    "90",
+    "--allocation-cap-mib",
+    "1024",
+    "--evidence-dir",
+    "/home/tumlinson/V200/evidence/B02/execution-r2",
+    "--bundle",
+    "B02",
+    "--expected-uuid",
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "--expected-uuid",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "--",
+    "/home/tumlinson/V200/build-execution-hw-smoke/v200_execution_gpu_smoke",
+    "--execute",
+    "--expect-a",
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "--expect-b",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+  ],
+  "timeout": 105,
+  "build_timeout": 900,
+  "binary_paths": [
+    "build-execution-hw-smoke/v200_execution_gpu_smoke"
+  ],
+  "paths": [
+    "src/execution",
+    "include/v200/execution",
+    "tests/execution/owner_execution_gpu_smoke.cpp"
+  ],
+  "benchmark": {
+    "build_argv": [
+      "cmake",
+      "--build",
+      "build-execution-hw-smoke",
+      "--target",
+      "v200_execution_gpu_smoke",
+      "--parallel",
+      "4"
+    ]
+  }
+}

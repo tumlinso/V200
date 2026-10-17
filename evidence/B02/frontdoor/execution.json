@@ -1,0 +1,35 @@
+{
+  "returncode": 0,
+  "timed_out": false,
+  "interrupted": false,
+  "orphaned_children": false,
+  "termination_uncertain": false,
+  "wall_seconds": 0.46583655399990676,
+  "stdout_sha256": "f434da88e337b0ca37d6d869da966f28a5411f16d6dd745b70709bb51219890c",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "bundle": "B02",
+  "argv": [
+    "env",
+    "V200_MODE=pair",
+    "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "V200_B01_EVIDENCE_ID=8426eab5-278d-4687-ab7d-f5ec937e46ec",
+    "V200_OWNER0_BUDGET_MIB=64",
+    "V200_OWNER1_BUDGET_MIB=64",
+    "V200_PROFILE_LOG=/home/tumlinson/V200/evidence/B02/frontdoor-profile.jsonl",
+    "LD_PRELOAD=/home/tumlinson/V200/build/src/frontdoor/libv200_frontdoor.so:/home/tumlinson/V200/build/src/integration/libv200_pair_init.so:/lib/x86_64-linux-gnu/libcuda.so.1:/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9/targets/x86_64-linux/lib/libcudart.so.12",
+    "/home/tumlinson/V200/build/src/frontdoor/v200_frontdoor_closure",
+    "--execute"
+  ],
+  "lease": {
+    "receipt": "/home/tumlinson/V200/.todo-orchestrator/runtime/background-artifacts/foreground/b737bb59-11d6-4e80-9c0c-4c386d4d5a17/lease.json",
+    "owner_pid": 263041,
+    "visible_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ]
+  },
+  "allocation_cap_mib_per_gpu": 1024,
+  "memory_cap_enforcement": "fixture responsibility; not an OS hard quota",
+  "gpu_correctness": "read case-level fixture output; child exit alone is not GPU acceptance",
+  "status": "CHILD_COMPLETED"
+}

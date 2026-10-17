@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "project_root": "/home/tumlinson/V200",
+  "command_cwd": "/home/tumlinson/V200",
+  "recipe": "baseline",
+  "toolchain": {
+    "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9",
+    "require_sanitizer": false
+  },
+  "resources": {
+    "gpu_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ],
+    "gpus": 2,
+    "cpu_threads": 4,
+    "ram_bytes": 4294967296,
+    "isolate_nvlink_domain": true,
+    "isolate_pcie_root": false
+  },
+  "argv": [
+    "python3",
+    "/home/tumlinson/V200/planning/v200-bootstrap/tools/run_bounded.py",
+    "--project-root",
+    "/home/tumlinson/V200",
+    "--seconds",
+    "90",
+    "--allocation-cap-mib",
+    "1024",
+    "--evidence-dir",
+    "/home/tumlinson/V200/evidence/B02/frontdoor",
+    "--bundle",
+    "B02",
+    "--expected-uuid",
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "--expected-uuid",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "--",
+    "env",
+    "V200_MODE=pair",
+    "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "V200_B01_EVIDENCE_ID=8426eab5-278d-4687-ab7d-f5ec937e46ec",
+    "V200_OWNER0_BUDGET_MIB=64",
+    "V200_OWNER1_BUDGET_MIB=64",
+    "V200_PROFILE_LOG=/home/tumlinson/V200/evidence/B02/frontdoor-profile.jsonl",
+    "LD_PRELOAD=/home/tumlinson/V200/build/src/frontdoor/libv200_frontdoor.so:/home/tumlinson/V200/build/src/integration/libv200_pair_init.so:/lib/x86_64-linux-gnu/libcuda.so.1:/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9/targets/x86_64-linux/lib/libcudart.so.12",
+    "/home/tumlinson/V200/build/src/frontdoor/v200_frontdoor_closure",
+    "--execute"
+  ],
+  "timeout": 105,
+  "build_timeout": 900,
+  "binary_paths": [
+    "build/src/frontdoor/v200_frontdoor_closure",
+    "build/src/frontdoor/libv200_frontdoor.so",
+    "build/src/integration/libv200_pair_init.so"
+  ],
+  "paths": [
+    "src/frontdoor",
+    "src/memory",
+    "src/execution",
+    "src/integration",
+    "include/v200",
+    "tests/abi/frontdoor_closure.cpp"
+  ],
+  "benchmark": {
+    "build_argv": [
+      "cmake",
+      "--build",
+      "build",
+      "--target",
+      "v200_frontdoor_closure",
+      "v200_pair_init",
+      "--parallel",
+      "4"
+    ]
+  }
+}

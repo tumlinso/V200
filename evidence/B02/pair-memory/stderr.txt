@@ -1,0 +1,1 @@
+pair memory GPU smoke: controller must expose exactly the ordered pair

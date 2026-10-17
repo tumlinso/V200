@@ -1,0 +1,6 @@
+{
+  "status": "REJECTED",
+  "controller_evidence_id": "f76212f8-4f34-46f7-8226-4739bfd80c8c",
+  "reason": "The child printed GPU_PASS before a destructor reported cuMemFreeHost failure. Exit status and the marker did not establish successful cleanup.",
+  "replacement_evidence_id": "f9e1d6eb-599e-41f0-ab7e-54ce164b9c05"
+}

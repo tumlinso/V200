@@ -1434,8 +1434,13 @@ extern "C" CUresult CUDAAPI cuMemMap(CUdeviceptr ptr, size_t size, size_t offset
     }
     if (!pair_memory_ready()) return ensure_pair_profile();
     auto fn = memory_fn<MemVmmMap>("v200_memory_vmm_map");
-    InternalCallScope bypass;
-    return fn ? fn(ptr, size, offset, handle, flags) : CUDA_ERROR_NOT_SUPPORTED;
+    CUresult result = CUDA_ERROR_NOT_SUPPORTED;
+    {
+        InternalCallScope bypass;
+        result = fn ? fn(ptr, size, offset, handle, flags) : CUDA_ERROR_NOT_SUPPORTED;
+    }
+    if (result == CUDA_SUCCESS) v200_frontdoor_snapshot("cu_mem_map");
+    return result;
 }
 
 extern "C" CUresult CUDAAPI cuMemSetAccess(CUdeviceptr ptr, size_t size,
@@ -1467,9 +1472,14 @@ extern "C" CUresult CUDAAPI cuMemUnmap(CUdeviceptr ptr, size_t size) {
     }
     if (!pair_memory_ready()) return ensure_pair_profile();
     auto fn = memory_fn<MemVmmUnmap>("v200_memory_vmm_unmap");
-    std::unique_lock<std::shared_mutex> use_lock(tracked_use_gate);
-    InternalCallScope bypass;
-    return fn ? fn(ptr, size) : CUDA_ERROR_NOT_SUPPORTED;
+    CUresult result = CUDA_ERROR_NOT_SUPPORTED;
+    {
+        std::unique_lock<std::shared_mutex> use_lock(tracked_use_gate);
+        InternalCallScope bypass;
+        result = fn ? fn(ptr, size) : CUDA_ERROR_NOT_SUPPORTED;
+    }
+    if (result == CUDA_SUCCESS) v200_frontdoor_snapshot("cu_mem_unmap");
+    return result;
 }
 
 extern "C" CUresult CUDAAPI cuMemRelease(CUmemGenericAllocationHandle handle) {
@@ -1570,4 +1580,3 @@ void write_profile_snapshot(const char *event_name) {
 extern "C" void v200_frontdoor_snapshot(const char *event_name) {
     write_profile_snapshot(event_name);
 }
-

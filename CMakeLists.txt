@@ -50,6 +50,7 @@ foreach(v200_component IN ITEMS
     src/frontdoor
     src/memory
     src/execution
+    src/integration
     tests/consumer)
   if(EXISTS "${PROJECT_SOURCE_DIR}/${v200_component}/CMakeLists.txt")
     add_subdirectory("${v200_component}")

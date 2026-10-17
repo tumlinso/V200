@@ -1,0 +1,87 @@
+{
+  "schema_version": 3,
+  "project": {
+    "name": "V200"
+  },
+  "tasks": [
+    {
+      "id": "V200-I01",
+      "title": "Integrate the process pair initializer and opt-in llama launcher",
+      "kind": "integration",
+      "objective": "Wire accepted pair memory, completion and frontdoor ABI into a lazy native-context initializer and controller-mediated opt-in llama-server launch surface. Finish this setup while frontdoor closure completes; real consumer acceptance remains V200-06.",
+      "scope": {
+        "exclusive_paths": [
+          "src/integration",
+          "include/v200/core",
+          "scripts/v200",
+          "tests/integration",
+          "docs/v200/runtime-init.md",
+          "CMakeLists.txt",
+          "tests/consumer",
+          "benchmarks/fixtures",
+          "README.md",
+          "evidence/B02",
+          "scripts/qualification",
+          "tests/execution",
+          "evidence/B03",
+          "src/frontdoor"
+        ],
+        "read_paths": [
+          "build-support",
+          "CMakeLists.txt",
+          "docs/v200/charter.md",
+          "docs/v200/interfaces.md",
+          "docs/v200/source-profile.json",
+          "docs/v200/consumer-profile.json",
+          "evidence/foundation",
+          "include/v200/memory",
+          "include/v200/execution",
+          "tests/consumer",
+          "benchmarks/fixtures",
+          "include/v200/frontdoor",
+          "src/frontdoor",
+          "src/memory",
+          "src/execution",
+          "tests/abi",
+          "tests/execution",
+          "planning/v200-bootstrap/tools"
+        ]
+      },
+      "checkpoints": [
+        {
+          "id": "V200-I01-READY",
+          "title": "Lazy runtime initializer and controlled launcher are ready for hardware closure"
+        }
+      ],
+      "notes": "Root setup prerequisite receipts are already accepted: V200-01,Q01,03,04,05. No terminal task is upserted. Native frontdoor ABI was communicated by its owner; no source changes outside this outcome. No constructor CUDA calls; exact qualified UUIDs and budgets; controller admission mandatory."
+    }
+  ],
+  "runs": [
+    {
+      "id": "V200-INIT-RUN-1",
+      "root_task_id": "V200-I01",
+      "charter": {
+        "objective": "Integrate a small opt-in runtime without waiting for final frontdoor CPU closure",
+        "boundaries": [
+          "No GPU execution before built admitted closure; no full graph or generic kernel redistribution implementation"
+        ],
+        "invariants": [
+          "Use actual native dispatch and the accepted B01 pair identity; constructor must not initialize CUDA",
+          "Keep the selected llama workload and disclosed preview limits; no false capacity/speed claims"
+        ]
+      },
+      "lanes": [
+        {
+          "id": "V200-INIT-RUN-1-MAIN",
+          "role": "implementer",
+          "tasks": [
+            "V200-I01"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        }
+      ]
+    }
+  ]
+}

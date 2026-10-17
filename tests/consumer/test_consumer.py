@@ -16,7 +16,10 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(ROOT / "scripts/v200"))
 import run_consumer as consumer  # noqa: E402
+import bounded_runner  # noqa: E402
+import serve as serve_launcher  # noqa: E402
 
 
 class FixtureTests(unittest.TestCase):
@@ -80,10 +83,24 @@ class FixtureTests(unittest.TestCase):
         with self.assertRaises(consumer.ConsumerError):
             consumer.validate_live_environment("facade_owner", self.fixture, env, "unexpected")
 
+    def test_nvidia_smi_identity_probe_fails_closed_on_missing_uuid(self) -> None:
+        completed = subprocess.CompletedProcess([], 0, "GPU-aaaaaaaa\nGPU-bbbbbbbb\n", "")
+        with mock.patch.object(consumer.shutil, "which", return_value="/fake/nvidia-smi"), \
+             mock.patch.object(consumer.subprocess, "run", return_value=completed):
+            path, observed = consumer._verify_nvidia_smi_uuid_selection(
+                ["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
+            self.assertEqual(path, "/fake/nvidia-smi")
+            self.assertEqual(len(observed), 2)
+        with mock.patch.object(consumer.shutil, "which", return_value="/fake/nvidia-smi"), \
+             mock.patch.object(consumer.subprocess, "run", return_value=completed):
+            with self.assertRaisesRegex(consumer.ConsumerError, "not visible"):
+                consumer._verify_nvidia_smi_uuid_selection(["GPU-cccccccc"])
+
     def test_child_environment_clears_hidden_fit_and_keeps_controller_selection(self) -> None:
         env = {"PATH": "/bin", "CUDA_VISIBLE_DEVICES": "GPU-a,GPU-b",
                "V200_DEVICE_UUIDS": "GPU-aaaaaaaa,GPU-bbbbbbbb",
                "LLAMA_ARG_N_GPU_LAYERS": "999", "GGML_CUDA_FORCE_CUBLAS": "1",
+               "GGML_CUDA_DISABLE_GRAPHS": "0", "V200_B01_EVIDENCE_ID": "untrusted-parent-value",
                "LD_PRELOAD": "/tmp/libv200_frontdoor.so /tmp/libunrelated.so"}
         native = consumer._clean_environment("native_single", self.fixture, None, env,
                                              selected_uuids=["GPU-aaaaaaaa"])
@@ -91,17 +108,26 @@ class FixtureTests(unittest.TestCase):
         self.assertNotIn("GGML_CUDA_FORCE_CUBLAS", native)
         self.assertNotIn("V200_MODE", native)
         self.assertNotIn("V200_DEVICE_UUIDS", native)
+        self.assertNotIn("V200_B01_EVIDENCE_ID", native)
         self.assertEqual(native["CUDA_VISIBLE_DEVICES"], "GPU-a,GPU-b")
+        self.assertEqual(native["GGML_CUDA_DISABLE_GRAPHS"], "1")
         self.assertEqual(native["LD_PRELOAD"], "/tmp/libunrelated.so")
         with tempfile.TemporaryDirectory() as directory:
             preload = Path(directory) / "libv200_frontdoor.so"
+            initializer = Path(directory) / "libv200_pair_init.so"
             preload.touch()
-            facade = consumer._clean_environment("facade_owner", self.fixture, [preload], env,
-                                                 facade_mode="anchor",
-                                                 selected_uuids=["GPU-aaaaaaaa"])
-            self.assertEqual(facade["V200_MODE"], "anchor")
-            self.assertEqual(facade["V200_DEVICE_UUIDS"], "GPU-aaaaaaaa")
-            self.assertEqual(facade["LD_PRELOAD"], f"{preload}:/tmp/libunrelated.so")
+            initializer.touch()
+            facade = consumer._clean_environment("facade_owner", self.fixture,
+                                                 [preload, initializer], env,
+                                                 facade_mode="pair",
+                                                 selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
+            self.assertEqual(facade["V200_MODE"], "pair")
+            self.assertEqual(facade["V200_DEVICE_UUIDS"], "GPU-aaaaaaaa,GPU-bbbbbbbb")
+            self.assertEqual(facade["GGML_CUDA_DISABLE_GRAPHS"], "1")
+            self.assertEqual(facade["V200_B01_EVIDENCE_ID"],
+                             self.fixture["controls"]["facade_owner"]["required_b01_evidence_id"])
+            self.assertEqual(facade["LD_PRELOAD"],
+                             f"{preload}:{initializer}:/tmp/libunrelated.so")
 
     def test_cli_preserves_single_preload_and_accepts_initializer_as_second(self) -> None:
         args = consumer._parse_args([
@@ -134,6 +160,74 @@ class FixtureTests(unittest.TestCase):
                                               ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget)
             self.assertEqual(over["status"], "OVER_BUDGET")
             self.assertEqual(over["records"][0]["owner_used_bytes"][0], budget + 1)
+            record["owner_used_bytes"] = [100, 200]
+            record["qualification_id"] = "wrong-evidence"
+            path.write_text(json.dumps(record) + "\n")
+            mismatch = consumer._read_profile_log(
+                path, ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget, "expected-evidence")
+            self.assertEqual(mismatch["status"], "INVALID")
+
+
+class LauncherPlanTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.uuids, self.pair_identity = serve_launcher._load_selected_pair()
+
+    def test_default_service_plan_is_bounded_pair_facade_and_controller_only(self) -> None:
+        imported = bounded_runner._load_bootstrap()
+        self.assertEqual(Path(imported.__file__).resolve(),
+                         serve_launcher.BOOTSTRAP_RUNNER.resolve())
+        self.assertTrue(callable(imported.live_lease))
+        plan = serve_launcher._make_plan("serve", self.uuids, "serve-test",
+                                         duration_seconds=1800, port=8123)
+        self.assertEqual(plan["bundle"], "V200-SERVE")
+        self.assertEqual(plan["selected_gpu_uuids"], self.uuids)
+        self.assertEqual(plan["duration_seconds"], 1800)
+        self.assertEqual(plan["endpoint"], "http://127.0.0.1:8123")
+        self.assertEqual(plan["bounded_seconds"], 2080)
+        self.assertLessEqual(plan["controller_timeout_seconds"], 3600)
+        self.assertEqual(plan["controller_spec"]["resources"]["gpus"], 2)
+        self.assertEqual(plan["controller_spec"]["resources"]["gpu_uuids"], self.uuids)
+        self.assertEqual(plan["controller_spec"]["resources"]["cpu_threads"], 4)
+        self.assertEqual(plan["controller_spec"]["binary_paths"], [
+            "build/src/frontdoor/libv200_frontdoor.so",
+            "build/src/integration/libv200_pair_init.so",
+        ])
+        pinned_llama = consumer.load_documents()[1]["binary"]["path"]
+        self.assertNotIn(pinned_llama, plan["controller_spec"]["binary_paths"])
+        self.assertEqual(plan["controller_spec"]["argv"][1],
+                         str(serve_launcher.BOUNDED_ADAPTER))
+        self.assertIn("V200_DEVICE_UUIDS=" + ",".join(self.uuids),
+                      plan["bounded_child_argv"])
+        self.assertEqual(plan["static_memory_preflight"][0]["control"], "facade_owner")
+        self.assertTrue(plan["static_memory_preflight"][0]["fits_static_preflight"])
+        default_plan = serve_launcher._make_plan("serve", self.uuids, "default-serve")
+        self.assertEqual(default_plan["duration_seconds"], serve_launcher.SERVE_DEFAULT_SECONDS)
+        self.assertEqual(default_plan["endpoint"], "http://127.0.0.1:8080")
+
+    def test_default_cli_selects_finite_serve_but_keeps_explicit_execution_gate(self) -> None:
+        args = serve_launcher._parse_args([])
+        self.assertEqual(args.mode, "serve")
+        self.assertFalse(args.execute)
+        self.assertEqual(args.duration_seconds, None)
+        self.assertEqual(args.port, None)
+
+    def test_matched_preview_uses_graph_off_native_and_facade_through_b03_bound(self) -> None:
+        plan = serve_launcher._make_plan("preview", self.uuids, "preview-test")
+        self.assertEqual(plan["bundle"], "B03")
+        self.assertEqual(plan["controls"], ["native_single", "facade_owner"])
+        self.assertEqual(plan["bounded_seconds"], 300)
+        self.assertEqual(plan["controller_timeout_seconds"], 315)
+        self.assertEqual(plan["controller_spec"]["argv"][1],
+                         str(serve_launcher.BOOTSTRAP_RUNNER))
+        self.assertEqual([item["fits_static_preflight"]
+                          for item in plan["static_memory_preflight"]], [True, True])
+
+    def test_service_duration_and_pair_overrides_fail_closed(self) -> None:
+        with self.assertRaisesRegex(serve_launcher.LaunchError, "between 1 and 3000"):
+            serve_launcher._make_plan("serve", self.uuids, "too-long",
+                                      duration_seconds=3601, port=8123)
+        with self.assertRaisesRegex(serve_launcher.LaunchError, "exact ordered UUID pair"):
+            serve_launcher._parse_gpu_option("GPU-not-the-pair,GPU-other", self.uuids)
 
 
 class OracleTests(unittest.TestCase):
@@ -170,6 +264,35 @@ class OracleTests(unittest.TestCase):
 
 
 class ProcessLifetimeTests(unittest.TestCase):
+    def test_bounded_adapter_allows_nested_foreground_cleanup_before_escalation(self) -> None:
+        source = """
+import os, signal, subprocess, sys, time
+nested = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'], start_new_session=True)
+print(nested.pid, flush=True)
+def stop(_signum, _frame):
+    try:
+        os.killpg(nested.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    nested.wait(timeout=5)
+    raise SystemExit(143)
+signal.signal(signal.SIGTERM, stop)
+while True:
+    time.sleep(0.1)
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            result = bounded_runner.run_child(
+                [sys.executable, "-u", "-c", source], 0.25, Path(directory), dict(os.environ))
+            stdout = (Path(directory) / "stdout.txt").read_text()
+            nested_pid = int(stdout.strip())
+            self.assertTrue(result["timed_out"])
+            self.assertFalse(result["interrupted"])
+            self.assertFalse(result["termination_uncertain"])
+            self.assertFalse(result["orphaned_children"])
+            self.assertFalse(self._process_is_live(nested_pid))
+            self.assertTrue(consumer._is_sha(result["stdout_sha256"]))
+            self.assertTrue(consumer._is_sha(result["stderr_sha256"]))
+
     def test_fake_http_server_and_child_are_cleaned_as_owned_process_group(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -231,6 +354,7 @@ class ProcessLifetimeTests(unittest.TestCase):
             self.assertEqual(result["application_status"], "PASS")
             self.assertEqual(result["gpu_qualification"], "NOT_CLAIMED")
             self.assertTrue(result["partial_offload_preview"])
+            self.assertEqual(result["preview_environment"]["GGML_CUDA_DISABLE_GRAPHS"], "1")
             self.assertEqual(result["response"]["normalized_content"], "2")
             self.assertEqual(result["memory_guard"]["telemetry_status"], "not-started")
             self.assertTrue(result["cleanup"]["no_live_group_members"])
@@ -238,6 +362,28 @@ class ProcessLifetimeTests(unittest.TestCase):
             self.assertEqual(saved["application_status"], "PASS")
             self.assertEqual(saved["allocation_evidence"]["native_limit_enforcement"],
                              "descriptor-based preflight only; no native allocator ledger")
+
+    def test_finite_serve_mode_keeps_verified_loopback_server_alive_then_cleans_it(self) -> None:
+        fixture, profile = consumer.load_documents()
+        fake = Path(__file__).with_name("fake_server.py")
+
+        def fake_popen(_argv: list[str], **kwargs: object) -> subprocess.Popen[bytes]:
+            return subprocess.Popen([sys.executable, "-u", str(fake), "19080"], **kwargs)
+
+        with tempfile.TemporaryDirectory() as directory:
+            result = consumer._run_one(
+                "smoke", "native_single", fixture, profile, {"test_identity": "fake"},
+                ["GPU-aaaaaaaa"], Path(directory), preloads=None, monitor=False,
+                environ=dict(os.environ), popen_factory=fake_popen, server_port=19080,
+                serve_duration_seconds=1)
+            self.assertEqual(result["application_status"], "PASS")
+            self.assertEqual(result["service"]["endpoint"], "http://127.0.0.1:19080")
+            self.assertEqual(result["service"]["duration_requested_seconds"], 1)
+            self.assertGreaterEqual(result["service"]["duration_observed_seconds"], 1)
+            self.assertEqual(result["service"]["status"], "PASS")
+            self.assertTrue(result["cleanup"]["no_live_group_members"])
+            self.assertFalse(result["cleanup"]["sigkill_escalation"],
+                             "SIGTERM must reach the child after the parent masks it for Popen assignment")
 
     def test_process_memory_guard_stops_only_its_fake_owned_group(self) -> None:
         fake = Path(__file__).with_name("fake_server.py")

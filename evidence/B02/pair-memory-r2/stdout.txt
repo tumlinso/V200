@@ -1,0 +1,1 @@
+{"status":"GPU_PASS","qualification_only":true,"bundle":"B02","ordered_uuids":["GPU-21131915-1488-23af-38dd-1743ae1f5cc8","GPU-d745da9c-7649-8334-41f1-483afa6f3206"],"requested_bytes":100663296,"mapped_bytes":100663296,"owner_bytes":[33554432,67108864],"full_range_anchor_write_read":true,"ledger_zero_after_free":true,"arbitrary_kernel_transparency":false}
