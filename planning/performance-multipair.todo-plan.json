@@ -1,0 +1,119 @@
+{
+  "schema_version": 3,
+  "project": {
+    "name": "V200"
+  },
+  "tasks": [
+    {
+      "id": "V200-12",
+      "kind": "task",
+      "title": "Make the measured performance and product decision",
+      "objective": "Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Correctness passes precede performance interpretation for each selected case.\",\"Observed overhead/scaling, raw samples, contamination and uncertainty are documented.\",\"D04 is resolved or explicitly pending user preference; a faster less-transparent route cannot silently redefine V200.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D07\"],\"recommended_start\":\"Run B05 with the strongest matched native pair baseline and facade-owner control, prefill/decode separately. Include conversion, gathering and context/workspace accounting. Start with a few repetitions and increase only if the decision is genuinely ambiguous. Compare four-device results from B06 separately when available. Do not blend incompatible regimes into an arbitrary winner.\",\"research_refs\":[\"A-E16\",\"A-E18\",\"A-E19\",\"A-E20\",\"P-ADAPT\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-12.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-12\",\"outputs\":[\"benchmarks/comparison/\",\"docs/v200/performance.md\",\"evidence/B05\"],\"parallelism\":\"May finish pair performance before V200-11 receives a four-GPU window. Do not block pair decisions on optional deeper experiments.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Matched-case and arithmetic/evidence checks\"],\"gpu\":[\"B05\"],\"stop\":\"No tuning campaign beyond the agreed cap without a specific unresolved decision.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17: 07/08/09/10 hardwareaccepted through2bd3020. Perform a small matched pair performance check using exact qualified binary hashes before broader tuning; this is independent of four-GPU availability. CPU implementation of11 may proceed under root coordination while12 measures pinned unchanged DSOs. Keep build-multipair separate and do not overwrite build qualification artifacts while benchmark runs. Preserve unchangedconsumer, graph-off/nativefallback and exact numerics. 11 must expose TWO logical devices in one process, independent pair accounting and topology-aware copies; separateprocessone-device launchers alone do not complete11. No unsupportedall-to-allpeerclaims.",
+      "depends_on": [],
+      "checkpoints": [
+        {
+          "id": "V200-12-READY",
+          "title": "V200-12-READY"
+        }
+      ],
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "src",
+          "include/v200",
+          "tests",
+          "scripts/v200",
+          "scripts/qualification",
+          "benchmarks",
+          "docs/v200",
+          "README.md",
+          "evidence/B05",
+          "evidence/B06",
+          "evidence/B03"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap",
+          "planning/EXECUTION_PLAN.md",
+          "build-support",
+          "evidence/foundation",
+          "evidence/B04"
+        ]
+      }
+    },
+    {
+      "id": "V200-11",
+      "kind": "task",
+      "title": "Expose and integrate two logical V200 devices",
+      "objective": "Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Both logical devices enumerate with stable identity and independent resource accounting.\",\"B06 validates selected inter-pair copy and consumer workload over the recorded/rediscovered topology.\",\"No claim that a generic shim infers model layer/sequence/expert semantics without a contract.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D08\"],\"recommended_start\":\"Implement stable two-device enumeration and logical copies using eligible physical endpoints. Separate general peer-load permission from routable bulk copy. Do not advertise arbitrary cross-pair pointers when some constituent paths are inaccessible. Qualify native consumer layer/pipeline distribution across two logical IDs and any needed collective/NVML handling.\",\"research_refs\":[\"A-R07\",\"A-E20\",\"W-LLAMA-SERVER\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-11.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-11\",\"outputs\":[\"src/multi_pair/\",\"tests/multi_pair/\",\"docs/v200/two-device.md\",\"evidence/B06\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"budget\":\"Four-device admission only after pair readiness; keep session short.\",\"cpu\":[\"Directed endpoint/capability map tests\"],\"gpu\":[\"B06\"]},\"workstream\":\"V200 single-device product\"}\n2026-10-17: 07/08/09/10 hardwareaccepted through2bd3020. Perform a small matched pair performance check using exact qualified binary hashes before broader tuning; this is independent of four-GPU availability. CPU implementation of11 may proceed under root coordination while12 measures pinned unchanged DSOs. Keep build-multipair separate and do not overwrite build qualification artifacts while benchmark runs. Preserve unchangedconsumer, graph-off/nativefallback and exact numerics. 11 must expose TWO logical devices in one process, independent pair accounting and topology-aware copies; separateprocessone-device launchers alone do not complete11. No unsupportedall-to-allpeerclaims.",
+      "depends_on": [
+        {
+          "type": "task",
+          "task_id": "V200-12"
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "V200-11-READY",
+          "title": "V200-11-READY"
+        }
+      ],
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "src",
+          "include/v200",
+          "tests",
+          "scripts/v200",
+          "scripts/qualification",
+          "benchmarks",
+          "docs/v200",
+          "README.md",
+          "evidence/B05",
+          "evidence/B06",
+          "evidence/B03"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap",
+          "planning/EXECUTION_PLAN.md",
+          "build-support",
+          "evidence/foundation",
+          "evidence/B04"
+        ]
+      }
+    }
+  ],
+  "runs": [
+    {
+      "id": "V200-PAIR-PERF-MULTIPAIR-1",
+      "root_task_id": "V200-12",
+      "charter": {
+        "objective": "Measure qualified pair functionality, then deliver two logical V200s acrossfourphysicalV100s",
+        "boundaries": [
+          "Preserve actualcapacity/compute/graphbaseline; CPU11canoverlapfrozenbinary12measurement",
+          "No consumerpatch/modelparallelbackend/numericweakening",
+          "Controller-admitted finiteB05/B06 only"
+        ],
+        "invariants": [
+          "Pinned qualifiedDSOs for12 mustnotbeoverwritten by11 builds",
+          "WithinpairNVLinkandbetweenpairdirectedtopologyremain distinct",
+          "Task11requiresoneprocess2logicaldevices,notjust2separateone-deviceprocesses"
+        ]
+      },
+      "lanes": [
+        {
+          "id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+          "role": "implementer",
+          "tasks": [
+            "V200-12",
+            "V200-11"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T14:14:51Z",
+  "generated_at": "2026-10-17T14:19:52Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 95,
+  "project_revision": 103,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 95,
+    "project_revision": 103,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -129,10 +129,10 @@
       {
         "id": "V200-10-READY",
         "metadata_json": "{}",
-        "reached_at": null,
-        "revision": 86,
+        "reached_at": "2026-10-17T14:15:06Z",
+        "revision": 100,
         "revoked_at": null,
-        "state": "pending",
+        "state": "reached",
         "task_id": "V200-10",
         "title": "V200-10-READY"
       },
@@ -140,7 +140,7 @@
         "id": "V200-11-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 2,
+        "revision": 101,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-11",
@@ -150,7 +150,7 @@
         "id": "V200-12-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 2,
+        "revision": 101,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-12",
@@ -1148,6 +1148,86 @@
         "revision": 95,
         "seq": 95,
         "timestamp": "2026-10-17T14:14:51Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-10-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-10-CPU\"}",
+        "revision": 96,
+        "seq": 96,
+        "timestamp": "2026-10-17T14:15:02Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-10-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"8b8fa343-0b36-46db-9b48-3936123f20a1\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 97,
+        "seq": 97,
+        "timestamp": "2026-10-17T14:15:06Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-10-GRAPHS",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-10-GRAPHS\"}",
+        "revision": 98,
+        "seq": 98,
+        "timestamp": "2026-10-17T14:15:06Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-10-GRAPHS",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"a4ea8206-6569-4ca6-bc65-a8c2053609f3\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 99,
+        "seq": 99,
+        "timestamp": "2026-10-17T14:15:06Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-10",
+        "entity_type": "task",
+        "event_type": "task.completed",
+        "payload_json": "{\"completion_revision\": 100, \"disposition\": \"implemented\", \"reached_checkpoints\": [\"V200-10-READY\"]}",
+        "revision": 100,
+        "seq": 100,
+        "timestamp": "2026-10-17T14:15:06Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "6c6463a7-0f66-4e12-813f-c17e46185775",
+        "entity_type": "project",
+        "event_type": "plan.applied",
+        "payload_json": "{\"plan_digest\": \"02b66469700013cc9816b2ea1edd44ebb8d12312136c9ddcda10629ea0a89793\", \"source\": \"project-control\"}",
+        "revision": 101,
+        "seq": 101,
+        "timestamp": "2026-10-17T14:17:14Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-PAIR-PERF-MULTIPAIR-1-MAIN\", \"run_id\": \"V200-PAIR-PERF-MULTIPAIR-1\", \"status\": \"claimed\", \"task_id\": \"V200-12\"}",
+        "revision": 102,
+        "seq": 102,
+        "timestamp": "2026-10-17T14:17:15Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-12",
+        "entity_type": "task",
+        "event_type": "workflow.task.release",
+        "payload_json": "{\"reason\": \"User requested pause at next checkpoint. V200-07 through10 are accepted; latest qualified graph baseline2bd3020. V200-12 comparison has not run; optimizer parked before edits. V200-11 memory/initializer workers parked before edits; two-device implementation not started. No GPU job running; latest graph controller797dc352-ff64-40cf-ae18-3dcfc29874f2 owner released/resources[]. A final scoped CPU repair removes leftover smoke-only run_matrix serviceguard so documented resident_capacity serve reaches finite runner; 27 fixture/launcher checks passed, retained graph/evidence verifier still passes. Preserve source and authoringplan for resume; no performance or multipair completion claim.\"}",
+        "revision": 103,
+        "seq": 103,
+        "timestamp": "2026-10-17T14:19:52Z"
       }
     ],
     "evidence": [
@@ -1298,6 +1378,19 @@
         "checkpoint_id": null,
         "claim_id": null,
         "content_hash": null,
+        "created_at": "2026-10-17T14:15:06Z",
+        "gate_id": "V200-10-CPU",
+        "id": "8b8fa343-0b36-46db-9b48-3936123f20a1",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"44b081785ec362d49bb95e1fedd9ca9a17421ae3d9a47126defa77c1e9055218\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"timeout\": 180}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"docs/v200/abi-profile.json\", \"sha256\": \"d7cd86a195e045fad0c6e244f42475b1f5c45bb7b8e1bfa3778ad8f33455323d\"}, {\"path\": \"include/v200/operators\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/operators\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 96}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/8b8fa343-0b36-46db-9b48-3936123f20a1",
+        "revision": 97,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
         "created_at": "2026-10-17T12:43:12Z",
         "gate_id": "V200-06-RETAINED-EVIDENCE",
         "id": "8e5431ba-23ab-432c-a856-fda9f2a42ce1",
@@ -1318,6 +1411,19 @@
         "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','-S','.','-B','build','-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9','-DV200_EXECUTION_BUILD_GPU_SMOKE=ON','-DV200_INTEGRATION_BUILD_GPU_SMOKE=ON','-DBUILD_TESTING=ON'],check=True); subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','-S','.','-B','build','-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9','-DV200_EXECUTION_BUILD_GPU_SMOKE=ON','-DV200_INTEGRATION_BUILD_GPU_SMOKE=ON','-DBUILD_TESTING=ON'],check=True); subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"c4ca5296b7776e45e653d19be7a89dc4b32169f526b1ab9bd83c2d3c625d88f1\"}, {\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/core\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/execution\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/integration\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/execution\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"8b6b9a80bcea6edc2eace40e87198b49184bad59\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 60}",
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/9b617037-45f4-411a-b988-7bdeabac6912",
         "revision": 61,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T14:15:06Z",
+        "gate_id": "V200-10-GRAPHS",
+        "id": "a4ea8206-6569-4ca6-bc65-a8c2053609f3",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/graphs-r1\", \"--require-experts\", \"--require-graphs\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"05484d553d7000d854d1957251fee53048ea1f31950c651855659c82414a818c\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/graphs-r1\", \"--require-experts\", \"--require-graphs\"], \"cwd\": \".\", \"timeout\": 30}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/graphs-r1\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/graphs-r1.controller-evidence.json\", \"sha256\": \"a071bd83b85fcd8527d97eac57ed1eb0363d33bef046c9a4b6dd57660d106319\"}, {\"path\": \"evidence/B03/graphs-r1.controller-result.json\", \"sha256\": \"ad1f9f87a058620aa593cf2eb475f094d7da2f4f90dcfacd39a500dd891b5b81\"}, {\"path\": \"evidence/B03/graphs-r1.host-release.json\", \"sha256\": \"45a15ca8d833257df5bd785a2528c534952659cbaa79e3f407b791c339286a04\"}, {\"path\": \"tests/capacity\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/verify_consumer.py\", \"sha256\": \"d42f941f8ea6708c3ba0ceff56e7fab6d43b60bb75b1074061666ed8d9058eec\"}], \"interfaces\": [], \"recorded_git_head\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 98}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/a4ea8206-6569-4ca6-bc65-a8c2053609f3",
+        "revision": 99,
         "status": "passed"
       },
       {
@@ -1638,27 +1744,27 @@
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"src/frontdoor\", \"src/operators\", \"include/v200/operators\", \"tests/abi\", \"tests/consumer\", \"scripts/v200\", \"docs/v200/abi-profile.json\"], \"timeout\": 180}",
         "id": "V200-10-CPU",
-        "input_fingerprint": null,
-        "last_run_at": null,
+        "input_fingerprint": "44b081785ec362d49bb95e1fedd9ca9a17421ae3d9a47126defa77c1e9055218",
+        "last_run_at": "2026-10-17T14:15:06Z",
         "required": 1,
-        "revision": 95,
-        "status": "pending",
+        "revision": 97,
+        "status": "passed",
         "task_id": "V200-10",
         "type": "command",
-        "valid": 0
+        "valid": 1
       },
       {
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/graphs-r1\", \"--require-experts\", \"--require-graphs\"], \"cwd\": \".\", \"input_paths\": [\"tests/operators/verify_consumer.py\", \"tests/capacity\", \"tests/consumer\", \"benchmarks/fixtures\", \"evidence/B03/graphs-r1\", \"evidence/B03/graphs-r1.controller-result.json\", \"evidence/B03/graphs-r1.controller-evidence.json\", \"evidence/B03/graphs-r1.host-release.json\"], \"timeout\": 30}",
         "id": "V200-10-GRAPHS",
-        "input_fingerprint": null,
-        "last_run_at": null,
+        "input_fingerprint": "05484d553d7000d854d1957251fee53048ea1f31950c651855659c82414a818c",
+        "last_run_at": "2026-10-17T14:15:06Z",
         "required": 1,
-        "revision": 95,
-        "status": "pending",
+        "revision": 99,
+        "status": "passed",
         "task_id": "V200-10",
         "type": "command",
-        "valid": 0
+        "valid": 1
       },
       {
         "checkpoint_id": null,
@@ -1714,6 +1820,16 @@
         "payload_json": "{\"authority_commit\": \"4cbbd10387917891bcd9e9e3b8da9971fab17ee5\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-02-READY\", \"reached_at\": \"2026-10-17T12:17:45Z\", \"state\": \"reached\"}], \"completion_commit\": \"4cbbd10387917891bcd9e9e3b8da9971fab17ee5\", \"completion_gates\": [{\"evidence_id\": \"dbf4a9ed-1f3b-47d8-aae7-0ef87b6aeb49\", \"evidence_revision\": 49, \"id\": \"V200-02-ABI-CPU\", \"input_fingerprint\": \"bdd7d484e97758d681b60d8045ca48f02f46f4035189c5362e003fefaf6da8f9\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"4cbbd10387917891bcd9e9e3b8da9971fab17ee5\"}], \"completion_revision\": 50, \"finalized_checkpoints\": [\"V200-02-READY\"], \"gates\": [{\"id\": \"V200-02-ABI-CPU\", \"input_fingerprint\": \"bdd7d484e97758d681b60d8045ca48f02f46f4035189c5362e003fefaf6da8f9\", \"last_run_at\": \"2026-10-17T12:17:45Z\", \"revision\": 49, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \".todo-orchestrator/state.snapshot.json | 2435 ++++++++++++++++++++++++++------\\n tests/consumer/run_consumer.py         |    4 +-\\n tests/consumer/test_consumer.py        |   13 +\\n todo-status.md                         |   14 +-\\n todos.md                               |   14 +-\\n todos/v200-01.md                       |   10 +-\\n todos/v200-02.md                       |   17 +-\\n todos/v200-03.md                       |   19 +-\\n todos/v200-04.md                       |   19 +-\\n todos/v200-05.md                       |   19 +-\\n todos/v200-06.md                       |   14 +-\\n todos/v200-07.md                       |    2 +\\n todos/v200-08.md                       |    2 +\\n todos/v200-09.md                       |    2 +\\n todos/v200-10.md                       |    2 +\\n todos/v200-11.md                       |    2 +\\n todos/v200-12.md                       |    2 +\\n todos/v200-13.md                       |    2 +\\n todos/v200-14.md                       |    2 +\\n 19 files changed, 2107 insertions(+), 487 deletions(-)\", \"git_head\": \"4cbbd10387917891bcd9e9e3b8da9971fab17ee5\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"V200-02 CPU-readyfrontdoor: observedCUDAkernel/copy/stream/device/VMM routes, nativeanchorpropertieswithoutfalsecapacity/SMcount, versioneddriverresolver+RTLD_LOCALnativeDSOdispatch, PTDStrackingandatomicforward+memorylease. RequiredABIgate3/3CPUtests includingfakeRTLD_LOCALCUDAregression andexportclosurepassed. RootreviewedcouplingwithB/C; actualinitializer/GPUABIclosureandllama/cuBLAS/NCCLsemanticsunqualified until06. Firstpreviewexplicitgraph-offmatchedconfiguration; no universalCUDA/T2unrestrictedclaim. Builtfinitehardwareclosureharnessnotrun.\", \"producer_commit\": \"4cbbd10387917891bcd9e9e3b8da9971fab17ee5\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-02\"}",
         "revision": 50,
         "task_id": "V200-02"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T14:15:06Z",
+        "id": "6f41eb35-e50d-4e89-bb4b-5f5b4030f7bf",
+        "kind": "complete",
+        "note": "Commit2bd3020: explicit--cuda-graphs supports unchanged llama Runtimecapture/instantiate/update/replaywithtruepeercompute. EndCapture rewritesqualifiedwholeexpert-banknodefuncs to distinctpeer-contextCUfunctions viaDrivergraph APIs, preservingargs/grid/edges; partialrewriteerror discardsgraph. Duringcapture nativeforwardbypassesperopledger; GraphLaunchnormaldispatch retainsallpairallocations to actualcompletionprefix. Controller797dc352-ff64-40cf-ae18-3dcfc29874f2 passedfull18.55GBresidentmodel/49layers+embedding,answer2,twocapture/replaysamples,max34peerrewrittennodes ininferencegraph,zerofinalaccountingandcleanreleasedresources. Directwarmupfirst6144expertoutputsbitwiseequalnativebeforecapture. IndependentLunasourcedreviewfoundnoactionabledefect. Graphdefaultoffpreserved; top-levelkernelParamsnodesonly, unmatchednodesanchor, noarbitrarygraphAPIorIPC/MPSclaim; singlematrixsplitandplainexpertfamilynotGPUobserved. Firstrequestcapturetimingisnotsteadyperformanceclaim. Proceed12matchedpairmeasurementand11twologicaldevices, bothauthorizedoutcomes.",
+        "payload_json": "{\"authority_commit\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-10-READY\", \"reached_at\": \"2026-10-17T14:15:06Z\", \"state\": \"reached\"}], \"completion_commit\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\", \"completion_gates\": [{\"evidence_id\": \"8b8fa343-0b36-46db-9b48-3936123f20a1\", \"evidence_revision\": 97, \"id\": \"V200-10-CPU\", \"input_fingerprint\": \"44b081785ec362d49bb95e1fedd9ca9a17421ae3d9a47126defa77c1e9055218\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\"}, {\"evidence_id\": \"a4ea8206-6569-4ca6-bc65-a8c2053609f3\", \"evidence_revision\": 99, \"id\": \"V200-10-GRAPHS\", \"input_fingerprint\": \"05484d553d7000d854d1957251fee53048ea1f31950c651855659c82414a818c\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\"}], \"completion_revision\": 100, \"finalized_checkpoints\": [\"V200-10-READY\"], \"gates\": [{\"id\": \"V200-10-CPU\", \"input_fingerprint\": \"44b081785ec362d49bb95e1fedd9ca9a17421ae3d9a47126defa77c1e9055218\", \"last_run_at\": \"2026-10-17T14:15:06Z\", \"revision\": 97, \"status\": \"passed\", \"valid\": 1}, {\"id\": \"V200-10-GRAPHS\", \"input_fingerprint\": \"05484d553d7000d854d1957251fee53048ea1f31950c651855659c82414a818c\", \"last_run_at\": \"2026-10-17T14:15:06Z\", \"revision\": 99, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \"\", \"git_head\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Commit2bd3020: explicit--cuda-graphs supports unchanged llama Runtimecapture/instantiate/update/replaywithtruepeercompute. EndCapture rewritesqualifiedwholeexpert-banknodefuncs to distinctpeer-contextCUfunctions viaDrivergraph APIs, preservingargs/grid/edges; partialrewriteerror discardsgraph. Duringcapture nativeforwardbypassesperopledger; GraphLaunchnormaldispatch retainsallpairallocations to actualcompletionprefix. Controller797dc352-ff64-40cf-ae18-3dcfc29874f2 passedfull18.55GBresidentmodel/49layers+embedding,answer2,twocapture/replaysamples,max34peerrewrittennodes ininferencegraph,zerofinalaccountingandcleanreleasedresources. Directwarmupfirst6144expertoutputsbitwiseequalnativebeforecapture. IndependentLunasourcedreviewfoundnoactionabledefect. Graphdefaultoffpreserved; top-levelkernelParamsnodesonly, unmatchednodesanchor, noarbitrarygraphAPIorIPC/MPSclaim; singlematrixsplitandplainexpertfamilynotGPUobserved. Firstrequestcapturetimingisnotsteadyperformanceclaim. Proceed12matchedpairmeasurementand11twologicaldevices, bothauthorizedoutcomes.\", \"producer_commit\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-10\"}",
+        "revision": 100,
+        "task_id": "V200-10"
       },
       {
         "claim_id": null,
@@ -2530,22 +2646,82 @@
       },
       {
         "mode": "exclusive",
-        "path": "docs/v200/two-device.md",
+        "path": "CMakeLists.txt",
         "task_id": "V200-11"
       },
       {
         "mode": "exclusive",
-        "path": "src/multi_pair",
+        "path": "README.md",
         "task_id": "V200-11"
       },
       {
         "mode": "exclusive",
-        "path": "tests/multi_pair",
+        "path": "benchmarks",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "exclusive",
+        "path": "docs/v200",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B03",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B05",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B06",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "exclusive",
+        "path": "include/v200",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/qualification",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/v200",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "exclusive",
+        "path": "src",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests",
         "task_id": "V200-11"
       },
       {
         "mode": "read",
-        "path": "docs/v200",
+        "path": "build-support",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B04",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/foundation",
+        "task_id": "V200-11"
+      },
+      {
+        "mode": "read",
+        "path": "planning/EXECUTION_PLAN.md",
         "task_id": "V200-11"
       },
       {
@@ -2555,17 +2731,82 @@
       },
       {
         "mode": "exclusive",
-        "path": "benchmarks/comparison",
+        "path": "CMakeLists.txt",
         "task_id": "V200-12"
       },
       {
         "mode": "exclusive",
-        "path": "docs/v200/performance.md",
+        "path": "README.md",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "benchmarks",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "docs/v200",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B03",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B05",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B06",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "include/v200",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/qualification",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/v200",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "src",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests",
         "task_id": "V200-12"
       },
       {
         "mode": "read",
-        "path": "docs/v200",
+        "path": "build-support",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B04",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/foundation",
+        "task_id": "V200-12"
+      },
+      {
+        "mode": "read",
+        "path": "planning/EXECUTION_PLAN.md",
         "task_id": "V200-12"
       },
       {
@@ -2977,6 +3218,32 @@
         "validation_git_head": "8ffe5923738989af718d02789997b7df68c80345"
       },
       {
+        "completion_git_head": "2bd3020146cd4378a6bb60a614b361d030a3bc34",
+        "completion_revision": 100,
+        "evidence_id": "8b8fa343-0b36-46db-9b48-3936123f20a1",
+        "evidence_revision": 97,
+        "gate_id": "V200-10-CPU",
+        "input_fingerprint": "44b081785ec362d49bb95e1fedd9ca9a17421ae3d9a47126defa77c1e9055218",
+        "provenance_json": "{\"claim_id\": \"ab86a2e7-e878-4409-b1ff-14b56b3e33d7\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"44b081785ec362d49bb95e1fedd9ca9a17421ae3d9a47126defa77c1e9055218\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(abi_profile|frontdoor_export_closure|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"timeout\": 180}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"docs/v200/abi-profile.json\", \"sha256\": \"d7cd86a195e045fad0c6e244f42475b1f5c45bb7b8e1bfa3778ad8f33455323d\"}, {\"path\": \"include/v200/operators\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/operators\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 96}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/8b8fa343-0b36-46db-9b48-3936123f20a1\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-10",
+        "valid": 1,
+        "validation_git_head": "2bd3020146cd4378a6bb60a614b361d030a3bc34"
+      },
+      {
+        "completion_git_head": "2bd3020146cd4378a6bb60a614b361d030a3bc34",
+        "completion_revision": 100,
+        "evidence_id": "a4ea8206-6569-4ca6-bc65-a8c2053609f3",
+        "evidence_revision": 99,
+        "gate_id": "V200-10-GRAPHS",
+        "input_fingerprint": "05484d553d7000d854d1957251fee53048ea1f31950c651855659c82414a818c",
+        "provenance_json": "{\"claim_id\": \"ab86a2e7-e878-4409-b1ff-14b56b3e33d7\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/graphs-r1\", \"--require-experts\", \"--require-graphs\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"05484d553d7000d854d1957251fee53048ea1f31950c651855659c82414a818c\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/graphs-r1\", \"--require-experts\", \"--require-graphs\"], \"cwd\": \".\", \"timeout\": 30}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/graphs-r1\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/graphs-r1.controller-evidence.json\", \"sha256\": \"a071bd83b85fcd8527d97eac57ed1eb0363d33bef046c9a4b6dd57660d106319\"}, {\"path\": \"evidence/B03/graphs-r1.controller-result.json\", \"sha256\": \"ad1f9f87a058620aa593cf2eb475f094d7da2f4f90dcfacd39a500dd891b5b81\"}, {\"path\": \"evidence/B03/graphs-r1.host-release.json\", \"sha256\": \"45a15ca8d833257df5bd785a2528c534952659cbaa79e3f407b791c339286a04\"}, {\"path\": \"tests/capacity\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/verify_consumer.py\", \"sha256\": \"d42f941f8ea6708c3ba0ceff56e7fab6d43b60bb75b1074061666ed8d9058eec\"}], \"interfaces\": [], \"recorded_git_head\": \"2bd3020146cd4378a6bb60a614b361d030a3bc34\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 98}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/a4ea8206-6569-4ca6-bc65-a8c2053609f3\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-10",
+        "valid": 1,
+        "validation_git_head": "2bd3020146cd4378a6bb60a614b361d030a3bc34"
+      },
+      {
         "completion_git_head": "8b6b9a80bcea6edc2eace40e87198b49184bad59",
         "completion_revision": 62,
         "evidence_id": "9b617037-45f4-411a-b988-7bdeabac6912",
@@ -2991,94 +3258,6 @@
       }
     ],
     "task_dependencies": [
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 14,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-04",
-        "task_id": "V200-11",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 15,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-07",
-        "task_id": "V200-11",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 16,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-08",
-        "task_id": "V200-11",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 17,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-09",
-        "task_id": "V200-11",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 18,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-07",
-        "task_id": "V200-12",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 19,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-08",
-        "task_id": "V200-12",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 20,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-09",
-        "task_id": "V200-12",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 21,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-10",
-        "task_id": "V200-12",
-        "type": "task"
-      },
       {
         "barrier_id": null,
         "checkpoint_id": null,
@@ -3187,6 +3366,17 @@
         "interface_id": null,
         "prerequisite_task_id": "V200-09",
         "task_id": "V200-10",
+        "type": "task"
+      },
+      {
+        "barrier_id": null,
+        "checkpoint_id": null,
+        "condition_json": "{}",
+        "decision_id": null,
+        "id": 37,
+        "interface_id": null,
+        "prerequisite_task_id": "V200-12",
+        "task_id": "V200-11",
         "type": "task"
       }
     ],
@@ -3420,9 +3610,9 @@
       },
       {
         "attention_reason": null,
-        "completion_commit": null,
-        "completion_git_head": null,
-        "completion_revision": null,
+        "completion_commit": "2bd3020146cd4378a6bb60a614b361d030a3bc34",
+        "completion_git_head": "2bd3020146cd4378a6bb60a614b361d030a3bc34",
+        "completion_revision": 100,
         "created_at": "2026-10-17T11:40:58Z",
         "id": "V200-10",
         "kind": "task",
@@ -3434,14 +3624,14 @@
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
-        "result": null,
+        "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 94,
-        "status": "in_progress",
+        "revision": 100,
+        "status": "done",
         "tags_json": "[]",
         "title": "Close the observed compatibility profile and targeted regressions",
-        "updated_at": "2026-10-17T14:10:07Z",
-        "version": 3
+        "updated_at": "2026-10-17T14:15:06Z",
+        "version": 4
       },
       {
         "attention_reason": null,
@@ -3450,48 +3640,48 @@
         "completion_revision": null,
         "created_at": "2026-10-17T11:40:58Z",
         "id": "V200-11",
-        "kind": "integration",
+        "kind": "task",
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Both logical devices enumerate with stable identity and independent resource accounting.\",\"B06 validates selected inter-pair copy and consumer workload over the recorded/rediscovered topology.\",\"No claim that a generic shim infers model layer/sequence/expert semantics without a contract.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D08\"],\"recommended_start\":\"Implement stable two-device enumeration and logical copies using eligible physical endpoints. Separate general peer-load permission from routable bulk copy. Do not advertise arbitrary cross-pair pointers when some constituent paths are inaccessible. Qualify native consumer layer/pipeline distribution across two logical IDs and any needed collective/NVML handling.\",\"research_refs\":[\"A-R07\",\"A-E20\",\"W-LLAMA-SERVER\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-11.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-11\",\"outputs\":[\"src/multi_pair/\",\"tests/multi_pair/\",\"docs/v200/two-device.md\",\"evidence/B06\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"budget\":\"Four-device admission only after pair readiness; keep session short.\",\"cpu\":[\"Directed endpoint/capability map tests\"],\"gpu\":[\"B06\"]},\"workstream\":\"V200 single-device product\"}",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Both logical devices enumerate with stable identity and independent resource accounting.\",\"B06 validates selected inter-pair copy and consumer workload over the recorded/rediscovered topology.\",\"No claim that a generic shim infers model layer/sequence/expert semantics without a contract.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D08\"],\"recommended_start\":\"Implement stable two-device enumeration and logical copies using eligible physical endpoints. Separate general peer-load permission from routable bulk copy. Do not advertise arbitrary cross-pair pointers when some constituent paths are inaccessible. Qualify native consumer layer/pipeline distribution across two logical IDs and any needed collective/NVML handling.\",\"research_refs\":[\"A-R07\",\"A-E20\",\"W-LLAMA-SERVER\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-11.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-11\",\"outputs\":[\"src/multi_pair/\",\"tests/multi_pair/\",\"docs/v200/two-device.md\",\"evidence/B06\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"budget\":\"Four-device admission only after pair readiness; keep session short.\",\"cpu\":[\"Directed endpoint/capability map tests\"],\"gpu\":[\"B06\"]},\"workstream\":\"V200 single-device product\"}\n2026-10-17: 07/08/09/10 hardwareaccepted through2bd3020. Perform a small matched pair performance check using exact qualified binary hashes before broader tuning; this is independent of four-GPU availability. CPU implementation of11 may proceed under root coordination while12 measures pinned unchanged DSOs. Keep build-multipair separate and do not overwrite build qualification artifacts while benchmark runs. Preserve unchangedconsumer, graph-off/nativefallback and exact numerics. 11 must expose TWO logical devices in one process, independent pair accounting and topology-aware copies; separateprocessone-device launchers alone do not complete11. No unsupportedall-to-allpeerclaims.",
         "objective": "Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 2,
+        "revision": 101,
         "status": "planned",
         "tags_json": "[]",
         "title": "Expose and integrate two logical V200 devices",
-        "updated_at": "2026-10-17T11:40:58Z",
-        "version": 1
+        "updated_at": "2026-10-17T14:17:14Z",
+        "version": 2
       },
       {
-        "attention_reason": null,
+        "attention_reason": "User requested pause at next checkpoint. V200-07 through10 are accepted; latest qualified graph baseline2bd3020. V200-12 comparison has not run; optimizer parked before edits. V200-11 memory/initializer workers parked before edits; two-device implementation not started. No GPU job running; latest graph controller797dc352-ff64-40cf-ae18-3dcfc29874f2 owner released/resources[]. A final scoped CPU repair removes leftover smoke-only run_matrix serviceguard so documented resident_capacity serve reaches finite runner; 27 fixture/launcher checks passed, retained graph/evidence verifier still passes. Preserve source and authoringplan for resume; no performance or multipair completion claim.",
         "completion_commit": null,
         "completion_git_head": null,
         "completion_revision": null,
         "created_at": "2026-10-17T11:40:58Z",
         "id": "V200-12",
-        "kind": "validation",
+        "kind": "task",
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Correctness passes precede performance interpretation for each selected case.\",\"Observed overhead/scaling, raw samples, contamination and uncertainty are documented.\",\"D04 is resolved or explicitly pending user preference; a faster less-transparent route cannot silently redefine V200.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D07\"],\"recommended_start\":\"Run B05 with the strongest matched native pair baseline and facade-owner control, prefill/decode separately. Include conversion, gathering and context/workspace accounting. Start with a few repetitions and increase only if the decision is genuinely ambiguous. Compare four-device results from B06 separately when available. Do not blend incompatible regimes into an arbitrary winner.\",\"research_refs\":[\"A-E16\",\"A-E18\",\"A-E19\",\"A-E20\",\"P-ADAPT\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-12.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-12\",\"outputs\":[\"benchmarks/comparison/\",\"docs/v200/performance.md\",\"evidence/B05\"],\"parallelism\":\"May finish pair performance before V200-11 receives a four-GPU window. Do not block pair decisions on optional deeper experiments.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Matched-case and arithmetic/evidence checks\"],\"gpu\":[\"B05\"],\"stop\":\"No tuning campaign beyond the agreed cap without a specific unresolved decision.\"},\"workstream\":\"V200 single-device product\"}",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Correctness passes precede performance interpretation for each selected case.\",\"Observed overhead/scaling, raw samples, contamination and uncertainty are documented.\",\"D04 is resolved or explicitly pending user preference; a faster less-transparent route cannot silently redefine V200.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\",\"D07\"],\"recommended_start\":\"Run B05 with the strongest matched native pair baseline and facade-owner control, prefill/decode separately. Include conversion, gathering and context/workspace accounting. Start with a few repetitions and increase only if the decision is genuinely ambiguous. Compare four-device results from B06 separately when available. Do not blend incompatible regimes into an arbitrary winner.\",\"research_refs\":[\"A-E16\",\"A-E18\",\"A-E19\",\"A-E20\",\"P-ADAPT\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-12.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-12\",\"outputs\":[\"benchmarks/comparison/\",\"docs/v200/performance.md\",\"evidence/B05\"],\"parallelism\":\"May finish pair performance before V200-11 receives a four-GPU window. Do not block pair decisions on optional deeper experiments.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"root\",\"validation\":{\"cpu\":[\"Matched-case and arithmetic/evidence checks\"],\"gpu\":[\"B05\"],\"stop\":\"No tuning campaign beyond the agreed cap without a specific unresolved decision.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17: 07/08/09/10 hardwareaccepted through2bd3020. Perform a small matched pair performance check using exact qualified binary hashes before broader tuning; this is independent of four-GPU availability. CPU implementation of11 may proceed under root coordination while12 measures pinned unchanged DSOs. Keep build-multipair separate and do not overwrite build qualification artifacts while benchmark runs. Preserve unchangedconsumer, graph-off/nativefallback and exact numerics. 11 must expose TWO logical devices in one process, independent pair accounting and topology-aware copies; separateprocessone-device launchers alone do not complete11. No unsupportedall-to-allpeerclaims.",
         "objective": "Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 2,
-        "status": "planned",
+        "revision": 102,
+        "status": "in_progress",
         "tags_json": "[]",
         "title": "Make the measured performance and product decision",
-        "updated_at": "2026-10-17T11:40:58Z",
-        "version": 1
+        "updated_at": "2026-10-17T14:19:52Z",
+        "version": 4
       },
       {
         "attention_reason": null,
@@ -3865,6 +4055,74 @@
         "series_key": "",
         "superseded_by": null,
         "task_id": "V200-10",
+        "version": 1
+      },
+      {
+        "content_hash": "eab335bf9d4f7639c099e2e52b37f885d46b24beaa0bb3ea026a998939de76e2",
+        "content_json": "{\"authority\":\"server_enforced_role_and_task_scope\",\"interfaces\":[],\"ordered_tasks\":[\"V200-12\",\"V200-11\"],\"rendezvous\":[],\"role\":\"implementer\",\"workspace_mode\":\"exclusive\"}",
+        "created_at": "2026-10-17T14:17:14Z",
+        "creation_revision": 101,
+        "id": "V200-PAIR-PERF-MULTIPAIR-1:lane_brief:V200-PAIR-PERF-MULTIPAIR-1-MAIN:-:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "lane_brief",
+        "lane_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-PAIR-PERF-MULTIPAIR-1-MAIN\",\"run_id\":\"V200-PAIR-PERF-MULTIPAIR-1\"}",
+        "run_id": "V200-PAIR-PERF-MULTIPAIR-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": null,
+        "version": 1
+      },
+      {
+        "content_hash": "1d8fdb644a8d44b7dd0fa467ddca5bb32f789785a9a987441d5e2e22e73f8ebb",
+        "content_json": "{\"boundaries\":[\"Preserve actualcapacity/compute/graphbaseline; CPU11canoverlapfrozenbinary12measurement\",\"No consumerpatch/modelparallelbackend/numericweakening\",\"Controller-admitted finiteB05/B06 only\"],\"invariants\":[\"Pinned qualifiedDSOs for12 mustnotbeoverwritten by11 builds\",\"WithinpairNVLinkandbetweenpairdirectedtopologyremain distinct\",\"Task11requiresoneprocess2logicaldevices,notjust2separateone-deviceprocesses\"],\"objective\":\"Measure qualified pair functionality, then deliver two logical V200s acrossfourphysicalV100s\"}",
+        "created_at": "2026-10-17T14:17:14Z",
+        "creation_revision": 101,
+        "id": "V200-PAIR-PERF-MULTIPAIR-1:run_charter:-:-:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "run_charter",
+        "lane_id": null,
+        "owner_scope_json": "{\"run_id\":\"V200-PAIR-PERF-MULTIPAIR-1\"}",
+        "run_id": "V200-PAIR-PERF-MULTIPAIR-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": null,
+        "version": 1
+      },
+      {
+        "content_hash": "bb1873607dd1b0559092d4595cb0421afae3579bc67b85451059537c5526bdb5",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"CMakeLists.txt\",\"src\",\"include/v200\",\"tests\",\"scripts/v200\",\"scripts/qualification\",\"benchmarks\",\"docs/v200\",\"README.md\",\"evidence/B05\",\"evidence/B06\",\"evidence/B03\"],\"forbidden_paths\":[],\"read_paths\":[\"planning/v200-bootstrap\",\"planning/EXECUTION_PLAN.md\",\"build-support\",\"evidence/foundation\",\"evidence/B04\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T14:17:14Z",
+        "creation_revision": 101,
+        "id": "V200-PAIR-PERF-MULTIPAIR-1:task_brief:V200-PAIR-PERF-MULTIPAIR-1-MAIN:V200-11:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "task_brief",
+        "lane_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-PAIR-PERF-MULTIPAIR-1-MAIN\",\"run_id\":\"V200-PAIR-PERF-MULTIPAIR-1\",\"task_id\":\"V200-11\"}",
+        "run_id": "V200-PAIR-PERF-MULTIPAIR-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": "V200-11",
+        "version": 1
+      },
+      {
+        "content_hash": "857b4cf68750267d7aed5d5cb48011c552873211633589b8a7fb9020e4806f91",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"CMakeLists.txt\",\"src\",\"include/v200\",\"tests\",\"scripts/v200\",\"scripts/qualification\",\"benchmarks\",\"docs/v200\",\"README.md\",\"evidence/B05\",\"evidence/B06\",\"evidence/B03\"],\"forbidden_paths\":[],\"read_paths\":[\"planning/v200-bootstrap\",\"planning/EXECUTION_PLAN.md\",\"build-support\",\"evidence/foundation\",\"evidence/B04\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T14:17:14Z",
+        "creation_revision": 101,
+        "id": "V200-PAIR-PERF-MULTIPAIR-1:task_brief:V200-PAIR-PERF-MULTIPAIR-1-MAIN:V200-12:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "task_brief",
+        "lane_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-PAIR-PERF-MULTIPAIR-1-MAIN\",\"run_id\":\"V200-PAIR-PERF-MULTIPAIR-1\",\"task_id\":\"V200-12\"}",
+        "run_id": "V200-PAIR-PERF-MULTIPAIR-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": "V200-12",
         "version": 1
       },
       {
@@ -4456,13 +4714,33 @@
       },
       {
         "activated_at": "2026-10-17T14:10:07Z",
-        "completed_at": null,
+        "completed_at": "2026-10-17T14:15:06Z",
         "enqueued_at": "2026-10-17T13:51:05Z",
         "lane_id": "V200-LOCALITY-COMPAT-1-MAIN",
         "position": 1,
-        "revision": 94,
-        "state": "active",
+        "revision": 100,
+        "state": "completed",
         "task_id": "V200-10"
+      },
+      {
+        "activated_at": null,
+        "completed_at": null,
+        "enqueued_at": "2026-10-17T14:17:14Z",
+        "lane_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "position": 0,
+        "revision": 103,
+        "state": "queued",
+        "task_id": "V200-12"
+      },
+      {
+        "activated_at": null,
+        "completed_at": null,
+        "enqueued_at": "2026-10-17T14:17:14Z",
+        "lane_id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "position": 1,
+        "revision": 101,
+        "state": "queued",
+        "task_id": "V200-11"
       },
       {
         "activated_at": "2026-10-17T11:50:19Z",
@@ -4695,11 +4973,23 @@
         "created_at": "2026-10-17T13:51:05Z",
         "id": "V200-LOCALITY-COMPAT-1-MAIN",
         "parent_lane_id": null,
-        "revision": 94,
+        "revision": 100,
         "role": "implementer",
         "run_id": "V200-LOCALITY-COMPAT-1",
-        "state": "active",
-        "updated_at": "2026-10-17T14:10:07Z",
+        "state": "closed",
+        "updated_at": "2026-10-17T14:15:06Z",
+        "workspace_mode": "exclusive"
+      },
+      {
+        "context_cursor": 0,
+        "created_at": "2026-10-17T14:17:14Z",
+        "id": "V200-PAIR-PERF-MULTIPAIR-1-MAIN",
+        "parent_lane_id": null,
+        "revision": 103,
+        "role": "implementer",
+        "run_id": "V200-PAIR-PERF-MULTIPAIR-1",
+        "state": "ready",
+        "updated_at": "2026-10-17T14:19:52Z",
         "workspace_mode": "exclusive"
       },
       {
@@ -4839,6 +5129,16 @@
         "version": 1
       },
       {
+        "content_hash": "1d8fdb644a8d44b7dd0fa467ddca5bb32f789785a9a987441d5e2e22e73f8ebb",
+        "content_json": "{\"boundaries\":[\"Preserve actualcapacity/compute/graphbaseline; CPU11canoverlapfrozenbinary12measurement\",\"No consumerpatch/modelparallelbackend/numericweakening\",\"Controller-admitted finiteB05/B06 only\"],\"invariants\":[\"Pinned qualifiedDSOs for12 mustnotbeoverwritten by11 builds\",\"WithinpairNVLinkandbetweenpairdirectedtopologyremain distinct\",\"Task11requiresoneprocess2logicaldevices,notjust2separateone-deviceprocesses\"],\"objective\":\"Measure qualified pair functionality, then deliver two logical V200s acrossfourphysicalV100s\"}",
+        "created_at": "2026-10-17T14:17:14Z",
+        "creation_revision": 101,
+        "run_id": "V200-PAIR-PERF-MULTIPAIR-1",
+        "superseded_at": null,
+        "superseded_revision": null,
+        "version": 1
+      },
+      {
         "content_hash": "af435667e099def2237836cf0886c444a6e504880633fe3eb8ed163c6dc71338",
         "content_json": "{\"acceptance_conditions\":[\"V200-01 foundation and source identity are recorded.\",\"V200-Q01 records the bounded B01 outcome and any stop condition.\",\"V200-02 through V200-05 are completed by nonoverlapping owners.\",\"V200-06 records actual llama consumer behavior and the tested transparency tier.\"],\"boundaries\":[\"Keep the facade application-scoped and reversible.\",\"Do not silently narrow the supported one-logical-device-per-physical-pair contract.\",\"Use the package probe and existing CUDA controller; do not add a scheduler or test framework.\"],\"glossary\":{\"B01\":\"bounded pair-memory probe\",\"llama-server\":\"the selected existing first consumer\"},\"invariants\":[\"Memory ownership, completion ordering, and observed consumer calls must not return false success.\",\"CPU checks and compilation are not GPU qualification.\",\"Release the GPU allocation after the bounded B01 decision; the implementation lanes do CPU work only.\"],\"objective\":\"Deliver the earliest correct, opt-in single-logical-device preview for the existing llama.cpp/llama-server workload, with pair feasibility measured early and honest evidence boundaries.\"}",
         "created_at": "2026-10-17T11:49:55Z",
@@ -4885,10 +5185,20 @@
         "completed_at": null,
         "created_at": "2026-10-17T13:51:05Z",
         "id": "V200-LOCALITY-COMPAT-1",
-        "revision": 86,
+        "revision": 100,
         "root_task_id": "V200-09",
+        "status": "completed",
+        "updated_at": "2026-10-17T14:15:06Z"
+      },
+      {
+        "active_charter_version": 1,
+        "completed_at": null,
+        "created_at": "2026-10-17T14:17:14Z",
+        "id": "V200-PAIR-PERF-MULTIPAIR-1",
+        "revision": 101,
+        "root_task_id": "V200-12",
         "status": "active",
-        "updated_at": "2026-10-17T13:51:05Z"
+        "updated_at": "2026-10-17T14:17:14Z"
       },
       {
         "active_charter_version": 1,

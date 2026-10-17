@@ -27,6 +27,19 @@ class FixtureTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.fixture, cls.profile = consumer.load_documents()
 
+    def test_resident_service_reaches_the_finite_runner(self) -> None:
+        with mock.patch.object(consumer, "validate_live_environment", return_value=["GPU-a", "GPU-b"]), \
+             mock.patch.object(consumer, "verify_identities", return_value={}), \
+             mock.patch.object(consumer, "_run_one", return_value={"application_status": "PASS"}) as run:
+            consumer.run_matrix(
+                "resident_capacity", ["facade_owner"], Path("/tmp/unused-v200-service"),
+                [Path("/tmp/libv200_frontdoor.so"), Path("/tmp/libv200_pair_init.so")],
+                monitor=False, facade_mode="pair", server_port=18080,
+                serve_duration_seconds=5, cuda_graphs_enabled=True)
+        self.assertEqual(run.call_args.args[0], "resident_capacity")
+        self.assertEqual(run.call_args.kwargs["serve_duration_seconds"], 5)
+        self.assertTrue(run.call_args.kwargs["cuda_graphs_enabled"])
+
     def test_fixture_pins_consumer_model_and_all_runtime_objects(self) -> None:
         self.assertEqual(self.fixture["model"]["sha256"],
                          "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad")

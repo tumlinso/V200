@@ -1227,8 +1227,8 @@ def run_matrix(workload_name: str, controls: list[str], output_dir: Path,
     if len(set(controls)) != len(controls):
         raise ConsumerError("matched matrix controls must be unique")
     if serve_duration_seconds:
-        if workload_name != "smoke" or controls != ["facade_owner"]:
-            raise ConsumerError("finite service mode requires only the smoke facade control")
+        if controls != ["facade_owner"]:
+            raise ConsumerError("finite service mode requires only the facade control")
         if server_port is None:
             raise ConsumerError("finite service mode requires a launcher-selected loopback port")
         if not 1 <= serve_duration_seconds <= MAX_SERVE_DURATION_S:
