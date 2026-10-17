@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T13:49:17Z",
+  "generated_at": "2026-10-17T14:09:41Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 80,
+  "project_revision": 88,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 80,
+    "project_revision": 88,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -109,10 +109,10 @@
       {
         "id": "V200-08-READY",
         "metadata_json": "{}",
-        "reached_at": null,
-        "revision": 71,
+        "reached_at": "2026-10-17T13:49:39Z",
+        "revision": 85,
         "revoked_at": null,
-        "state": "pending",
+        "state": "reached",
         "task_id": "V200-08",
         "title": "V200-08-READY"
       },
@@ -120,7 +120,7 @@
         "id": "V200-09-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 2,
+        "revision": 86,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-09",
@@ -130,7 +130,7 @@
         "id": "V200-10-READY",
         "metadata_json": "{}",
         "reached_at": null,
-        "revision": 2,
+        "revision": 86,
         "revoked_at": null,
         "state": "pending",
         "task_id": "V200-10",
@@ -998,6 +998,86 @@
         "revision": 80,
         "seq": 80,
         "timestamp": "2026-10-17T13:49:17Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-08-CONSUMER",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-08-CONSUMER\"}",
+        "revision": 81,
+        "seq": 81,
+        "timestamp": "2026-10-17T13:49:34Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-08-CONSUMER",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"82a57a0b-50b6-4db7-818c-67a99d71af98\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 82,
+        "seq": 82,
+        "timestamp": "2026-10-17T13:49:35Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-08-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-08-CPU\"}",
+        "revision": 83,
+        "seq": 83,
+        "timestamp": "2026-10-17T13:49:35Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-08-CPU",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"eca4fd34-1e5f-468f-97c9-108e39cca32f\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 84,
+        "seq": 84,
+        "timestamp": "2026-10-17T13:49:39Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-08",
+        "entity_type": "task",
+        "event_type": "task.completed",
+        "payload_json": "{\"completion_revision\": 85, \"disposition\": \"implemented\", \"reached_checkpoints\": [\"V200-08-READY\"]}",
+        "revision": 85,
+        "seq": 85,
+        "timestamp": "2026-10-17T13:49:39Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "6c6463a7-0f66-4e12-813f-c17e46185775",
+        "entity_type": "project",
+        "event_type": "plan.applied",
+        "payload_json": "{\"plan_digest\": \"99aaeae2fa278340357d701a8fec0cd2a897b732e913f5da3118220c9351284e\", \"source\": \"project-control\"}",
+        "revision": 86,
+        "seq": 86,
+        "timestamp": "2026-10-17T13:51:05Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-LOCALITY-COMPAT-1-MAIN",
+        "entity_type": "workflow_dispatch",
+        "event_type": "workflow.next_task",
+        "payload_json": "{\"lane_id\": \"V200-LOCALITY-COMPAT-1-MAIN\", \"run_id\": \"V200-LOCALITY-COMPAT-1\", \"status\": \"claimed\", \"task_id\": \"V200-09\"}",
+        "revision": 87,
+        "seq": 87,
+        "timestamp": "2026-10-17T13:51:09Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "7ebebcc3-bdbb-46b8-b462-1b4e81418a20",
+        "entity_type": "gate_binding",
+        "event_type": "workflow.gates.bound",
+        "payload_json": "{\"gate_count\": 2}",
+        "revision": 88,
+        "seq": 88,
+        "timestamp": "2026-10-17T14:09:41Z"
       }
     ],
     "evidence": [
@@ -1109,6 +1189,19 @@
         "checkpoint_id": null,
         "claim_id": null,
         "content_hash": null,
+        "created_at": "2026-10-17T13:49:35Z",
+        "gate_id": "V200-08-CONSUMER",
+        "id": "82a57a0b-50b6-4db7-818c-67a99d71af98",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"74a074d1f97905a2e2280d10d55da2022cbc5dff21b451c03c1f2ccd03c42c58\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\"], \"cwd\": \".\", \"timeout\": 30}, \"diff_fingerprint\": \"c958d3912d940cd093e8a869fac85a732ebf9781c39d9f29b6b6eb84a8304266\", \"dirty_paths\": [\"include/v200/operators/expert_plan.hpp\", \"src/operators/expert_plan.cpp\"], \"files\": [{\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/operator-r2\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/operator-r2.controller-evidence.json\", \"sha256\": \"5c966fa9db1d023d44023c576a1e1fdda9b79ba0fb126dd911506d02d5beeab0\"}, {\"path\": \"evidence/B03/operator-r2.controller-result.json\", \"sha256\": \"f6b6df9d00bf63937d652862234886696c3dfaecdf910cf0fdd8012e09ecea97\"}, {\"path\": \"evidence/B03/operator-r2.host-release.json\", \"sha256\": \"821ab4f085d4ed062b5c447fa8d599cb02adabcdb7dbb73899aeb38b9de6c227\"}, {\"path\": \"tests/capacity\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/verify_consumer.py\", \"sha256\": \"0e3055aa651acc4189e5548330ab1f90958aaef8f8df71996c837122238429ca\"}], \"interfaces\": [], \"recorded_git_head\": \"a22190c8ae13c3435b1363069702d689e297cc6e\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 81}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/82a57a0b-50b6-4db7-818c-67a99d71af98",
+        "revision": 82,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
         "created_at": "2026-10-17T12:06:43Z",
         "gate_id": "V200-03-MEMORY-CPU-GATE",
         "id": "86cd9075-ecc4-4506-9915-152d5faa42b2",
@@ -1207,6 +1300,19 @@
         "metadata_json": "{\"argv\": [\"python3\", \"tests/abi/run_cpu_gate.py\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"bdd7d484e97758d681b60d8045ca48f02f46f4035189c5362e003fefaf6da8f9\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/abi/run_cpu_gate.py\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"0c8136900c8832c350e8c2c88b71d0f8181a89e5676aa44ed34833ff31179bdb\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"planning/runtime-integration-v3.todo-plan.json\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"todo-status.md\", \"todos.md\", \"todos/v200-01.md\", \"todos/v200-02.md\", \"todos/v200-03.md\", \"todos/v200-04.md\", \"todos/v200-05.md\", \"todos/v200-06.md\", \"todos/v200-07.md\", \"todos/v200-08.md\", \"todos/v200-09.md\", \"todos/v200-10.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\", \"todos/v200-i01.md\", \"todos/v200-q01.md\"], \"files\": [{\"path\": \"docs/v200/abi-profile.json\", \"sha256\": \"bf7d7f2fc768b81f2e2fbb8d19b4161b5d4f13fa5cded57af68962d4c5f0d089\"}, {\"path\": \"include/v200/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"4cbbd10387917891bcd9e9e3b8da9971fab17ee5\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 48}",
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/dbf4a9ed-1f3b-47d8-aae7-0ef87b6aeb49",
         "revision": 49,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T13:49:39Z",
+        "gate_id": "V200-08-CPU",
+        "id": "eca4fd34-1e5f-468f-97c9-108e39cca32f",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"11a3389c40fb422ab764f6aeaa9ada3a9445425f438135f109123c3df56eff21\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"timeout\": 180}, \"diff_fingerprint\": \"c958d3912d940cd093e8a869fac85a732ebf9781c39d9f29b6b6eb84a8304266\", \"dirty_paths\": [\"include/v200/operators/expert_plan.hpp\", \"src/operators/expert_plan.cpp\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"5598a4fab1eb1ee9d2cdeffbfb22ebbe2a816098732126dfe3cb022c023b4675\"}, {\"path\": \"include/v200/operators/launch.hpp\", \"sha256\": \"a16854bd5203a6b41150045d3810bd3df8c81ffe9989a9793981021f9e16e32c\"}, {\"path\": \"include/v200/operators/mmvq_plan.hpp\", \"sha256\": \"7273ef85c2b5bd72da8b9b8110c22bfe7c8c5b92949ccf958b2bb6028fec82cd\"}, {\"path\": \"include/v200/operators/pair_runtime.hpp\", \"sha256\": \"ea482f465d2f06713a0dd18beb04a638964bfe823852c9cc00abcb3bee2efb24\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"src/operators/CMakeLists.txt\", \"sha256\": \"03e640ac02c22d30c6c5c1ab6fae260fbb610303fc101a25373eaac20b6b0b82\"}, {\"path\": \"src/operators/launch.cpp\", \"sha256\": \"4dbc8b74f4aa637f6647142dbc4baa77f633c5723061c7270f715bf9c20c5a2d\"}, {\"path\": \"src/operators/mmvq_plan.cpp\", \"sha256\": \"a7c089178f121deb5b5f4f8731124129bcd4201c1eb5545f2bd513b0b8756313\"}, {\"path\": \"src/operators/pair_runtime.cpp\", \"sha256\": \"687933c28bbe7ccdccf27fcdd49d647ba74a36efa37f275c08ca422d4ed46f64\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/test_mmvq_plan.cpp\", \"sha256\": \"f6c93c72b2d4bee48bcbe6aa6d76c609f3d93bc0bac5f8848db9c8f67273a23b\"}], \"interfaces\": [], \"recorded_git_head\": \"a22190c8ae13c3435b1363069702d689e297cc6e\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 83}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/eca4fd34-1e5f-468f-97c9-108e39cca32f",
+        "revision": 84,
         "status": "passed"
       },
       {
@@ -1384,25 +1490,51 @@
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\"], \"cwd\": \".\", \"input_paths\": [\"tests/operators/verify_consumer.py\", \"tests/capacity\", \"tests/consumer\", \"benchmarks/fixtures\", \"evidence/B03/operator-r2\", \"evidence/B03/operator-r2.controller-result.json\", \"evidence/B03/operator-r2.controller-evidence.json\", \"evidence/B03/operator-r2.host-release.json\"], \"timeout\": 30}",
         "id": "V200-08-CONSUMER",
-        "input_fingerprint": null,
-        "last_run_at": null,
+        "input_fingerprint": "74a074d1f97905a2e2280d10d55da2022cbc5dff21b451c03c1f2ccd03c42c58",
+        "last_run_at": "2026-10-17T13:49:35Z",
         "required": 1,
-        "revision": 80,
-        "status": "pending",
+        "revision": 82,
+        "status": "passed",
         "task_id": "V200-08",
         "type": "command",
-        "valid": 0
+        "valid": 1
       },
       {
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"CMakeLists.txt\", \"src/operators/CMakeLists.txt\", \"src/operators/launch.cpp\", \"src/operators/mmvq_plan.cpp\", \"src/operators/pair_runtime.cpp\", \"include/v200/operators/launch.hpp\", \"include/v200/operators/mmvq_plan.hpp\", \"include/v200/operators/pair_runtime.hpp\", \"src/memory\", \"tests/memory\", \"tests/consumer\", \"tests/operators/test_mmvq_plan.cpp\", \"scripts/v200\"], \"timeout\": 180}",
         "id": "V200-08-CPU",
+        "input_fingerprint": "11a3389c40fb422ab764f6aeaa9ada3a9445425f438135f109123c3df56eff21",
+        "last_run_at": "2026-10-17T13:49:39Z",
+        "required": 1,
+        "revision": 84,
+        "status": "passed",
+        "task_id": "V200-08",
+        "type": "command",
+        "valid": 1
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','v200_abi_profile_test','v200_frontdoor_closure','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu|abi_profile|frontdoor_export_closure)$','--output-on-failure'],check=True); subprocess.run(['python3','-m','unittest','discover','-s','tests/consumer','-p','test_model_identity.py'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"CMakeLists.txt\", \"src/frontdoor\", \"src/memory\", \"src/operators\", \"include/v200/memory\", \"include/v200/operators\", \"tests/abi\", \"tests/memory\", \"tests/operators/test_mmvq_plan.cpp\", \"tests/consumer\", \"scripts/v200\"], \"timeout\": 180}",
+        "id": "V200-09-CPU",
         "input_fingerprint": null,
         "last_run_at": null,
         "required": 1,
-        "revision": 80,
+        "revision": 88,
         "status": "pending",
-        "task_id": "V200-08",
+        "task_id": "V200-09",
+        "type": "command",
+        "valid": 0
+      },
+      {
+        "checkpoint_id": null,
+        "config_json": "{\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\", \"--run-dir\", \"evidence/B03/locality-r1\", \"--require-experts\"], \"cwd\": \".\", \"input_paths\": [\"tests/operators/verify_consumer.py\", \"tests/capacity\", \"tests/consumer\", \"benchmarks/fixtures\", \"evidence/B03/locality-r1\", \"evidence/B03/locality-r1.controller-result.json\", \"evidence/B03/locality-r1.controller-evidence.json\", \"evidence/B03/locality-r1.host-release.json\"], \"timeout\": 30}",
+        "id": "V200-09-LOCALITY",
+        "input_fingerprint": null,
+        "last_run_at": null,
+        "required": 1,
+        "revision": 88,
+        "status": "pending",
+        "task_id": "V200-09",
         "type": "command",
         "valid": 0
       },
@@ -1490,6 +1622,16 @@
         "payload_json": "{\"authority_commit\": \"7f60a68a596797c7a51360bcaced199113eaf24e\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-04-READY\", \"reached_at\": \"2026-10-17T12:11:27Z\", \"state\": \"reached\"}], \"completion_commit\": \"7f60a68a596797c7a51360bcaced199113eaf24e\", \"completion_gates\": [{\"evidence_id\": \"01a658c3-0267-4762-98a2-de84f4c8a31a\", \"evidence_revision\": 37, \"id\": \"V200-04-CPU\", \"input_fingerprint\": \"11628b55e50fc5367f33ed1db135560384063322ab9a085113d578e294df6283\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"7f60a68a596797c7a51360bcaced199113eaf24e\"}], \"completion_revision\": 38, \"finalized_checkpoints\": [\"V200-04-READY\"], \"gates\": [{\"id\": \"V200-04-CPU\", \"input_fingerprint\": \"11628b55e50fc5367f33ed1db135560384063322ab9a085113d578e294df6283\", \"last_run_at\": \"2026-10-17T12:11:27Z\", \"revision\": 37, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \".todo-orchestrator/state.snapshot.json | 1422 ++++++++++++++++++++++++++++----\\n tests/consumer/run_consumer.py         |    4 +-\\n tests/consumer/test_consumer.py        |   13 +\\n todo-status.md                         |   13 +-\\n todos.md                               |   13 +-\\n todos/v200-01.md                       |   10 +-\\n todos/v200-02.md                       |   17 +-\\n todos/v200-03.md                       |   17 +-\\n todos/v200-04.md                       |   17 +-\\n todos/v200-05.md                       |   19 +-\\n todos/v200-06.md                       |   14 +-\\n todos/v200-07.md                       |    2 +\\n todos/v200-08.md                       |    2 +\\n todos/v200-09.md                       |    2 +\\n todos/v200-10.md                       |    2 +\\n todos/v200-11.md                       |    2 +\\n todos/v200-12.md                       |    2 +\\n todos/v200-13.md                       |    2 +\\n todos/v200-14.md                       |    2 +\\n 19 files changed, 1377 insertions(+), 198 deletions(-)\", \"git_head\": \"7f60a68a596797c7a51360bcaced199113eaf24e\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"V200-04 CPUmodule complete: realinjectedDriveradapter/CABI, immutablefullprefix/fanin/context/lifetime/failstop; independentLunareview foundandownerfixed dispatch-observe race, eventcapture/failedfallback recovery and destroy+restorefailure double-destroy; rootidentifiedPTDS lazycapturethreadissue fixedwithsame-thread eagercapturetest. HostCTests passed independently andowner; optionalrealDriverGPUharnessbuilt/linkedonly, noexecution. RequiredCPUgate capturesfinalsource. No genericGPUcompletionclaim until06 runsactualadapterharness.\", \"producer_commit\": \"7f60a68a596797c7a51360bcaced199113eaf24e\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-04\"}",
         "revision": 38,
         "task_id": "V200-04"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T13:49:39Z",
+        "id": "9d4f6b7d-f7f2-47bf-b0ac-4b71b49b84a0",
+        "kind": "complete",
+        "note": "Commit a22190c delivers transparent physical-owner execution of real pinned llama Q4_K single-column matvecs. B03 controller522cf904-7936-47fd-951f-c9da82306355 passed unchanged full-resident18.55GB model/49layers+embedding, exactanswer2. 68anchor-local calls135168rows +174peer-owner calls335872rows; firstpeeroperation4096outputsbitwiseequal originalkernel(maxabs0). Peerin/out eventorderjoinedtoexistingledger; singleextentpermissionsfixed incllogicalrevocation; zeroallocationaccounting, ownedprocessclean, canonicalhostreleased/noresources. Capacity-only/nativefallback+finitefullresidentserveravailable. SplitrouteCPUcheckedonly(noactualsplitcalls), graphsoff, expertindexed/fusedfamiliesfallbackanchor, speedupNOTestablished. Scope-focusedindependentreviewaddressedexactABI-symbolmatching andfailedverificationreporting. Continue09localityand10compatibility.",
+        "payload_json": "{\"authority_commit\": \"a22190c8ae13c3435b1363069702d689e297cc6e\", \"changed_owned_paths\": [\"include/v200/operators/expert_plan.hpp\", \"src/operators/expert_plan.cpp\"], \"checkpoints\": [{\"id\": \"V200-08-READY\", \"reached_at\": \"2026-10-17T13:49:39Z\", \"state\": \"reached\"}], \"completion_commit\": \"a22190c8ae13c3435b1363069702d689e297cc6e\", \"completion_gates\": [{\"evidence_id\": \"82a57a0b-50b6-4db7-818c-67a99d71af98\", \"evidence_revision\": 82, \"id\": \"V200-08-CONSUMER\", \"input_fingerprint\": \"74a074d1f97905a2e2280d10d55da2022cbc5dff21b451c03c1f2ccd03c42c58\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"a22190c8ae13c3435b1363069702d689e297cc6e\"}, {\"evidence_id\": \"eca4fd34-1e5f-468f-97c9-108e39cca32f\", \"evidence_revision\": 84, \"id\": \"V200-08-CPU\", \"input_fingerprint\": \"11a3389c40fb422ab764f6aeaa9ada3a9445425f438135f109123c3df56eff21\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"a22190c8ae13c3435b1363069702d689e297cc6e\"}], \"completion_revision\": 85, \"finalized_checkpoints\": [\"V200-08-READY\"], \"gates\": [{\"id\": \"V200-08-CPU\", \"input_fingerprint\": \"11a3389c40fb422ab764f6aeaa9ada3a9445425f438135f109123c3df56eff21\", \"last_run_at\": \"2026-10-17T13:49:39Z\", \"revision\": 84, \"status\": \"passed\", \"valid\": 1}, {\"id\": \"V200-08-CONSUMER\", \"input_fingerprint\": \"74a074d1f97905a2e2280d10d55da2022cbc5dff21b451c03c1f2ccd03c42c58\", \"last_run_at\": \"2026-10-17T13:49:35Z\", \"revision\": 82, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \"\", \"git_head\": \"a22190c8ae13c3435b1363069702d689e297cc6e\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Commit a22190c delivers transparent physical-owner execution of real pinned llama Q4_K single-column matvecs. B03 controller522cf904-7936-47fd-951f-c9da82306355 passed unchanged full-resident18.55GB model/49layers+embedding, exactanswer2. 68anchor-local calls135168rows +174peer-owner calls335872rows; firstpeeroperation4096outputsbitwiseequal originalkernel(maxabs0). Peerin/out eventorderjoinedtoexistingledger; singleextentpermissionsfixed incllogicalrevocation; zeroallocationaccounting, ownedprocessclean, canonicalhostreleased/noresources. Capacity-only/nativefallback+finitefullresidentserveravailable. SplitrouteCPUcheckedonly(noactualsplitcalls), graphsoff, expertindexed/fusedfamiliesfallbackanchor, speedupNOTestablished. Scope-focusedindependentreviewaddressedexactABI-symbolmatching andfailedverificationreporting. Continue09localityand10compatibility.\", \"producer_commit\": \"a22190c8ae13c3435b1363069702d689e297cc6e\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-08\"}",
+        "revision": 85,
+        "task_id": "V200-08"
       },
       {
         "claim_id": null,
@@ -2086,27 +2228,82 @@
       },
       {
         "mode": "exclusive",
-        "path": "docs/v200/placement.md",
+        "path": "CMakeLists.txt",
         "task_id": "V200-09"
       },
       {
         "mode": "exclusive",
-        "path": "include/v200/placement",
+        "path": "README.md",
         "task_id": "V200-09"
       },
       {
         "mode": "exclusive",
-        "path": "src/placement",
+        "path": "benchmarks/fixtures",
         "task_id": "V200-09"
       },
       {
         "mode": "exclusive",
-        "path": "tests/placement",
+        "path": "docs/v200",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B03",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B05",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/operators",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "exclusive",
+        "path": "include/v200",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/qualification",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/v200",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "exclusive",
+        "path": "src",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests",
         "task_id": "V200-09"
       },
       {
         "mode": "read",
-        "path": "docs/v200",
+        "path": "build-support",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B04",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/foundation",
+        "task_id": "V200-09"
+      },
+      {
+        "mode": "read",
+        "path": "planning/EXECUTION_PLAN.md",
         "task_id": "V200-09"
       },
       {
@@ -2116,22 +2313,82 @@
       },
       {
         "mode": "exclusive",
-        "path": "docs/v200/compatibility.md",
+        "path": "CMakeLists.txt",
         "task_id": "V200-10"
       },
       {
         "mode": "exclusive",
-        "path": "src/compat",
+        "path": "README.md",
         "task_id": "V200-10"
       },
       {
         "mode": "exclusive",
-        "path": "tests/compat",
+        "path": "benchmarks/fixtures",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "exclusive",
+        "path": "docs/v200",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B03",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/B05",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "exclusive",
+        "path": "evidence/operators",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "exclusive",
+        "path": "include/v200",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/qualification",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "exclusive",
+        "path": "scripts/v200",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "exclusive",
+        "path": "src",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "exclusive",
+        "path": "tests",
         "task_id": "V200-10"
       },
       {
         "mode": "read",
-        "path": "docs/v200",
+        "path": "build-support",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/B04",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "read",
+        "path": "evidence/foundation",
+        "task_id": "V200-10"
+      },
+      {
+        "mode": "read",
+        "path": "planning/EXECUTION_PLAN.md",
         "task_id": "V200-10"
       },
       {
@@ -2536,6 +2793,32 @@
         "validation_git_head": "d0a81e83969488c73cc8c21b0286501eb7de5383"
       },
       {
+        "completion_git_head": "a22190c8ae13c3435b1363069702d689e297cc6e",
+        "completion_revision": 85,
+        "evidence_id": "82a57a0b-50b6-4db7-818c-67a99d71af98",
+        "evidence_revision": 82,
+        "gate_id": "V200-08-CONSUMER",
+        "input_fingerprint": "74a074d1f97905a2e2280d10d55da2022cbc5dff21b451c03c1f2ccd03c42c58",
+        "provenance_json": "{\"claim_id\": \"ec3f0257-3427-4afb-b9fc-85cfb12ac7b3\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"74a074d1f97905a2e2280d10d55da2022cbc5dff21b451c03c1f2ccd03c42c58\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/operators/verify_consumer.py\"], \"cwd\": \".\", \"timeout\": 30}, \"diff_fingerprint\": \"c958d3912d940cd093e8a869fac85a732ebf9781c39d9f29b6b6eb84a8304266\", \"dirty_paths\": [\"include/v200/operators/expert_plan.hpp\", \"src/operators/expert_plan.cpp\"], \"files\": [{\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/operator-r2\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03/operator-r2.controller-evidence.json\", \"sha256\": \"5c966fa9db1d023d44023c576a1e1fdda9b79ba0fb126dd911506d02d5beeab0\"}, {\"path\": \"evidence/B03/operator-r2.controller-result.json\", \"sha256\": \"f6b6df9d00bf63937d652862234886696c3dfaecdf910cf0fdd8012e09ecea97\"}, {\"path\": \"evidence/B03/operator-r2.host-release.json\", \"sha256\": \"821ab4f085d4ed062b5c447fa8d599cb02adabcdb7dbb73899aeb38b9de6c227\"}, {\"path\": \"tests/capacity\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/verify_consumer.py\", \"sha256\": \"0e3055aa651acc4189e5548330ab1f90958aaef8f8df71996c837122238429ca\"}], \"interfaces\": [], \"recorded_git_head\": \"a22190c8ae13c3435b1363069702d689e297cc6e\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 81}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/82a57a0b-50b6-4db7-818c-67a99d71af98\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-08",
+        "valid": 1,
+        "validation_git_head": "a22190c8ae13c3435b1363069702d689e297cc6e"
+      },
+      {
+        "completion_git_head": "a22190c8ae13c3435b1363069702d689e297cc6e",
+        "completion_revision": 85,
+        "evidence_id": "eca4fd34-1e5f-468f-97c9-108e39cca32f",
+        "evidence_revision": 84,
+        "gate_id": "V200-08-CPU",
+        "input_fingerprint": "11a3389c40fb422ab764f6aeaa9ada3a9445425f438135f109123c3df56eff21",
+        "provenance_json": "{\"claim_id\": \"ec3f0257-3427-4afb-b9fc-85cfb12ac7b3\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"11a3389c40fb422ab764f6aeaa9ada3a9445425f438135f109123c3df56eff21\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--target','v200_operators','v200_operator_plan_tests','v200_memory_tests','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','-R','^v200_(operator_mmvq_plan|memory_tests|consumer_fixture_cpu)$','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"timeout\": 180}, \"diff_fingerprint\": \"c958d3912d940cd093e8a869fac85a732ebf9781c39d9f29b6b6eb84a8304266\", \"dirty_paths\": [\"include/v200/operators/expert_plan.hpp\", \"src/operators/expert_plan.cpp\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"5598a4fab1eb1ee9d2cdeffbfb22ebbe2a816098732126dfe3cb022c023b4675\"}, {\"path\": \"include/v200/operators/launch.hpp\", \"sha256\": \"a16854bd5203a6b41150045d3810bd3df8c81ffe9989a9793981021f9e16e32c\"}, {\"path\": \"include/v200/operators/mmvq_plan.hpp\", \"sha256\": \"7273ef85c2b5bd72da8b9b8110c22bfe7c8c5b92949ccf958b2bb6028fec82cd\"}, {\"path\": \"include/v200/operators/pair_runtime.hpp\", \"sha256\": \"ea482f465d2f06713a0dd18beb04a638964bfe823852c9cc00abcb3bee2efb24\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"src/operators/CMakeLists.txt\", \"sha256\": \"03e640ac02c22d30c6c5c1ab6fae260fbb610303fc101a25373eaac20b6b0b82\"}, {\"path\": \"src/operators/launch.cpp\", \"sha256\": \"4dbc8b74f4aa637f6647142dbc4baa77f633c5723061c7270f715bf9c20c5a2d\"}, {\"path\": \"src/operators/mmvq_plan.cpp\", \"sha256\": \"a7c089178f121deb5b5f4f8731124129bcd4201c1eb5545f2bd513b0b8756313\"}, {\"path\": \"src/operators/pair_runtime.cpp\", \"sha256\": \"687933c28bbe7ccdccf27fcdd49d647ba74a36efa37f275c08ca422d4ed46f64\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/operators/test_mmvq_plan.cpp\", \"sha256\": \"f6c93c72b2d4bee48bcbe6aa6d76c609f3d93bc0bac5f8848db9c8f67273a23b\"}], \"interfaces\": [], \"recorded_git_head\": \"a22190c8ae13c3435b1363069702d689e297cc6e\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 83}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/eca4fd34-1e5f-468f-97c9-108e39cca32f\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-08",
+        "valid": 1,
+        "validation_git_head": "a22190c8ae13c3435b1363069702d689e297cc6e"
+      },
+      {
         "completion_git_head": "8b6b9a80bcea6edc2eace40e87198b49184bad59",
         "completion_revision": 62,
         "evidence_id": "9b617037-45f4-411a-b988-7bdeabac6912",
@@ -2550,39 +2833,6 @@
       }
     ],
     "task_dependencies": [
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 11,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-03",
-        "task_id": "V200-09",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 12,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-08",
-        "task_id": "V200-09",
-        "type": "task"
-      },
-      {
-        "barrier_id": null,
-        "checkpoint_id": null,
-        "condition_json": "{}",
-        "decision_id": null,
-        "id": 13,
-        "interface_id": null,
-        "prerequisite_task_id": "V200-06",
-        "task_id": "V200-10",
-        "type": "task"
-      },
       {
         "barrier_id": null,
         "checkpoint_id": null,
@@ -2769,6 +3019,17 @@
         "prerequisite_task_id": "V200-07",
         "task_id": "V200-08",
         "type": "task"
+      },
+      {
+        "barrier_id": null,
+        "checkpoint_id": null,
+        "condition_json": "{}",
+        "decision_id": null,
+        "id": 36,
+        "interface_id": null,
+        "prerequisite_task_id": "V200-09",
+        "task_id": "V200-10",
+        "type": "task"
       }
     ],
     "task_invariants": [],
@@ -2951,9 +3212,9 @@
       },
       {
         "attention_reason": null,
-        "completion_commit": null,
-        "completion_git_head": null,
-        "completion_revision": null,
+        "completion_commit": "a22190c8ae13c3435b1363069702d689e297cc6e",
+        "completion_git_head": "a22190c8ae13c3435b1363069702d689e297cc6e",
+        "completion_revision": 85,
         "created_at": "2026-10-17T11:40:58Z",
         "id": "V200-08",
         "kind": "task",
@@ -2965,14 +3226,14 @@
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
-        "result": null,
+        "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 79,
-        "status": "in_progress",
+        "revision": 85,
+        "status": "done",
         "tags_json": "[]",
         "title": "Accelerate the dominant qualified operation across the pair",
-        "updated_at": "2026-10-17T13:42:57Z",
-        "version": 3
+        "updated_at": "2026-10-17T13:49:39Z",
+        "version": 4
       },
       {
         "attention_reason": null,
@@ -2985,19 +3246,19 @@
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Policy choices have explicit full-path cost and legality inputs; unknown cases take the qualified conservative route.\",\"No assumed six-links-per-peer, arbitrary multi-hop forwarding or coherent writable aliases.\",\"B05 comparisons are prepared; a failed locality hypothesis can be rejected without building new infrastructure.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\"],\"recommended_start\":\"Compare remote reads, staging, owner computation and justified replicas for the qualified operation. Account for canonicalization and owner-memory interference. Retain shards only at known compatible boundaries. Use deterministic measured thresholds before any adaptive system. Dual host ingress is optional only if loader time matters and page locality is available.\",\"research_refs\":[\"A-R07\",\"A-E18\",\"A-E20\",\"A-E21\",\"A-E19\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-09.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-09\",\"outputs\":[\"src/placement/\",\"include/v200/placement/\",\"tests/placement/\",\"docs/v200/placement.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Placement policy/range/version-invalidation checks\"],\"gpu\":\"B05 in V200-12; a narrow B03 regression only after changed code.\"},\"workstream\":\"V200 single-device product\"}",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Policy choices have explicit full-path cost and legality inputs; unknown cases take the qualified conservative route.\",\"No assumed six-links-per-peer, arbitrary multi-hop forwarding or coherent writable aliases.\",\"B05 comparisons are prepared; a failed locality hypothesis can be rejected without building new infrastructure.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\"],\"recommended_start\":\"Compare remote reads, staging, owner computation and justified replicas for the qualified operation. Account for canonicalization and owner-memory interference. Retain shards only at known compatible boundaries. Use deterministic measured thresholds before any adaptive system. Dual host ingress is optional only if loader time matters and page locality is available.\",\"research_refs\":[\"A-R07\",\"A-E18\",\"A-E20\",\"A-E21\",\"A-E19\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-09.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-09\",\"outputs\":[\"src/placement/\",\"include/v200/placement/\",\"tests/placement/\",\"docs/v200/placement.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Placement policy/range/version-invalidation checks\"],\"gpu\":\"B05 in V200-12; a narrow B03 regression only after changed code.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17: V200-07 and08 accepted at d0a81e8/a22190c. Extend actual operator/consumer vertical path in existing modules; no mandatory new placement/compat abstraction. 09 implement NVLink-efficient physical-owner routing inclwholeexpertbanks, no peropCPU routing-ID copy where ownershipprovable; narrow costs basedexistingVoltaatlas and actualselectedshape. 10 addcompatibilityonlyfor actualconsumer/launchpath, evaluategraphswithqualifiedpairoperation safely. No consumerpatch/hiddenoffload/numericweakening. UseHPC12.9/controllerfinitechecks; preservebaseline. Prior prerequisite receiptsretained; do notupsertterminaltasks.",
         "objective": "Choose data ownership and communication that improve complete application work rather than merely saturating NVLink. Read planning/v200-bootstrap/tasks/V200-09.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 2,
-        "status": "planned",
+        "revision": 87,
+        "status": "in_progress",
         "tags_json": "[]",
         "title": "Optimize pair locality and NVLink use with a small cost policy",
-        "updated_at": "2026-10-17T11:40:58Z",
-        "version": 1
+        "updated_at": "2026-10-17T13:51:09Z",
+        "version": 3
       },
       {
         "attention_reason": null,
@@ -3010,19 +3271,19 @@
         "legacy_owner": null,
         "legacy_payload_json": "{}",
         "next_action": "",
-        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Compatibility matrix distinguishes tested/unsupported/unqualified for exact stack and binary profiles.\",\"Graph and async-lifetime regressions are covered where supported; disabling a required feature is disclosed.\",\"No broad compatibility claim is based only on one model running.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\",\"D08\"],\"recommended_start\":\"Cover observed graph capture/replay/update, library workspaces/pointer modes, stream behavior, module state and diagnostics. Essential first-consumer features already belong to V200-06. Add the narrowest second consumer/kernel family that tests generality. IPC, cooperative grids and MPS remain explicit unsupported features unless made part of the selected profile.\",\"research_refs\":[\"W-ENTRY\",\"W-CUDA12\",\"W-LLAMA-CUDA\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-10.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-10\",\"outputs\":[\"src/compat/\",\"tests/compat/\",\"docs/v200/compatibility.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"ABI/graph/handle contract fixtures\"],\"gpu\":[\"B03\"],\"gpu_subset\":\"B03 selected regression subset\",\"limit\":\"No all-framework test matrix.\"},\"workstream\":\"V200 single-device product\"}",
+        "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Compatibility matrix distinguishes tested/unsupported/unqualified for exact stack and binary profiles.\",\"Graph and async-lifetime regressions are covered where supported; disabling a required feature is disclosed.\",\"No broad compatibility claim is based only on one model running.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\",\"D08\"],\"recommended_start\":\"Cover observed graph capture/replay/update, library workspaces/pointer modes, stream behavior, module state and diagnostics. Essential first-consumer features already belong to V200-06. Add the narrowest second consumer/kernel family that tests generality. IPC, cooperative grids and MPS remain explicit unsupported features unless made part of the selected profile.\",\"research_refs\":[\"W-ENTRY\",\"W-CUDA12\",\"W-LLAMA-CUDA\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-10.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-10\",\"outputs\":[\"src/compat/\",\"tests/compat/\",\"docs/v200/compatibility.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"ABI/graph/handle contract fixtures\"],\"gpu\":[\"B03\"],\"gpu_subset\":\"B03 selected regression subset\",\"limit\":\"No all-framework test matrix.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17: V200-07 and08 accepted at d0a81e8/a22190c. Extend actual operator/consumer vertical path in existing modules; no mandatory new placement/compat abstraction. 09 implement NVLink-efficient physical-owner routing inclwholeexpertbanks, no peropCPU routing-ID copy where ownershipprovable; narrow costs basedexistingVoltaatlas and actualselectedshape. 10 addcompatibilityonlyfor actualconsumer/launchpath, evaluategraphswithqualifiedpairoperation safely. No consumerpatch/hiddenoffload/numericweakening. UseHPC12.9/controllerfinitechecks; preservebaseline. Prior prerequisite receiptsretained; do notupsertterminaltasks.",
         "objective": "Extend the first profile only where actual consumer behavior or a chosen second fixture requires it, preserving ordinary CUDA semantics. Read planning/v200-bootstrap/tasks/V200-10.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
         "result": null,
         "result_policy_json": "{}",
-        "revision": 2,
+        "revision": 86,
         "status": "planned",
         "tags_json": "[]",
         "title": "Close the observed compatibility profile and targeted regressions",
-        "updated_at": "2026-10-17T11:40:58Z",
-        "version": 1
+        "updated_at": "2026-10-17T13:51:05Z",
+        "version": 2
       },
       {
         "attention_reason": null,
@@ -3379,6 +3640,74 @@
         "superseded_by": null,
         "task_id": "V200-I01",
         "version": 6
+      },
+      {
+        "content_hash": "80f05387d86fd4e75efe5b4f4888a59b7b927409896fe8f24657252413c0d9ee",
+        "content_json": "{\"authority\":\"server_enforced_role_and_task_scope\",\"interfaces\":[],\"ordered_tasks\":[\"V200-09\",\"V200-10\"],\"rendezvous\":[],\"role\":\"implementer\",\"workspace_mode\":\"exclusive\"}",
+        "created_at": "2026-10-17T13:51:05Z",
+        "creation_revision": 86,
+        "id": "V200-LOCALITY-COMPAT-1:lane_brief:V200-LOCALITY-COMPAT-1-MAIN:-:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "lane_brief",
+        "lane_id": "V200-LOCALITY-COMPAT-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-LOCALITY-COMPAT-1-MAIN\",\"run_id\":\"V200-LOCALITY-COMPAT-1\"}",
+        "run_id": "V200-LOCALITY-COMPAT-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": null,
+        "version": 1
+      },
+      {
+        "content_hash": "1efc234cc8686070c836bd669d9faf7d1a0d6b13746d461ced53a6d336c5da15",
+        "content_json": "{\"boundaries\":[\"Unchangedconsumer; originalkernelarithmetic; no model-parallelbackend; finiteadmittedGPUchecks\"],\"invariants\":[\"Preserve actualcapacity/dualcompute baseline\",\"Nographreplaypathmaybypass peerjoinor allocationlifetimes\",\"No newgenericpolicyframeworkbeforeconcreteoperationneedsit\"],\"objective\":\"Expand useful physical-owner compute and NVLink locality, then grow compatibility required by real consumer\"}",
+        "created_at": "2026-10-17T13:51:05Z",
+        "creation_revision": 86,
+        "id": "V200-LOCALITY-COMPAT-1:run_charter:-:-:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "run_charter",
+        "lane_id": null,
+        "owner_scope_json": "{\"run_id\":\"V200-LOCALITY-COMPAT-1\"}",
+        "run_id": "V200-LOCALITY-COMPAT-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": null,
+        "version": 1
+      },
+      {
+        "content_hash": "02613f6d5ac74cc3950971b157902b1cb25832102986d10c832bf63bba8b8448",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Choose data ownership and communication that improve complete application work rather than merely saturating NVLink. Read planning/v200-bootstrap/tasks/V200-09.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Choose data ownership and communication that improve complete application work rather than merely saturating NVLink. Read planning/v200-bootstrap/tasks/V200-09.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"CMakeLists.txt\",\"src\",\"include/v200\",\"tests\",\"scripts/v200\",\"scripts/qualification\",\"benchmarks/fixtures\",\"docs/v200\",\"README.md\",\"evidence/B03\",\"evidence/B05\",\"evidence/operators\"],\"forbidden_paths\":[],\"read_paths\":[\"planning/v200-bootstrap\",\"planning/EXECUTION_PLAN.md\",\"build-support\",\"evidence/foundation\",\"evidence/B04\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T13:51:05Z",
+        "creation_revision": 86,
+        "id": "V200-LOCALITY-COMPAT-1:task_brief:V200-LOCALITY-COMPAT-1-MAIN:V200-09:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "task_brief",
+        "lane_id": "V200-LOCALITY-COMPAT-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-LOCALITY-COMPAT-1-MAIN\",\"run_id\":\"V200-LOCALITY-COMPAT-1\",\"task_id\":\"V200-09\"}",
+        "run_id": "V200-LOCALITY-COMPAT-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": "V200-09",
+        "version": 1
+      },
+      {
+        "content_hash": "17bd43f2f09e0a4c1d9eb967e1441571600ebd0e9032e90e612a97f2c45cfcfc",
+        "content_json": "{\"completion_contract\":null,\"forbidden_mutations\":[],\"gates\":[],\"next_action\":\"Extend the first profile only where actual consumer behavior or a chosen second fixture requires it, preserving ordinary CUDA semantics. Read planning/v200-bootstrap/tasks/V200-10.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"objective\":\"Extend the first profile only where actual consumer behavior or a chosen second fixture requires it, preserving ordinary CUDA semantics. Read planning/v200-bootstrap/tasks/V200-10.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.\",\"scope\":{\"exclusive_paths\":[\"CMakeLists.txt\",\"src\",\"include/v200\",\"tests\",\"scripts/v200\",\"scripts/qualification\",\"benchmarks/fixtures\",\"docs/v200\",\"README.md\",\"evidence/B03\",\"evidence/B05\",\"evidence/operators\"],\"forbidden_paths\":[],\"read_paths\":[\"planning/v200-bootstrap\",\"planning/EXECUTION_PLAN.md\",\"build-support\",\"evidence/foundation\",\"evidence/B04\"],\"shared_locks\":[]},\"tests\":[]}",
+        "created_at": "2026-10-17T13:51:05Z",
+        "creation_revision": 86,
+        "id": "V200-LOCALITY-COMPAT-1:task_brief:V200-LOCALITY-COMPAT-1-MAIN:V200-10:1",
+        "invalidated_at": null,
+        "invalidation_revision": null,
+        "kind": "task_brief",
+        "lane_id": "V200-LOCALITY-COMPAT-1-MAIN",
+        "owner_scope_json": "{\"lane_id\":\"V200-LOCALITY-COMPAT-1-MAIN\",\"run_id\":\"V200-LOCALITY-COMPAT-1\",\"task_id\":\"V200-10\"}",
+        "run_id": "V200-LOCALITY-COMPAT-1",
+        "series_key": "",
+        "superseded_by": null,
+        "task_id": "V200-10",
+        "version": 1
       },
       {
         "content_hash": "47b0dd20fb697f9b71ee4eb69be8bdb85dc12dc5405b9a769d91fee103c7c13f",
@@ -3939,12 +4268,12 @@
       },
       {
         "activated_at": "2026-10-17T13:42:57Z",
-        "completed_at": null,
+        "completed_at": "2026-10-17T13:49:39Z",
         "enqueued_at": "2026-10-17T13:23:04Z",
         "lane_id": "V200-CAPACITY-COMPUTE-1-MAIN",
         "position": 1,
-        "revision": 79,
-        "state": "active",
+        "revision": 85,
+        "state": "completed",
         "task_id": "V200-08"
       },
       {
@@ -3956,6 +4285,26 @@
         "revision": 62,
         "state": "completed",
         "task_id": "V200-I01"
+      },
+      {
+        "activated_at": "2026-10-17T13:51:09Z",
+        "completed_at": null,
+        "enqueued_at": "2026-10-17T13:51:05Z",
+        "lane_id": "V200-LOCALITY-COMPAT-1-MAIN",
+        "position": 0,
+        "revision": 87,
+        "state": "active",
+        "task_id": "V200-09"
+      },
+      {
+        "activated_at": null,
+        "completed_at": null,
+        "enqueued_at": "2026-10-17T13:51:05Z",
+        "lane_id": "V200-LOCALITY-COMPAT-1-MAIN",
+        "position": 1,
+        "revision": 86,
+        "state": "queued",
+        "task_id": "V200-10"
       },
       {
         "activated_at": "2026-10-17T11:50:19Z",
@@ -4164,11 +4513,11 @@
         "created_at": "2026-10-17T13:23:04Z",
         "id": "V200-CAPACITY-COMPUTE-1-MAIN",
         "parent_lane_id": null,
-        "revision": 79,
+        "revision": 85,
         "role": "implementer",
         "run_id": "V200-CAPACITY-COMPUTE-1",
-        "state": "active",
-        "updated_at": "2026-10-17T13:42:57Z",
+        "state": "closed",
+        "updated_at": "2026-10-17T13:49:39Z",
         "workspace_mode": "exclusive"
       },
       {
@@ -4181,6 +4530,18 @@
         "run_id": "V200-INIT-RUN-1",
         "state": "closed",
         "updated_at": "2026-10-17T12:35:11Z",
+        "workspace_mode": "exclusive"
+      },
+      {
+        "context_cursor": 0,
+        "created_at": "2026-10-17T13:51:05Z",
+        "id": "V200-LOCALITY-COMPAT-1-MAIN",
+        "parent_lane_id": null,
+        "revision": 87,
+        "role": "implementer",
+        "run_id": "V200-LOCALITY-COMPAT-1",
+        "state": "active",
+        "updated_at": "2026-10-17T13:51:09Z",
         "workspace_mode": "exclusive"
       },
       {
@@ -4310,6 +4671,16 @@
         "version": 1
       },
       {
+        "content_hash": "1efc234cc8686070c836bd669d9faf7d1a0d6b13746d461ced53a6d336c5da15",
+        "content_json": "{\"boundaries\":[\"Unchangedconsumer; originalkernelarithmetic; no model-parallelbackend; finiteadmittedGPUchecks\"],\"invariants\":[\"Preserve actualcapacity/dualcompute baseline\",\"Nographreplaypathmaybypass peerjoinor allocationlifetimes\",\"No newgenericpolicyframeworkbeforeconcreteoperationneedsit\"],\"objective\":\"Expand useful physical-owner compute and NVLink locality, then grow compatibility required by real consumer\"}",
+        "created_at": "2026-10-17T13:51:05Z",
+        "creation_revision": 86,
+        "run_id": "V200-LOCALITY-COMPAT-1",
+        "superseded_at": null,
+        "superseded_revision": null,
+        "version": 1
+      },
+      {
         "content_hash": "af435667e099def2237836cf0886c444a6e504880633fe3eb8ed163c6dc71338",
         "content_json": "{\"acceptance_conditions\":[\"V200-01 foundation and source identity are recorded.\",\"V200-Q01 records the bounded B01 outcome and any stop condition.\",\"V200-02 through V200-05 are completed by nonoverlapping owners.\",\"V200-06 records actual llama consumer behavior and the tested transparency tier.\"],\"boundaries\":[\"Keep the facade application-scoped and reversible.\",\"Do not silently narrow the supported one-logical-device-per-physical-pair contract.\",\"Use the package probe and existing CUDA controller; do not add a scheduler or test framework.\"],\"glossary\":{\"B01\":\"bounded pair-memory probe\",\"llama-server\":\"the selected existing first consumer\"},\"invariants\":[\"Memory ownership, completion ordering, and observed consumer calls must not return false success.\",\"CPU checks and compilation are not GPU qualification.\",\"Release the GPU allocation after the bounded B01 decision; the implementation lanes do CPU work only.\"],\"objective\":\"Deliver the earliest correct, opt-in single-logical-device preview for the existing llama.cpp/llama-server workload, with pair feasibility measured early and honest evidence boundaries.\"}",
         "created_at": "2026-10-17T11:49:55Z",
@@ -4336,10 +4707,10 @@
         "completed_at": null,
         "created_at": "2026-10-17T13:23:04Z",
         "id": "V200-CAPACITY-COMPUTE-1",
-        "revision": 71,
+        "revision": 85,
         "root_task_id": "V200-07",
-        "status": "active",
-        "updated_at": "2026-10-17T13:23:04Z"
+        "status": "completed",
+        "updated_at": "2026-10-17T13:49:39Z"
       },
       {
         "active_charter_version": 1,
@@ -4350,6 +4721,16 @@
         "root_task_id": "V200-I01",
         "status": "completed",
         "updated_at": "2026-10-17T12:35:11Z"
+      },
+      {
+        "active_charter_version": 1,
+        "completed_at": null,
+        "created_at": "2026-10-17T13:51:05Z",
+        "id": "V200-LOCALITY-COMPAT-1",
+        "revision": 86,
+        "root_task_id": "V200-09",
+        "status": "active",
+        "updated_at": "2026-10-17T13:51:05Z"
       },
       {
         "active_charter_version": 1,

@@ -57,25 +57,32 @@ bool plan_q4k_mmvq_rows(uintptr_t weight, size_t bytes_per_row,
         return true;
     }
 
-    // The allocator emits at most two contiguous extents in preferred-owner
-    // order. cudaMalloc in pair mode always prefers profile.owner_device[0].
+    // The allocator emits at most two contiguous extents. The first extent can
+    // belong to either owner, so use the published owner identity rather than
+    // assuming preferred-owner order.
     if (allocation.extent_count != 2 || allocation.owner_bytes[0] == 0 ||
-        allocation.owner_bytes[1] == 0) {
+        allocation.owner_bytes[1] == 0 ||
+        (allocation.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_KNOWN) == 0) {
         return false;
     }
+    const uint32_t first_owner =
+        (allocation.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_1) != 0
+            ? 1u : 0u;
+    const uint32_t second_owner = 1u - first_owner;
     const uintptr_t base = static_cast<uintptr_t>(allocation.base);
-    if (allocation.owner_bytes[0] > std::numeric_limits<uintptr_t>::max() - base) {
+    if (allocation.owner_bytes[first_owner] >
+        std::numeric_limits<uintptr_t>::max() - base) {
         return false;
     }
-    const uintptr_t boundary = base + allocation.owner_bytes[0];
+    const uintptr_t boundary = base + allocation.owner_bytes[first_owner];
     const uintptr_t end = weight + matrix_bytes;
     if (end < weight) return false;
 
     if (end <= boundary) {
-        planned.first_owner = 0;
+        planned.first_owner = first_owner;
         planned.first_rows = rows;
     } else if (weight >= boundary) {
-        planned.first_owner = 1;
+        planned.first_owner = second_owner;
         planned.first_rows = rows;
     } else {
         const uintptr_t bytes_before_boundary = boundary - weight;
@@ -84,12 +91,12 @@ bool plan_q4k_mmvq_rows(uintptr_t weight, size_t bytes_per_row,
             ((bytes_before_boundary % bytes_per_row) != 0 ? 1u : 0u);
         if (split_rows > rows) return false;
         if (split_rows < 32 || rows - split_rows < 32) {
-            planned.first_owner = split_rows * 2 >= rows ? 0u : 1u;
+            planned.first_owner = split_rows * 2 >= rows ? first_owner : second_owner;
             planned.first_rows = rows;
         } else {
-            planned.first_owner = 0;
+            planned.first_owner = first_owner;
             planned.first_rows = static_cast<uint32_t>(split_rows);
-            planned.second_owner = 1;
+            planned.second_owner = second_owner;
             planned.second_rows = rows - planned.first_rows;
             planned.split = true;
         }

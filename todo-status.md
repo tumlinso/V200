@@ -3,7 +3,7 @@
 <!-- todo-orchestrator:v2-managed:start -->
 # Todo Status v2 Projection
 
-Project revision: `80`
+Project revision: `88`
 
 ## Workstreams
 - `V200-Q01` | status: done | execution: closed | next: Run the package existing B01 pair-memory probe on the approved V100 pair as soon as V200-01 is complete; record actual feasibility before consumer implementation concludes.
@@ -14,8 +14,8 @@ Project revision: `80`
 - `V200-05` | status: done | execution: closed | next: Create one reproducible application fixture and truthful compatibility/performance controls, without a broad model benchmark collection. Read planning/v200-bootstrap/tasks/V200-05.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-06` | status: done | execution: closed | next: Run a real consumer through one logical V200 with correct outputs and an honest transparency tier; settle the foundational feasibility risks before broad optimization. Read planning/v200-bootstrap/tasks/V200-06.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-07` | status: done | execution: closed | next: Prove genuinely resident aggregate HBM with live application data that does not fit on either constituent alone. Read planning/v200-bootstrap/tasks/V200-07.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
-- `V200-08` | status: in_progress | execution: claimed | next: Make both V100s perform meaningful selected application work under the unchanged outward interface. Read planning/v200-bootstrap/tasks/V200-08.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
-- `V200-09` | status: planned | execution: ready | next: Choose data ownership and communication that improve complete application work rather than merely saturating NVLink. Read planning/v200-bootstrap/tasks/V200-09.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-08` | status: done | execution: closed | next: Make both V100s perform meaningful selected application work under the unchanged outward interface. Read planning/v200-bootstrap/tasks/V200-08.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
+- `V200-09` | status: in_progress | execution: claimed | next: Choose data ownership and communication that improve complete application work rather than merely saturating NVLink. Read planning/v200-bootstrap/tasks/V200-09.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-10` | status: planned | execution: ready | next: Extend the first profile only where actual consumer behavior or a chosen second fixture requires it, preserving ordinary CUDA semantics. Read planning/v200-bootstrap/tasks/V200-10.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-11` | status: planned | execution: ready | next: Use all four physical GPUs as two correctly presented logical devices without flattening the directed inter-pair topology. Read planning/v200-bootstrap/tasks/V200-11.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.
 - `V200-12` | status: planned | execution: ready | next: Produce a small, matched end-to-end evaluation that decides promotion, remaining tuning or a user-facing trade-off. Read planning/v200-bootstrap/tasks/V200-12.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.

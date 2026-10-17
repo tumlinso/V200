@@ -17,7 +17,8 @@ v200_memory_pair_profile profile() {
 }
 
 v200_allocation_info allocation(uintptr_t base, size_t mapped,
-                                size_t first, size_t second, uint32_t extents) {
+                                size_t first, size_t second, uint32_t extents,
+                                uint32_t first_owner = 0) {
     v200_allocation_info value{};
     value.abi_version = V200_MEMORY_ABI_VERSION;
     value.struct_size = sizeof(value);
@@ -27,6 +28,11 @@ v200_allocation_info allocation(uintptr_t base, size_t mapped,
     value.owner_bytes[0] = first;
     value.owner_bytes[1] = second;
     value.extent_count = extents;
+    if (extents == 2) {
+        value.flags |= V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_KNOWN;
+        if (first_owner == 1)
+            value.flags |= V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_1;
+    }
     return value;
 }
 
@@ -60,6 +66,18 @@ int main() {
     assert(v200::operators::plan_q4k_mmvq_rows(base, row_bytes, rows,
                                                unaligned, pair, &result));
     assert(result.split && result.first_rows == 65 && result.second_rows == 63);
+
+    auto reversed_extents = allocation(base, total, total / 2, total / 2,
+                                       2, 1);
+    assert(v200::operators::plan_q4k_mmvq_rows(base, row_bytes, rows,
+                                               reversed_extents, pair, &result));
+    assert(result.split && result.first_owner == 1 && result.first_rows == 64 &&
+           result.second_owner == 0 && result.second_rows == 64);
+
+    assert(v200::operators::plan_q4k_mmvq_rows(base + row_bytes * 80,
+                                               row_bytes, 32,
+                                               reversed_extents, pair, &result));
+    assert(!result.split && result.first_owner == 0 && result.first_rows == 32);
 
     auto bad_owner_sum = allocation(base, total, total / 2, total / 2 - 1, 2);
     assert(!v200::operators::plan_q4k_mmvq_rows(base, row_bytes, rows,

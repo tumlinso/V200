@@ -28,8 +28,14 @@ int main() {
           "driver launch lookup must expose a distinct PTDS ABI variant");
     check(proc != nullptr && !version_available(*proc, 3000) && version_available(*proc, 12090),
           "driver entry-point version selection must honor its minimum version");
-    check(classify_api("cudaGraphLaunch") == ApiDisposition::native_anchor_passthrough,
-          "native graph execution must be explicitly classified as anchor dispatch");
+    check(classify_api("cudaGraphLaunch") == ApiDisposition::wrapped &&
+              classify_api("cudaStreamBeginCapture") == ApiDisposition::wrapped &&
+              classify_api("cudaStreamEndCapture") == ApiDisposition::wrapped &&
+              classify_api("cudaGraphInstantiate") == ApiDisposition::wrapped &&
+              classify_api("cudaGraphExecUpdate") == ApiDisposition::wrapped &&
+              classify_api("cudaGraphDestroy") == ApiDisposition::wrapped &&
+              classify_api("cudaGraphExecDestroy") == ApiDisposition::wrapped,
+          "opt-in graph capture, replay and cleanup must be intercepted as a tracked path");
     check(classify_api("cudaMemset") == ApiDisposition::wrapped,
           "synchronous memset must be intercepted for managed-memory lifetime tracking");
     check(classify_api("cuMemGetInfo_v2") == ApiDisposition::wrapped &&

@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT / "tests/capacity"))
 import verify_capacity as capacity
 
 
-def verify(run):
+def verify(run, require_experts=False):
     read = capacity._json
     require = capacity._require
     controller = read(run.with_name(run.name + ".controller-result.json"))
@@ -64,18 +64,29 @@ def verify(run):
     for route, count in (("peer-owner", totals["peer_owner_calls"]), ("split", totals["split_calls"])):
         require(not count or any(r["route"] == route for r in verified),
                 "executed route lacks a completed native-output comparison: " + route)
-    return {"status": "PASS_V200_08", "controller_evidence_id": evidence["id"],
+    expert_verified = [r for r in operations if r["event"] == "q4k_mmvq_expert_verification"]
+    if require_experts:
+        require(totals.get("expert_peer_owner_calls", 0) > 0 and
+                totals.get("expert_peer_rows", 0) > 0 and
+                totals.get("expert_verification_failures") == 0,
+                "no successful real-consumer expert execution on the peer")
+        require(expert_verified and all(r["status"] == 0 and r["max_abs_error"] == 0 and
+                                        r.get("expert_verified_outputs", 0) > 0
+                                        for r in expert_verified),
+                "expert route lacks a completed exact native-output comparison")
+    return {"status": "PASS_V200_09" if require_experts else "PASS_V200_08", "controller_evidence_id": evidence["id"],
             "physical_uuids": pair, "capacity": result, "operator": totals,
-            "verified_routes": [r["route"] for r in verified],
+            "verified_routes": [r["route"] for r in verified + expert_verified],
             "host_resources_released": True, "speedup": "NOT_ESTABLISHED"}
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-dir", type=Path, default=ROOT / "evidence/B03/operator-r2")
+    parser.add_argument("--require-experts", action="store_true")
     args = parser.parse_args()
     try:
-        print(json.dumps(verify(args.run_dir.resolve()), indent=2))
+        print(json.dumps(verify(args.run_dir.resolve(), args.require_experts), indent=2))
     except (KeyError, OSError, TypeError, ValueError) as error:
         print(json.dumps({"status": "FAIL", "error": str(error)}), file=sys.stderr)
         sys.exit(1)

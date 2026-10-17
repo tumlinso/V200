@@ -41,6 +41,12 @@ typedef struct v200_memory_pair_profile {
     char qualification_id[160];
 } v200_memory_pair_profile;
 
+/* v200_allocation_info::flags. Owner indices refer to owner_device[0/1] in
+ * the qualified pair profile, not CUDA device ordinals. */
+#define V200_ALLOCATION_INFO_FLAG_ALLOCATION_API (1u << 0)
+#define V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_KNOWN (1u << 1)
+#define V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_1 (1u << 2)
+
 typedef struct v200_allocation_info {
     uint32_t abi_version;
     size_t struct_size;

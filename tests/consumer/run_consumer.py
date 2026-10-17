@@ -27,6 +27,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Callable
 
+import model_identity
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_PATH = REPO_ROOT / "benchmarks/fixtures/llama-server-v200.json"
@@ -269,12 +271,14 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
                        environ: dict[str, str] | None = None,
                        facade_mode: str | None = None,
                        selected_uuids: list[str] | None = None,
-                       profile_log_path: Path | None = None) -> dict[str, str]:
+                       profile_log_path: Path | None = None,
+                       cuda_graphs_enabled: bool = False) -> dict[str, str]:
     source = dict(os.environ if environ is None else environ)
     child = {key: value for key, value in source.items()
              if not key.startswith("LLAMA_ARG_") and not key.startswith("GGML_CUDA_")}
     pair_compute_requested = child.pop("V200_PAIR_COMPUTE", None) == "1"
     operator_verify_requested = child.pop("V200_OPERATOR_VERIFY", None) == "1"
+    child.pop("V200_GRAPH_CAPTURE", None)
     inherited = [part for part in child.pop("LD_PRELOAD", "").split()
                  if "libv200" not in Path(part).name.lower()]
     child.pop("V200_MODE", None)
@@ -283,6 +287,10 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
     child.pop("V200_B01_EVIDENCE_ID", None)
     for key, value in fixture["server"].get("environment", {}).items():
         child[str(key)] = str(value)
+    if cuda_graphs_enabled:
+        # The native and facade controls must exercise the same llama graph
+        # path. Only the pair facade receives V200's explicit capture opt-in.
+        child["GGML_CUDA_DISABLE_GRAPHS"] = "0"
     if control_name == "facade_owner":
         if not preloads:
             raise ConsumerError("facade_owner requires at least one --preload-library")
@@ -304,6 +312,8 @@ def _clean_environment(control_name: str, fixture: dict[str, Any],
         child["LD_PRELOAD"] = ":".join([*(str(path) for path in preloads), *inherited])
         if mode == "pair":
             child["V200_B01_EVIDENCE_ID"] = str(control["required_b01_evidence_id"])
+            if cuda_graphs_enabled:
+                child["V200_GRAPH_CAPTURE"] = "1"
         if profile_log_path is not None:
             child["V200_PROFILE_LOG"] = str(profile_log_path.resolve())
     elif inherited:
@@ -332,13 +342,24 @@ def verify_identities(profile: dict[str, Any], fixture: dict[str, Any],
                       profile_path: Path = PROFILE_PATH,
                       preloads: list[Path] | None = None) -> dict[str, Any]:
     binary = profile["binary"]
+    try:
+        model_identity_result = model_identity.identify_model(fixture["model"]["path"])
+    except model_identity.ModelIdentityError as exc:
+        raise ConsumerError(f"cannot establish stable model identity: {exc}") from exc
+    expected_model_sha = fixture["model"]["sha256"]
+    if model_identity_result["sha256"] != expected_model_sha:
+        raise ConsumerError(
+            f"hash mismatch for {fixture['model']['path']}: expected {expected_model_sha}, "
+            f"got {model_identity_result['sha256']}")
     identities: dict[str, Any] = {
         "profile_sha256": sha256_file(profile_path),
         "fixture_sha256": sha256_file(fixture_path),
         "binary": _verify_hash_entry(binary),
         "runtime_closure": [_verify_hash_entry(item) for item in profile["runtime_closure"]],
         "model": {"path": fixture["model"]["path"],
-                  "sha256": _verify_hash(fixture["model"]["path"], fixture["model"]["sha256"])},
+                  "sha256": model_identity_result["sha256"],
+                  "identity_provenance": model_identity_result["provenance"],
+                  "file_signature": model_identity_result["signature"]},
         "source": _git_source_identity(profile),
     }
     if preloads:
@@ -824,6 +845,8 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
         return {"status": status, "path": str(path),
                 "sha256": hashlib.sha256(raw).hexdigest(), "records": records,
                 "operator_records": operator_records,
+                "graph_records": [record for record in records
+                                  if str(record.get("event", "")).startswith("graph_")],
                 "owner_budget_bytes": accepted_budgets,
                 "peak_owner_used_bytes": peak_used,
                 "peak_total_owner_used_bytes": peak_total,
@@ -835,12 +858,18 @@ def _read_profile_log(path: Path, selected_uuids: list[str],
                 "sha256": hashlib.sha256(raw).hexdigest() if "raw" in locals() else None,
                 "records": records if "records" in locals() else [],
                 "operator_records": operator_records if "operator_records" in locals() else [],
+                "graph_records": [record for record in records
+                                  if str(record.get("event", "")).startswith("graph_")]
+                                if "records" in locals() else [],
                 "error": str(exc)}
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
         return {"status": "INVALID", "path": str(path),
                 "sha256": hashlib.sha256(raw).hexdigest() if "raw" in locals() else None,
                 "records": records if "records" in locals() else [],
                 "operator_records": operator_records if "operator_records" in locals() else [],
+                "graph_records": [record for record in records
+                                  if str(record.get("event", "")).startswith("graph_")]
+                                if "records" in locals() else [],
                 "error": f"{type(exc).__name__}: {exc}"}
 
 
@@ -898,7 +927,8 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
              visible_gpu_uuids: list[str] | None = None,
              server_port: int | None = None,
              serve_duration_seconds: int = 0,
-             physical_memory_baseline: dict[str, dict[str, int]] | None = None) -> dict[str, Any]:
+             physical_memory_baseline: dict[str, dict[str, int]] | None = None,
+             cuda_graphs_enabled: bool = False) -> dict[str, Any]:
     workload = fixture["workloads"][workload_name]
     preflight = memory_preflight(workload_name, control_name, fixture, facade_mode)
     if not preflight["fits_static_preflight"]:
@@ -929,7 +959,8 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
     profile_log_path = (output_dir / f"{run_id}.v200-profile.jsonl"
                         if control_name == "facade_owner" and resolved_facade_mode == "pair" else None)
     child_env = _clean_environment(control_name, fixture, preloads, environ,
-                                   facade_mode, selected_uuids, profile_log_path)
+                                   facade_mode, selected_uuids, profile_log_path,
+                                   cuda_graphs_enabled)
     result: dict[str, Any] = {
         "schema": "v200-consumer-result/v1",
         "run_id": run_id,
@@ -949,6 +980,8 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
         "v200_b01_evidence_id": child_env.get("V200_B01_EVIDENCE_ID"),
         "preview_environment": {
             "GGML_CUDA_DISABLE_GRAPHS": child_env.get("GGML_CUDA_DISABLE_GRAPHS"),
+            "V200_GRAPH_CAPTURE": child_env.get("V200_GRAPH_CAPTURE"),
+            "cuda_graphs_enabled": cuda_graphs_enabled,
             "policy": fixture["server"]["preview_policy"],
         },
         "preflight": preflight,
@@ -1119,6 +1152,32 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
                     str(fixture["controls"]["facade_owner"]["required_b01_evidence_id"]),
                     minimum_resident_bytes=minimum_resident)
                 result["v200_profile_telemetry"] = profile_info
+                graph_records = profile_info.get("graph_records", [])
+                graph_capture_records = [record for record in graph_records
+                                         if record.get("event") == "graph_capture_rewrite"
+                                         and record.get("graph_status") == 0]
+                graph_replay_records = [record for record in graph_records
+                                        if record.get("event") == "graph_replay"
+                                        and record.get("graph_status") == 0]
+                result["graph_capture_evidence"] = {
+                    "enabled": cuda_graphs_enabled,
+                    "status": ("PASS_CAPTURE_AND_REPLAY"
+                               if graph_capture_records and graph_replay_records
+                               else "NOT_REQUESTED" if not cuda_graphs_enabled
+                               else "MISSING_CAPTURE_OR_REPLAY"),
+                    "successful_capture_count": len(graph_capture_records),
+                    "successful_replay_samples": len(graph_replay_records),
+                    "max_matched_nodes": max(
+                        (int(record.get("graph_matched_nodes", 0))
+                         for record in graph_capture_records), default=0),
+                    "max_rewritten_nodes": max(
+                        (int(record.get("graph_rewritten_nodes", 0))
+                         for record in graph_capture_records), default=0),
+                }
+                if cuda_graphs_enabled and result["graph_capture_evidence"]["status"] != "PASS_CAPTURE_AND_REPLAY":
+                    result["application_status"] = "FAIL"
+                    result["failure"] = result["failure"] or (
+                        "explicit CUDA graph mode did not record both capture and replay")
                 result["allocation_evidence"]["v200_memory_api_receipt"] = profile_info["status"]
                 if workload_name == "resident_capacity":
                     result["allocation_evidence"]["minimum_real_gpu_payload_bytes"] = minimum_resident
@@ -1152,7 +1211,8 @@ def run_matrix(workload_name: str, controls: list[str], output_dir: Path,
                monitor: bool = True,
                facade_mode: str | None = None,
                server_port: int | None = None,
-               serve_duration_seconds: int = 0) -> list[dict[str, Any]]:
+               serve_duration_seconds: int = 0,
+               cuda_graphs_enabled: bool = False) -> list[dict[str, Any]]:
     fixture, profile = load_documents(fixture_path, profile_path)
     if workload_name not in fixture["workloads"]:
         raise ConsumerError(f"unknown workload {workload_name!r}")
@@ -1202,7 +1262,8 @@ def run_matrix(workload_name: str, controls: list[str], output_dir: Path,
                           visible_gpu_uuids=visible_gpu_uuids,
                           server_port=server_port,
                           serve_duration_seconds=serve_duration_seconds,
-                          physical_memory_baseline=physical_memory)
+                          physical_memory_baseline=physical_memory,
+                          cuda_graphs_enabled=cuda_graphs_enabled)
         results.append(result)
         if result["application_status"] != "PASS":
             break
@@ -1224,6 +1285,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="launcher-selected loopback port, used only by finite serve mode")
     parser.add_argument("--serve-duration-seconds", type=int, default=0,
                         help=f"keep the smoke facade available after its exact self-check (max {MAX_SERVE_DURATION_S}s)")
+    parser.add_argument("--cuda-graphs", action="store_true",
+                        help="opt in to llama CUDA graph capture/replay for matched controls")
     parser.add_argument("--execute", action="store_true",
                         help="required explicit confirmation for the live app process")
     parser.add_argument("--cpu-fake-no-memory-guard", action="store_true", help=argparse.SUPPRESS)
@@ -1251,7 +1314,8 @@ def main(argv: list[str] | None = None) -> int:
         results = run_matrix(args.workload, args.controls, args.output_dir,
                              args.preloads, facade_mode=args.facade_mode,
                              server_port=args.server_port,
-                             serve_duration_seconds=args.serve_duration_seconds)
+                             serve_duration_seconds=args.serve_duration_seconds,
+                             cuda_graphs_enabled=args.cuda_graphs)
     except ConsumerError as exc:
         print(f"consumer run refused: {exc}", file=sys.stderr)
         return 2

@@ -11,6 +11,7 @@ endif()
 find_package(CUDAToolkit 12 REQUIRED)
 
 add_library(v200_operators SHARED
+  graph_rewrite.cpp
   launch.cpp
   mmvq_plan.cpp
   pair_runtime.cpp)

@@ -805,7 +805,18 @@ CUresult MemoryManager::query(const void *ptr, v200_allocation_info *out) const 
     out->owner_bytes[0] = 0;
     out->owner_bytes[1] = 0;
     out->extent_count = static_cast<uint32_t>(record->extents.size());
-    out->flags = record->allocation_api ? 1u : 0u;
+    uint32_t flags = record->allocation_api
+        ? V200_ALLOCATION_INFO_FLAG_ALLOCATION_API : 0u;
+    if (record->published && !record->extents.empty()) {
+        const int first_owner = owner_index(impl_->profile, record->extents[0].plan.owner);
+        if (first_owner >= 0) {
+            flags |= V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_KNOWN;
+            if (first_owner == 1) {
+                flags |= V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_1;
+            }
+        }
+    }
+    out->flags = flags;
     for (const auto &extent : record->extents) {
         const int index = owner_index(impl_->profile, extent.plan.owner);
         if (index >= 0) {

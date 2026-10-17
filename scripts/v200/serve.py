@@ -3,7 +3,8 @@
 
 Default mode is a matched graph-off native-vs-facade correctness preview. Use
 ``--mode serve`` for a finite foreground loopback server (30 minutes by
-default). Both modes are dry-run unless ``--execute`` is supplied.
+default). ``--cuda-graphs`` opts matched runs into llama capture/replay. Both
+modes are dry-run unless ``--execute`` is supplied.
 """
 
 from __future__ import annotations
@@ -128,7 +129,8 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
                python_executable: str | None = None,
                workload_name: str = "smoke",
                pair_compute: bool = False,
-               verify_pair_compute: bool = False) -> dict[str, Any]:
+               verify_pair_compute: bool = False,
+               cuda_graphs_enabled: bool = False) -> dict[str, Any]:
     fixture = _read_json(FIXTURE_PATH)
     selected_port = DEFAULT_SERVER_PORT if mode == "serve" and port is None else port
     controls, bundle, duration = _server_args(
@@ -176,6 +178,8 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
     for library in preload_libraries:
         inner.extend(["--preload-library", str(library)])
     inner.extend(["--facade-mode", "pair", "--output-dir", str(output_dir), "--execute"])
+    if cuda_graphs_enabled:
+        inner.append("--cuda-graphs")
     if duration:
         inner.extend(["--serve-duration-seconds", str(duration), "--server-port", str(selected_port)])
 
@@ -192,6 +196,7 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
     child_env = [
         "-u", "V200_PAIR_COMPUTE",
         "-u", "V200_OPERATOR_VERIFY",
+        "-u", "V200_GRAPH_CAPTURE",
         f"V200_DEVICE_UUIDS={','.join(uuids)}",
     ]
     if pair_compute:
@@ -209,15 +214,20 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         "docs/v200/consumer-profile.json",
         "evidence/foundation/pair-profile.json",
         "planning/v200-bootstrap/tools/run_bounded.py",
+        "src/frontdoor/cuda_wrappers.cpp",
+        "src/frontdoor/abi_profile.cpp",
+        "docs/v200/abi-profile.json",
     ]
     if pair_compute:
         paths.extend([
             "src/operators/launch.cpp",
             "src/operators/mmvq_plan.cpp",
             "src/operators/pair_runtime.cpp",
+            "src/operators/graph_rewrite.cpp",
             "include/v200/operators/launch.hpp",
             "include/v200/operators/mmvq_plan.hpp",
             "include/v200/operators/pair_runtime.hpp",
+            "include/v200/operators/graph_rewrite.hpp",
             "src/operators/CMakeLists.txt",
         ])
     spec: dict[str, Any] = {
@@ -254,7 +264,10 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         "selected_gpu_uuids": list(uuids),
         "duration_seconds": duration if duration else None,
         "endpoint": f"http://127.0.0.1:{selected_port}" if duration else None,
-        "graph_policy": fixture["server"].get("preview_policy"),
+        "graph_policy": (
+            "opt-in enabled: llama graphs capture and replay through the pair facade; "
+            "pair compute rewrites only qualified graph kernels"
+            if cuda_graphs_enabled else fixture["server"].get("preview_policy")),
         "model": {"name": fixture["model"]["name"], "path": fixture["model"]["path"],
                   "sha256": fixture["model"]["sha256"]},
         "consumer_binary": {"path": profile["binary"]["path"],
@@ -266,6 +279,7 @@ def _make_plan(mode: str, uuids: list[str], run_id: str,
         "preload_libraries": [str(path) for path in preload_libraries],
         "pair_compute": pair_compute,
         "operator_verification": verify_pair_compute,
+        "cuda_graphs_enabled": cuda_graphs_enabled,
         "static_memory_preflight": preflights,
         "app_allocation_cap_mib_per_gpu": APP_LIMIT_MIB,
         "bounded_seconds": bounded_seconds,
@@ -383,6 +397,8 @@ def _print_plan(plan: dict[str, Any], missing: list[str], execute: bool) -> None
     if plan["pair_compute"]:
         verification = " with operator verification" if plan["operator_verification"] else ""
         print(f"Pair compute: enabled{verification}")
+    if plan["cuda_graphs_enabled"]:
+        print("CUDA graphs: enabled by explicit opt-in; native control stays unwrapped and facade capture is tracked.")
     print(f"Static smoke memory preflight: {json.dumps(plan['static_memory_preflight'], sort_keys=True)}")
     print(f"Per-GPU application allocation budget: {plan['app_allocation_cap_mib_per_gpu']} MiB")
     if "pair_profile_identity" in plan:
@@ -442,6 +458,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="llama workload; resident_capacity uses the full-resident pair fixture")
     parser.add_argument("--pair-compute", action="store_true",
                         help="opt in to the pair operator library for supported operations")
+    parser.add_argument("--cuda-graphs", action="store_true",
+                        help="opt in to matched llama CUDA graph capture/replay")
     parser.add_argument("--execute", action="store_true",
                         help="explicitly enter the CUDA controller; without this flag, print a dry-run plan")
     return parser.parse_args(argv)
@@ -457,6 +475,7 @@ def main(argv: list[str] | None = None) -> int:
                           duration_seconds=args.duration_seconds, port=args.port,
                           workload_name=args.workload,
                           pair_compute=args.pair_compute,
+                          cuda_graphs_enabled=args.cuda_graphs,
                           verify_pair_compute=(args.pair_compute
                                                and os.environ.get("V200_OPERATOR_VERIFY") == "1"))
         plan["pair_profile_identity"] = pair_identity

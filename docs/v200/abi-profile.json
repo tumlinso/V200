@@ -42,12 +42,13 @@
       "cudaMemcpy2DAsync", "cudaMemcpyAsync", "cudaMemcpyPeerAsync", "cudaMemsetAsync",
       "cudaStreamCreateWithFlags", "cudaStreamDestroy", "cudaStreamSynchronize",
       "cudaStreamWaitEvent", "cudaEventRecord", "cudaEventSynchronize",
-      "cudaLaunchKernel", "cudaLaunchKernelExC", "cudaLaunchCooperativeKernel"
+      "cudaLaunchKernel", "cudaLaunchKernelExC", "cudaLaunchCooperativeKernel",
+      "cudaGraphInstantiate", "cudaGraphLaunch", "cudaGraphExecUpdate",
+      "cudaGraphDestroy", "cudaGraphExecDestroy", "cudaStreamBeginCapture",
+      "cudaStreamEndCapture", "cudaStreamIsCapturing"
     ],
     "unsupported_in_pair_mode": [
-      "cudaMallocManaged", "cudaGraphInstantiate", "cudaGraphLaunch",
-      "cudaGraphExecUpdate", "cudaStreamBeginCapture", "cudaStreamEndCapture",
-      "cudaStreamIsCapturing"
+      "cudaMallocManaged"
     ],
     "anchor_native_passthrough": [
       "cudaEventCreateWithFlags", "cudaEventDestroy", "cudaGraphDestroy",
@@ -65,8 +66,17 @@
     "cublasSetStream_v2", "cublasSetWorkspace_v2", "cublasGetStatusString",
     "nccl*"
   ],
+  "graph_capture": {
+    "opt_in": "--cuda-graphs sets GGML_CUDA_DISABLE_GRAPHS=0 for matched controls and V200_GRAPH_CAPTURE=1 only for the pair facade.",
+    "pair_execution": "During capture, native anchor launches are recorded without inserting ledger events or invoking the non-capture-safe pair operator. After EndCapture, exact eligible Q4_K MMVQ kernel nodes may be rewritten to peer-context functions. Graph replay is tracked as one asynchronous submission.",
+    "telemetry": "The pair frontdoor ledger records capture, instantiate, update, and a bounded sample of graph replays with matched/re-written node counts.",
+    "other_graph_apis_not_qualified": ["cudaGraphInstantiateWithFlags", "graph node creation/update APIs"],
+    "status": "Implementation candidate pending controller-backed graph qualification."
+  },
   "semantic_limits": [
-    "Pair-mode graph capture, instantiate, update and replay are not qualified and return unsupported where intercepted.",
+    "Graph support is explicit opt-in and limited to the pinned llama runtime capture/instantiate/update/replay path; only exact qualified Q4_K MMVQ graph nodes are peer-rewritten. Other captured operations remain anchor-side.",
+    "Launch-time operator numeric verification is skipped during capture because it synchronizes and copies results; graph correctness must be established by the consumer oracle and controller-backed graph qualification.",
+    "Applications must keep graph-referenced device allocations alive under CUDA graph lifetime rules; frontdoor completion tracking covers each graph replay, not the entire graph-exec lifetime.",
     "No split arbitrary kernel, cross-owner global/atomic coordination, module-global routing, or NCCL collective is claimed.",
     "The profile is a static import inventory; runtime call frequency and selected llama execution paths remain unproven until controller-backed evidence is recorded."
   ]

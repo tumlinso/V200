@@ -26,9 +26,13 @@ namespace {
 
 constexpr const char *q4k_mmvq_name =
     "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb0ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
+constexpr const char *q4k_mmvq_gate_name =
+    "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb1ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
 constexpr size_t q4k_block_bytes = 144;
 constexpr uint32_t q4k_block_elements = 256;
 constexpr size_t q8_1_block_bytes = 36;
+constexpr uint32_t q8_1_block_elements = 32;
+constexpr size_t minimum_peer_active_weight_bytes = 4 * 1024 * 1024;
 constexpr size_t max_verify_output_bytes = 1024 * 1024;
 
 struct FusionArgs {
@@ -82,6 +86,20 @@ struct OperatorCounters {
     std::atomic<uint64_t> peer_rows{0};
     std::atomic<uint64_t> verified_rows{0};
     std::atomic<uint64_t> verification_failures{0};
+    std::atomic<uint64_t> expert_matched_calls{0};
+    std::atomic<uint64_t> expert_anchor_local_calls{0};
+    std::atomic<uint64_t> expert_peer_owner_calls{0};
+    std::atomic<uint64_t> expert_small_peer_fallback_calls{0};
+    std::atomic<uint64_t> expert_rows{0};
+    std::atomic<uint64_t> expert_anchor_rows{0};
+    std::atomic<uint64_t> expert_peer_rows{0};
+    std::atomic<uint64_t> expert_verified_calls{0};
+    std::atomic<uint64_t> expert_verified_outputs{0};
+    std::atomic<uint64_t> expert_plain_verified_calls{0};
+    std::atomic<uint64_t> expert_plain_verified_outputs{0};
+    std::atomic<uint64_t> expert_fused_verified_calls{0};
+    std::atomic<uint64_t> expert_fused_verified_outputs{0};
+    std::atomic<uint64_t> expert_verification_failures{0};
 };
 
 void write_operator_event(const char *event, const char *route,
@@ -89,10 +107,23 @@ void write_operator_event(const char *event, const char *route,
                           uint64_t peer_owner_calls, uint64_t split_calls,
                           uint64_t anchor_rows, uint64_t peer_rows,
                           uint64_t verified_rows, float max_abs_error,
-                          int status) noexcept {
+                          int status, uint64_t expert_matched_calls = 0,
+                          uint64_t expert_anchor_local_calls = 0,
+                          uint64_t expert_peer_owner_calls = 0,
+                          uint64_t expert_small_peer_fallback_calls = 0,
+                          uint64_t expert_rows = 0,
+                          uint64_t expert_anchor_rows = 0,
+                          uint64_t expert_peer_rows = 0,
+                          uint64_t expert_verified_calls = 0,
+                          uint64_t expert_verified_outputs = 0,
+                          uint64_t expert_plain_verified_calls = 0,
+                          uint64_t expert_plain_verified_outputs = 0,
+                          uint64_t expert_fused_verified_calls = 0,
+                          uint64_t expert_fused_verified_outputs = 0,
+                          uint64_t expert_verification_failures = 0) noexcept {
     const char *path = std::getenv("V200_PROFILE_LOG");
     if (path == nullptr || path[0] == '\0') return;
-    char line[1024];
+    char line[1536];
     const int count = std::snprintf(
         line, sizeof(line),
         "{\"schema\":\"v200-operator-ledger/v1\",\"event\":\"%s\","
@@ -100,7 +131,17 @@ void write_operator_event(const char *event, const char *route,
         "\"matched_calls\":%llu,\"anchor_local_calls\":%llu,"
         "\"peer_owner_calls\":%llu,\"split_calls\":%llu,"
         "\"anchor_rows\":%llu,\"peer_rows\":%llu,"
-        "\"verified_rows\":%llu,\"max_abs_error\":%.9g,\"status\":%d}\n",
+        "\"verified_rows\":%llu,\"max_abs_error\":%.9g,\"status\":%d,"
+        "\"expert_matched_calls\":%llu,\"expert_anchor_local_calls\":%llu,"
+        "\"expert_peer_owner_calls\":%llu,\"expert_small_peer_fallback_calls\":%llu,"
+        "\"expert_rows\":%llu,\"expert_anchor_rows\":%llu,"
+        "\"expert_peer_rows\":%llu,\"expert_verified_calls\":%llu,"
+        "\"expert_verified_outputs\":%llu,"
+        "\"expert_plain_verified_calls\":%llu,"
+        "\"expert_plain_verified_outputs\":%llu,"
+        "\"expert_fused_verified_calls\":%llu,"
+        "\"expert_fused_verified_outputs\":%llu,"
+        "\"expert_verification_failures\":%llu}\n",
         event, route,
         static_cast<unsigned long long>(matched_calls),
         static_cast<unsigned long long>(anchor_local_calls),
@@ -108,7 +149,21 @@ void write_operator_event(const char *event, const char *route,
         static_cast<unsigned long long>(split_calls),
         static_cast<unsigned long long>(anchor_rows),
         static_cast<unsigned long long>(peer_rows),
-        static_cast<unsigned long long>(verified_rows), max_abs_error, status);
+        static_cast<unsigned long long>(verified_rows), max_abs_error, status,
+        static_cast<unsigned long long>(expert_matched_calls),
+        static_cast<unsigned long long>(expert_anchor_local_calls),
+        static_cast<unsigned long long>(expert_peer_owner_calls),
+        static_cast<unsigned long long>(expert_small_peer_fallback_calls),
+        static_cast<unsigned long long>(expert_rows),
+        static_cast<unsigned long long>(expert_anchor_rows),
+        static_cast<unsigned long long>(expert_peer_rows),
+        static_cast<unsigned long long>(expert_verified_calls),
+        static_cast<unsigned long long>(expert_verified_outputs),
+        static_cast<unsigned long long>(expert_plain_verified_calls),
+        static_cast<unsigned long long>(expert_plain_verified_outputs),
+        static_cast<unsigned long long>(expert_fused_verified_calls),
+        static_cast<unsigned long long>(expert_fused_verified_outputs),
+        static_cast<unsigned long long>(expert_verification_failures));
     if (count <= 0 || static_cast<size_t>(count) >= sizeof(line)) return;
 
     static std::mutex *write_mutex = new std::mutex();
@@ -136,7 +191,19 @@ OperatorCounters &operator_counters() {
                 final.peer_owner_calls.load(), final.split_calls.load(),
                 final.anchor_rows.load(), final.peer_rows.load(),
                 final.verified_rows.load(), -1.0f,
-                final.verification_failures.load() == 0 ? 0 : 1);
+                final.verification_failures.load() == 0 ? 0 : 1,
+                final.expert_matched_calls.load(),
+                final.expert_anchor_local_calls.load(),
+                final.expert_peer_owner_calls.load(),
+                final.expert_small_peer_fallback_calls.load(),
+                final.expert_rows.load(), final.expert_anchor_rows.load(),
+                final.expert_peer_rows.load(), final.expert_verified_calls.load(),
+                final.expert_verified_outputs.load(),
+                final.expert_plain_verified_calls.load(),
+                final.expert_plain_verified_outputs.load(),
+                final.expert_fused_verified_calls.load(),
+                final.expert_fused_verified_outputs.load(),
+                final.expert_verification_failures.load());
         }) == 0;
     }();
     (void)exit_report_registered;
@@ -163,7 +230,8 @@ bool all_null(const FusionArgs &fusion) noexcept {
            fusion.gate_scale == nullptr;
 }
 
-bool is_pair_managed_range(const void *pointer, size_t bytes) noexcept {
+bool query_pair_managed_range(const void *pointer, size_t bytes,
+                              v200_allocation_info *out) noexcept {
     if (pointer == nullptr || bytes == 0) return false;
     v200_allocation_info allocation{};
     allocation.abi_version = V200_MEMORY_ABI_VERSION;
@@ -176,8 +244,16 @@ bool is_pair_managed_range(const void *pointer, size_t bytes) noexcept {
     const uintptr_t address = reinterpret_cast<uintptr_t>(pointer);
     if (address < base) return false;
     const uintptr_t offset = address - base;
-    return offset <= allocation.requested_bytes &&
-           bytes <= allocation.requested_bytes - offset;
+    if (offset > allocation.requested_bytes ||
+        bytes > allocation.requested_bytes - offset) {
+        return false;
+    }
+    if (out != nullptr) *out = allocation;
+    return true;
+}
+
+bool is_pair_managed_range(const void *pointer, size_t bytes) noexcept {
+    return query_pair_managed_range(pointer, bytes, nullptr);
 }
 
 bool ranges_overlap(const void *left, size_t left_bytes,
@@ -189,6 +265,91 @@ bool ranges_overlap(const void *left, size_t left_bytes,
     const uintptr_t left_end = left_begin + left_bytes;
     const uintptr_t right_end = right_begin + right_bytes;
     return left_begin < right_end && right_begin < left_end;
+}
+
+bool checked_multiply(size_t left, size_t right, size_t *out) noexcept {
+    if (out == nullptr || (left != 0 && right > SIZE_MAX / left)) return false;
+    *out = left * right;
+    return true;
+}
+
+bool checked_add(size_t left, size_t right, size_t *out) noexcept {
+    if (out == nullptr || right > SIZE_MAX - left) return false;
+    *out = left + right;
+    return true;
+}
+
+bool allocation_contains_range(const v200_allocation_info &allocation,
+                               uintptr_t address, size_t bytes) noexcept {
+    if (allocation.base == 0 || allocation.requested_bytes == 0 || bytes == 0)
+        return false;
+    const uintptr_t base = static_cast<uintptr_t>(allocation.base);
+    if (address < base) return false;
+    const uintptr_t offset = address - base;
+    return offset <= allocation.requested_bytes &&
+           bytes <= allocation.requested_bytes - offset;
+}
+
+bool owner_for_contiguous_range(uintptr_t address, size_t bytes,
+                                const v200_allocation_info &allocation,
+                                const v200_memory_pair_profile &profile,
+                                uint32_t *owner_index) noexcept {
+    if (owner_index == nullptr || bytes == 0 ||
+        allocation.abi_version != V200_MEMORY_ABI_VERSION ||
+        allocation.struct_size < sizeof(v200_allocation_info) ||
+        allocation.mapped_bytes == 0 ||
+        allocation.requested_bytes > allocation.mapped_bytes ||
+        allocation.owner_bytes[0] > allocation.mapped_bytes ||
+        allocation.owner_bytes[1] > allocation.mapped_bytes ||
+        allocation.owner_bytes[0] > allocation.mapped_bytes - allocation.owner_bytes[1] ||
+        allocation.owner_bytes[0] + allocation.owner_bytes[1] != allocation.mapped_bytes ||
+        !allocation_contains_range(allocation, address, bytes)) {
+        return false;
+    }
+
+    if (allocation.extent_count == 1) {
+        const bool owner0 = allocation.owner_bytes[0] == allocation.mapped_bytes &&
+                            allocation.owner_bytes[1] == 0;
+        const bool owner1 = allocation.owner_bytes[1] == allocation.mapped_bytes &&
+                            allocation.owner_bytes[0] == 0;
+        if (!owner0 && !owner1) return false;
+        *owner_index = owner0 ? 0u : 1u;
+        return true;
+    }
+    if (allocation.extent_count != 2 || allocation.owner_bytes[0] == 0 ||
+        allocation.owner_bytes[1] == 0 ||
+        (allocation.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_KNOWN) == 0 ||
+        profile.abi_version != V200_MEMORY_ABI_VERSION ||
+        profile.struct_size < sizeof(v200_memory_pair_profile) ||
+        profile.owner_device[0] == profile.owner_device[1] ||
+        profile.default_owner != profile.owner_device[0] ||
+        profile.pair_access_qualified == 0 || profile.qualification_id[0] == '\0') {
+        return false;
+    }
+
+    const uint32_t first_owner =
+        (allocation.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_1) != 0
+            ? 1u : 0u;
+    const uint32_t second_owner = 1u - first_owner;
+    const uintptr_t base = static_cast<uintptr_t>(allocation.base);
+    if (allocation.owner_bytes[first_owner] > UINTPTR_MAX - base ||
+        bytes > UINTPTR_MAX - address) {
+        return false;
+    }
+    const uintptr_t boundary = base + allocation.owner_bytes[first_owner];
+    const uintptr_t end = address + bytes;
+    if (end <= boundary) {
+        *owner_index = first_owner;
+        return true;
+    }
+    if (address >= boundary) {
+        *owner_index = second_owner;
+        return true;
+    }
+    // The current expert path routes a complete bank to one owner; boundary
+    // banks remain on the original application path until the ID planner is
+    // integrated and qualified.
+    return false;
 }
 
 template <typename Function>
@@ -284,7 +445,361 @@ void **argument_addresses(Q4KMmvqArgs &args, std::array<void *, 19> &addresses) 
     return addresses.data();
 }
 
+enum class MmvqFamily : uint32_t {
+    q4k_plain = V200_OPERATOR_MMVQ_Q4K_PLAIN,
+    q4k_gate_fused = V200_OPERATOR_MMVQ_Q4K_GATE_FUSED,
+};
+
+struct ExpertBankCandidate {
+    Q4KMmvqArgs args{};
+    v200_memory_pair_profile profile{};
+    uint32_t owner_index = 0;
+    MmvqFamily family = MmvqFamily::q4k_plain;
+    size_t bank_bytes = 0;
+    size_t active_weight_bytes = 0;
+    uint64_t rows = 0;
+    size_t remote_transfer_bytes = 0;
+    size_t input_bytes = 0;
+    size_t ids_bytes = 0;
+    size_t output_bytes = 0;
+};
+
+bool capture_q4k_arguments(void **arguments, Q4KMmvqArgs *captured) noexcept {
+    if (arguments == nullptr || captured == nullptr) return false;
+    const size_t sizes[19] = {
+        sizeof(captured->vx), sizeof(captured->vy), sizeof(captured->ids),
+        sizeof(captured->fusion), sizeof(captured->dst), sizeof(captured->ncols_x),
+        sizeof(captured->nchannels_y), sizeof(captured->stride_row_x),
+        sizeof(captured->stride_col_y), sizeof(captured->stride_col_dst),
+        sizeof(captured->channel_ratio), sizeof(captured->stride_channel_x),
+        sizeof(captured->stride_channel_y), sizeof(captured->stride_channel_dst),
+        sizeof(captured->sample_ratio), sizeof(captured->stride_sample_x),
+        sizeof(captured->stride_sample_y), sizeof(captured->stride_sample_dst),
+        sizeof(captured->ids_stride)};
+    const size_t offsets[19] = {
+        offsetof(Q4KMmvqArgs, vx), offsetof(Q4KMmvqArgs, vy),
+        offsetof(Q4KMmvqArgs, ids), offsetof(Q4KMmvqArgs, fusion),
+        offsetof(Q4KMmvqArgs, dst), offsetof(Q4KMmvqArgs, ncols_x),
+        offsetof(Q4KMmvqArgs, nchannels_y), offsetof(Q4KMmvqArgs, stride_row_x),
+        offsetof(Q4KMmvqArgs, stride_col_y), offsetof(Q4KMmvqArgs, stride_col_dst),
+        offsetof(Q4KMmvqArgs, channel_ratio), offsetof(Q4KMmvqArgs, stride_channel_x),
+        offsetof(Q4KMmvqArgs, stride_channel_y), offsetof(Q4KMmvqArgs, stride_channel_dst),
+        offsetof(Q4KMmvqArgs, sample_ratio), offsetof(Q4KMmvqArgs, stride_sample_x),
+        offsetof(Q4KMmvqArgs, stride_sample_y), offsetof(Q4KMmvqArgs, stride_sample_dst),
+        offsetof(Q4KMmvqArgs, ids_stride)};
+    auto *destination = reinterpret_cast<unsigned char *>(captured);
+    for (size_t i = 0; i < 19; ++i) {
+        if (arguments[i] == nullptr) return false;
+        std::memcpy(destination + offsets[i], arguments[i], sizes[i]);
+    }
+    return true;
+}
+
+bool prepare_expert_bank_candidate(const void *host_function, dim3 grid,
+                                   dim3 block, void **arguments,
+                                   ExpertBankCandidate *out) noexcept {
+    if (out == nullptr || host_function == nullptr || grid.x == 0 || grid.y <= 1 ||
+        grid.z != 1 || block.x != 32 || block.y != 4 || block.z != 1) {
+        return false;
+    }
+
+    const std::string name = registered_kernel_name(host_function);
+    MmvqFamily family{};
+    if (name == q4k_mmvq_name) {
+        family = MmvqFamily::q4k_plain;
+    } else if (name == q4k_mmvq_gate_name) {
+        family = MmvqFamily::q4k_gate_fused;
+    } else {
+        return false;
+    }
+
+    ExpertBankCandidate candidate{};
+    candidate.family = family;
+    if (!capture_q4k_arguments(arguments, &candidate.args)) return false;
+    const Q4KMmvqArgs &args = candidate.args;
+    if (args.ids == nullptr || args.vx == nullptr || args.vy == nullptr ||
+        args.dst == nullptr || args.ncols_x < 2048 ||
+        args.ncols_x % q4k_block_elements != 0 ||
+        args.ncols_x % q8_1_block_elements != 0 || args.stride_row_x == 0 ||
+        args.stride_row_x > SIZE_MAX / q4k_block_bytes ||
+        static_cast<size_t>(args.stride_row_x) * q4k_block_elements != args.ncols_x ||
+        args.stride_sample_x == 0 || args.stride_channel_y == 0 ||
+        args.nchannels_y.z == 0 || args.stride_channel_dst < grid.x) {
+        return false;
+    }
+    if (family == MmvqFamily::q4k_plain) {
+        if (!all_null(args.fusion)) return false;
+    } else if (args.fusion.gate == nullptr || args.fusion.x_bias != nullptr ||
+               args.fusion.gate_bias != nullptr || args.fusion.x_scale != nullptr ||
+               args.fusion.gate_scale != nullptr) {
+        return false;
+    }
+
+    size_t row_bytes = 0;
+    size_t active_rows = 0;
+    size_t id_bytes = 0;
+    size_t blocks_per_input = 0;
+    size_t last_input_channel = 0;
+    size_t last_input_offset_bytes = 0;
+    size_t one_expert_bytes = 0;
+    size_t output_elements = 0;
+    size_t output_offset = 0;
+    if (!checked_multiply(args.stride_row_x, q4k_block_bytes, &row_bytes) ||
+        !checked_multiply(grid.x, grid.y, &active_rows) ||
+        !checked_multiply(active_rows, row_bytes, &candidate.active_weight_bytes) ||
+        !checked_multiply(grid.x, row_bytes, &one_expert_bytes) ||
+        !checked_multiply(grid.y, sizeof(int32_t), &id_bytes) ||
+        !checked_multiply(args.ncols_x / q8_1_block_elements,
+                          q8_1_block_bytes, &blocks_per_input) ||
+        !checked_multiply(std::min(grid.y, args.nchannels_y.z) - 1,
+                          args.stride_channel_y, &last_input_channel) ||
+        !checked_multiply(last_input_channel, q8_1_block_bytes,
+                          &last_input_offset_bytes) ||
+        !checked_add(last_input_offset_bytes, blocks_per_input,
+                     &candidate.input_bytes) ||
+        !checked_multiply(grid.y - 1, args.stride_channel_dst, &output_offset) ||
+        !checked_add(output_offset, grid.x, &output_elements) ||
+        !checked_multiply(output_elements, sizeof(float), &candidate.output_bytes) ||
+        !checked_add(candidate.input_bytes, candidate.output_bytes,
+                     &candidate.remote_transfer_bytes) ||
+        !checked_multiply(args.stride_sample_x, q4k_block_bytes,
+                          &candidate.bank_bytes)) {
+        return false;
+    }
+    candidate.ids_bytes = id_bytes;
+    candidate.rows = static_cast<uint64_t>(active_rows);
+    if (one_expert_bytes > candidate.bank_bytes ||
+        args.stride_channel_x == 0 || args.stride_channel_x > args.stride_sample_x ||
+        !query_pair_managed_range(args.vx, candidate.bank_bytes, nullptr) ||
+        !query_pair_managed_range(args.ids, candidate.ids_bytes, nullptr) ||
+        !query_pair_managed_range(args.vy, candidate.input_bytes, nullptr) ||
+        !query_pair_managed_range(args.dst, candidate.output_bytes, nullptr)) {
+        return false;
+    }
+    if (ranges_overlap(args.vx, candidate.bank_bytes, args.ids, candidate.ids_bytes) ||
+        ranges_overlap(args.vx, candidate.bank_bytes, args.vy, candidate.input_bytes) ||
+        ranges_overlap(args.vx, candidate.bank_bytes, args.dst, candidate.output_bytes) ||
+        ranges_overlap(args.ids, candidate.ids_bytes, args.vy, candidate.input_bytes) ||
+        ranges_overlap(args.ids, candidate.ids_bytes, args.dst, candidate.output_bytes) ||
+        ranges_overlap(args.vy, candidate.input_bytes, args.dst, candidate.output_bytes)) {
+        return false;
+    }
+
+    v200_allocation_info weight_allocation{};
+    if (!query_pair_managed_range(args.vx, candidate.bank_bytes, &weight_allocation))
+        return false;
+    candidate.profile.abi_version = V200_MEMORY_ABI_VERSION;
+    candidate.profile.struct_size = sizeof(candidate.profile);
+    if (v200_memory_get_profile(&candidate.profile) != CUDA_SUCCESS ||
+        candidate.profile.owner_device[0] == candidate.profile.owner_device[1] ||
+        candidate.profile.abi_version != V200_MEMORY_ABI_VERSION ||
+        candidate.profile.struct_size < sizeof(v200_memory_pair_profile) ||
+        candidate.profile.default_owner != candidate.profile.owner_device[0] ||
+        candidate.profile.pair_access_qualified == 0 ||
+        candidate.profile.qualification_id[0] == '\0' ||
+        !owner_for_contiguous_range(reinterpret_cast<uintptr_t>(args.vx),
+                                    candidate.bank_bytes, weight_allocation,
+                                    candidate.profile, &candidate.owner_index)) {
+        return false;
+    }
+    if (family == MmvqFamily::q4k_gate_fused) {
+        v200_allocation_info gate_allocation{};
+        uint32_t gate_owner = 0;
+        if (!query_pair_managed_range(args.fusion.gate, candidate.bank_bytes,
+                                      &gate_allocation) ||
+            !owner_for_contiguous_range(
+                reinterpret_cast<uintptr_t>(args.fusion.gate), candidate.bank_bytes,
+                gate_allocation, candidate.profile, &gate_owner) ||
+            gate_owner != candidate.owner_index ||
+            ranges_overlap(args.fusion.gate, candidate.bank_bytes, args.ids,
+                           candidate.ids_bytes) ||
+            ranges_overlap(args.fusion.gate, candidate.bank_bytes, args.vy,
+                           candidate.input_bytes) ||
+            ranges_overlap(args.fusion.gate, candidate.bank_bytes, args.dst,
+                           candidate.output_bytes)) {
+            return false;
+        }
+    }
+
+    *out = candidate;
+    return true;
+}
+
+bool above_peer_work_threshold(const ExpertBankCandidate &candidate) noexcept {
+    size_t threshold = 0;
+    return checked_add(minimum_peer_active_weight_bytes,
+                       candidate.remote_transfer_bytes, &threshold) &&
+           candidate.active_weight_bytes >= threshold;
+}
+
+int try_launch_expert_bank(const void *host_function, dim3 grid, dim3 block,
+                           void **arguments, size_t shared_bytes,
+                           cudaStream_t anchor_stream,
+                           v200_operator_native_launch_fn native_launch,
+                           cudaError_t *status) noexcept {
+    if (status == nullptr || v200_frontdoor_mode() != 2) return 0;
+    ExpertBankCandidate candidate{};
+    if (!prepare_expert_bank_candidate(host_function, grid, block, arguments,
+                                       &candidate)) {
+        return 0;
+    }
+
+    OperatorCounters &counters = operator_counters();
+    counters.expert_matched_calls.fetch_add(1);
+    if (candidate.owner_index == 0 || !above_peer_work_threshold(candidate)) {
+        const uint64_t local = counters.expert_anchor_local_calls.fetch_add(1) + 1;
+        counters.expert_anchor_rows.fetch_add(candidate.rows);
+        if (candidate.owner_index == 1)
+            counters.expert_small_peer_fallback_calls.fetch_add(1);
+        if (local == 1 || (local % 64) == 0) {
+            write_operator_event(
+                candidate.owner_index == 0 ? "q4k_mmvq_expert_anchor_bank"
+                                           : "q4k_mmvq_expert_small_peer_fallback",
+                candidate.owner_index == 0 ? "anchor-owner" : "small-peer-fallback",
+                counters.matched_calls.load(), counters.anchor_local_calls.load(),
+                counters.peer_owner_calls.load(), counters.split_calls.load(),
+                counters.anchor_rows.load(), counters.peer_rows.load(),
+                counters.verified_rows.load(), -1.0f, 0,
+                counters.expert_matched_calls.load(),
+                counters.expert_anchor_local_calls.load(),
+                counters.expert_peer_owner_calls.load(),
+                counters.expert_small_peer_fallback_calls.load(),
+                counters.expert_rows.load(), counters.expert_anchor_rows.load(),
+                counters.expert_peer_rows.load(), counters.expert_verified_calls.load(),
+                counters.expert_verified_outputs.load(),
+                counters.expert_plain_verified_calls.load(),
+                counters.expert_plain_verified_outputs.load(),
+                counters.expert_fused_verified_calls.load(),
+                counters.expert_fused_verified_outputs.load(),
+                counters.expert_verification_failures.load());
+            if (local == 1)
+                v200_frontdoor_snapshot("operator_q4k_mmvq_expert_anchor");
+        }
+        return 0;
+    }
+
+    v200::operators::OwnerPartition partition{};
+    partition.device = candidate.profile.owner_device[candidate.owner_index];
+    partition.grid = grid;
+    partition.arguments = arguments;
+    static std::atomic<bool> plain_verification_attempted{false};
+    static std::atomic<bool> fused_verification_attempted{false};
+    const char *verify_enabled = std::getenv("V200_OPERATOR_VERIFY");
+    const bool verify_requested = verify_enabled != nullptr &&
+        std::strcmp(verify_enabled, "1") == 0 &&
+        candidate.output_bytes <= max_verify_output_bytes;
+    std::atomic<bool> &verify_attempted =
+        candidate.family == MmvqFamily::q4k_plain
+            ? plain_verification_attempted : fused_verification_attempted;
+    const bool verify_this_route = verify_requested &&
+                                   !verify_attempted.exchange(true);
+    VerificationResult verification{};
+    if (verify_this_route) {
+        verification = verify_owner_launch(
+            host_function, grid, block, arguments, shared_bytes, anchor_stream,
+            native_launch, &partition, 1, candidate.args.dst,
+            candidate.output_bytes);
+    }
+    if (!verification.performed) {
+        *status = v200::operators::launch_owner_partitions(
+            &partition, 1, host_function, block, shared_bytes, anchor_stream,
+            native_launch);
+    } else {
+        *status = verification.status;
+    }
+
+    const bool launch_succeeded = verification.performed
+        ? verification.partition_launch_succeeded : *status == cudaSuccess;
+    const bool verification_failed = verification.mismatch ||
+        (verification.performed && verification.status != cudaSuccess);
+    if (verification_failed)
+        counters.expert_verification_failures.fetch_add(1);
+    if (verification.compared) {
+        const uint64_t output_count = candidate.output_bytes / sizeof(float);
+        counters.expert_verified_calls.fetch_add(1);
+        counters.expert_verified_outputs.fetch_add(output_count);
+        if (candidate.family == MmvqFamily::q4k_plain) {
+            counters.expert_plain_verified_calls.fetch_add(1);
+            counters.expert_plain_verified_outputs.fetch_add(output_count);
+        } else {
+            counters.expert_fused_verified_calls.fetch_add(1);
+            counters.expert_fused_verified_outputs.fetch_add(output_count);
+        }
+    }
+    uint64_t peer_calls = counters.expert_peer_owner_calls.load();
+    if (launch_succeeded) {
+        peer_calls = counters.expert_peer_owner_calls.fetch_add(1) + 1;
+        counters.expert_rows.fetch_add(candidate.rows);
+        counters.expert_peer_rows.fetch_add(candidate.rows);
+    }
+    if (launch_succeeded || verification.performed) {
+        if (peer_calls == 1 || (peer_calls % 64) == 0 || verification.performed ||
+            verification_failed) {
+            write_operator_event(
+                verification_failed ? "q4k_mmvq_expert_verification_failed"
+                    : verification.performed ? "q4k_mmvq_expert_verification"
+                                             : "q4k_mmvq_expert_peer_bank",
+                candidate.family == MmvqFamily::q4k_plain
+                    ? "peer-bank-plain" : "peer-bank-gate-fused",
+                counters.matched_calls.load(), counters.anchor_local_calls.load(),
+                counters.peer_owner_calls.load(), counters.split_calls.load(),
+                counters.anchor_rows.load(), counters.peer_rows.load(),
+                counters.verified_rows.load(), verification.max_abs_error, *status,
+                counters.expert_matched_calls.load(),
+                counters.expert_anchor_local_calls.load(),
+                counters.expert_peer_owner_calls.load(),
+                counters.expert_small_peer_fallback_calls.load(),
+                counters.expert_rows.load(), counters.expert_anchor_rows.load(),
+                counters.expert_peer_rows.load(), counters.expert_verified_calls.load(),
+                counters.expert_verified_outputs.load(),
+                counters.expert_plain_verified_calls.load(),
+                counters.expert_plain_verified_outputs.load(),
+                counters.expert_fused_verified_calls.load(),
+                counters.expert_fused_verified_outputs.load(),
+                counters.expert_verification_failures.load());
+            if (peer_calls == 1 || verification.performed || verification_failed)
+                v200_frontdoor_snapshot("operator_q4k_mmvq_expert_peer_bank");
+        }
+    }
+    return 1;
+}
+
 } // namespace
+
+extern "C" std::size_t v200_operator_list_mmvq_host_functions(
+    const void **out, std::size_t capacity) {
+    Registry &registered = registry();
+    std::lock_guard<std::mutex> lock(registered.mutex);
+    std::size_t count = 0;
+    for (const auto &entry : registered.names) {
+        if (entry.second != q4k_mmvq_name && entry.second != q4k_mmvq_gate_name)
+            continue;
+        if (out != nullptr && count < capacity) out[count] = entry.first;
+        ++count;
+    }
+    return count;
+}
+
+extern "C" int v200_operator_inspect_mmvq_bank(
+    const void *host_function, dim3 grid, dim3 block, void **arguments,
+    std::uint32_t *owner_index, std::uint32_t *family,
+    std::size_t *bank_bytes, std::size_t *active_weight_bytes) {
+    if (owner_index == nullptr || family == nullptr || bank_bytes == nullptr ||
+        active_weight_bytes == nullptr) {
+        return 0;
+    }
+    ExpertBankCandidate candidate{};
+    if (!prepare_expert_bank_candidate(host_function, grid, block, arguments,
+                                       &candidate) ||
+        !above_peer_work_threshold(candidate)) {
+        return 0;
+    }
+    *owner_index = candidate.owner_index;
+    *family = static_cast<std::uint32_t>(candidate.family);
+    *bank_bytes = candidate.bank_bytes;
+    *active_weight_bytes = candidate.active_weight_bytes;
+    return 1;
+}
 
 /* Registration is metadata-only. CUDA module registration remains owned by
  * the original runtime DSO, resolved through the frontdoor's loaded-library
@@ -323,7 +838,17 @@ extern "C" int v200_operator_try_launch(
     }
 
     const std::string name = registered_kernel_name(host_function);
+    if (name == q4k_mmvq_gate_name) {
+        return try_launch_expert_bank(host_function, grid, block, arguments,
+                                     shared_bytes, anchor_stream, native_launch,
+                                     status);
+    }
     if (name != q4k_mmvq_name) return 0;
+    if (grid.y > 1) {
+        return try_launch_expert_bank(host_function, grid, block, arguments,
+                                     shared_bytes, anchor_stream, native_launch,
+                                     status);
+    }
 
     // On Volta this exact Q4_K, single-column specialization uses one output
     // row per block. Small grids stay on the original launch to avoid paying
@@ -472,8 +997,10 @@ extern "C" int v200_operator_try_launch(
         ? verification.partition_launch_succeeded
         : *status == cudaSuccess;
     if (partition_launch_succeeded) {
-        const uint64_t anchor_rows = rows.split ? rows.first_rows : 0;
-        const uint64_t peer_rows = rows.split ? rows.second_rows : grid.x;
+        const uint64_t anchor_rows = rows.first_owner == 0
+            ? rows.first_rows : (rows.split ? rows.second_rows : 0u);
+        const uint64_t peer_rows = rows.first_owner == 1
+            ? rows.first_rows : (rows.split ? rows.second_rows : 0u);
         if (rows.split) {
             counters.split_calls.fetch_add(1);
         } else {

@@ -325,7 +325,39 @@ void test_single_extent_allocation_has_pair_access() {
     info.struct_size = sizeof(info);
     assert(manager.query(pointer, &info) == CUDA_SUCCESS);
     assert(info.extent_count == 1 && info.owner_bytes[0] == 12 && info.owner_bytes[1] == 0);
+    assert((info.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_KNOWN) != 0);
+    assert((info.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_1) == 0);
     assert(manager.release(pointer) == CUDA_SUCCESS);
+}
+
+void test_first_extent_owner_flags() {
+    FakeDriver fake;
+    auto profile = make_profile();
+    auto driver = make_driver(fake);
+    v200::memory::MemoryManager manager;
+    assert(manager.configure(profile, driver) == CUDA_SUCCESS);
+
+    struct Case {
+        CUdevice owner;
+        size_t requested_bytes;
+        uint32_t expected_extents;
+    };
+    const Case cases[]{{0, 8, 1}, {1, 8, 1}, {0, 24, 2}, {1, 24, 2}};
+    for (const Case &test : cases) {
+        void *pointer = nullptr;
+        assert(manager.allocate(test.owner, test.requested_bytes, 0, &pointer) == CUDA_SUCCESS);
+        v200_allocation_info info{};
+        info.struct_size = sizeof(info);
+        assert(manager.query(pointer, &info) == CUDA_SUCCESS);
+        assert(info.extent_count == test.expected_extents);
+        assert((info.flags & V200_ALLOCATION_INFO_FLAG_ALLOCATION_API) != 0);
+        assert((info.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_KNOWN) != 0);
+        const bool first_owner_is_one =
+            (info.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_1) != 0;
+        assert(first_owner_is_one == (test.owner == 1));
+        assert(info.owner_bytes[test.owner] != 0);
+        assert(manager.release(pointer) == CUDA_SUCCESS);
+    }
 }
 
 void test_single_extent_vmm_anchor_access_expands_to_pair() {
@@ -340,7 +372,7 @@ void test_single_extent_vmm_anchor_access_expands_to_pair() {
     CUmemAllocationProp prop{};
     prop.type = CU_MEM_ALLOCATION_TYPE_PINNED;
     prop.location.type = CU_MEM_LOCATION_TYPE_DEVICE;
-    prop.location.id = 0;
+    prop.location.id = 1;
     CUmemGenericAllocationHandle handle = 0;
     assert(manager.vmm_create(&handle, 12, &prop, 0) == CUDA_SUCCESS);
     assert(manager.vmm_map(reservation, 12, 0, handle, 0) == CUDA_SUCCESS);
@@ -349,6 +381,12 @@ void test_single_extent_vmm_anchor_access_expands_to_pair() {
     access.location.type = CU_MEM_LOCATION_TYPE_DEVICE;
     access.location.id = 0;
     access.flags = CU_MEM_ACCESS_FLAGS_PROT_READWRITE;
+    v200_allocation_info info{};
+    info.struct_size = sizeof(info);
+    assert(manager.query(reinterpret_cast<void *>(static_cast<uintptr_t>(reservation)), &info) == CUDA_SUCCESS);
+    assert((info.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_KNOWN) != 0);
+    assert((info.flags & V200_ALLOCATION_INFO_FLAG_FIRST_EXTENT_OWNER_1) != 0);
+    assert((info.flags & V200_ALLOCATION_INFO_FLAG_ALLOCATION_API) == 0);
     assert(manager.vmm_set_access(reservation, 12, &access, 1) == CUDA_SUCCESS);
     assert(fake.access_calls.size() == 1);
     assert(fake.access_calls.back().descriptors.size() == 2);
@@ -580,6 +618,7 @@ void test_submission_lease_closes_retain_race() {
 int main() {
     test_planner();
     test_single_extent_allocation_has_pair_access();
+    test_first_extent_owner_flags();
     test_single_extent_vmm_anchor_access_expands_to_pair();
     test_compound_vmm_and_lifetime();
     test_allocate_rollback_and_retry();

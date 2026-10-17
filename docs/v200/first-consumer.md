@@ -8,7 +8,7 @@ Validated on 17 October 2026 against this host's qualified V100 pair and existin
 python3 /home/tumlinson/V200/scripts/v200/serve.py --execute
 ```
 
-The foreground session defaults to 1,800 seconds after the startup correctness check, on loopback port 8080. The launcher prints its endpoint and evidence location before entering controller admission. Startup verifies the full existing model and executable hashes before loading; allow roughly a minute on this host. Readiness is available from another terminal:
+The foreground session defaults to 1,800 seconds after the startup correctness check, on loopback port 8080. The launcher prints its endpoint and evidence location before entering controller admission. Startup verifies the pinned executable and model identity before loading. The first model check hashes the full file; subsequent checks reuse that result only when its resolved path, inode, size, mtime and ctime match. A warm launch avoids the repeated full-file scan. Readiness is available from another terminal:
 
 ```sh
 curl http://127.0.0.1:8080/health
@@ -48,8 +48,8 @@ The launcher changes only its child's environment. Running the installed llama-s
 
 - Existing `llama-server`, llama.cpp commit `f280b26983ad0fdb705a0d9ebf0503e76f2899b0`; artifact identities are in [consumer-profile.json](consumer-profile.json) and [source-profile.json](source-profile.json).
 - Existing Qwen3-Coder-30B-A3B Q4_K_M GGUF; no download or copy. Exact model hash is in the fixture.
-- 28 GPU layers, context 2,048, batch/ubatch 64, four CPU threads, one server slot, f16 KV, fit off, flash attention off.
-- `GGML_CUDA_DISABLE_GRAPHS=1` in both native and V200 controls. Compute stays on the anchor; the pair memory allocator is available and enforces 12 GiB of application backing per owner.
+- Default smoke: 28 GPU layers and context 2,048. Full residency: 49/49 layers plus input embedding on CUDA0 and context 8,192. Both use batch/ubatch 64, four CPU threads, one server slot, f16 KV, fit off, and flash attention off.
+- `GGML_CUDA_DISABLE_GRAPHS=1` in both native and V200 controls. Without `--pair-compute`, computation stays on the anchor. With it, qualified Q4_K matvecs execute on their weight owner; other operations retain the anchor path. The pair allocator caps application backing at 12 GiB per owner and live physical headroom minus reserve.
 - Ordered physical UUIDs `GPU-21131915-1488-23af-38dd-1743ae1f5cc8`, `GPU-d745da9c-7649-8334-41f1-483afa6f3206`. Qualification is specific to these devices and the pinned stack.
 - All new V200 builds and controller specifications use `/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9`. The existing consumer is retained as installed, with its library identity recorded.
 
@@ -67,6 +67,8 @@ The runtime reports anchor compute properties and the allocator's capped, live-q
 | Matched native completion | B03 [native](../../evidence/B03/native.controller-result.json), `f2b89fd2-0a43-4dc4-82e8-56fade091835`; exact normalized answer `2` |
 | V200 completion | B03 [facade](../../evidence/B03/facade.controller-result.json), `aa82e8d5-f6a4-4f62-b5d6-4e56acc53c96`; same answer, managed allocations and zero ledger on exit |
 | Full-resident pair capacity | B04 [controller result](../../evidence/B04/capacity-r1.controller-result.json), `8b4250ac-792d-4c75-8359-292150ef800e`; all 49 layers and input embedding on CUDA0, 18.55 GB model tensor payload, both V100s used, correct output and zeroed owner ledger ([details](capacity.md)) |
+| Pair-native real inference | B03 [operator result](../../evidence/B03/operator-r2.controller-result.json), `522cf904-7936-47fd-951f-c9da82306355`; 68 anchor and 174 peer matvec calls, 4,096 peer outputs bitwise equal to native, full-resident model and clean release |
+| Owner-local expert computation | B03 [locality result](../../evidence/B03/locality-r1.controller-result.json), `7d72d5a0-cb5b-4b2b-b64b-17fd45ba5f06`; 71 peer fused expert calls, 6,144 outputs bitwise equal to native, full residency and clean release |
 | Usable foreground server | [Service](../../evidence/V200-SERVE/first-service.controller-result.json), `547cfd3a-4eba-426a-9e1f-9b3448f7e1b8`; 20-second serving window, [independent health/chat client](../../evidence/V200-SERVE/first-service-client.json), clean shutdown |
 
 Each successful hardware record retains controller artifacts, exact commands, source/binary identities and host release state. Rejected attempts remain alongside the retries: the initial execution smoke reported a late pinned-memory cleanup failure, and the first pair-memory fixture mistakenly checked physical enumeration through the logical facade. Neither is counted as a pass. Completion-r2 did not establish a fully quiescent post-run sampling window; its reservation release and absence of orphaned processes were verified.
@@ -92,4 +94,4 @@ CTest does not execute GPU work. Live checks use the supported CUDA controller a
 
 V200-06 completed with host gate `47e9a99e-9228-45fc-a557-9a76af7e9de7` and retained-evidence gate `8e5431ba-23ab-432c-a856-fda9f2a42ce1`. The latter passed 184 artifact checks, including the independent service/client record. The verifier also rejected a changed raw output in a temporary test copy.
 
-The next product milestone is useful computation across both physical GPUs while preserving the full-resident workload, followed by measured dispatch/locality optimization. Two logical pairs, broader CUDA coverage and packaging remain later work.
+The next product work extends owner-local execution to expert matrices and measures complete dispatch/locality cost while preserving the full-resident workload. Two logical pairs, broader CUDA coverage and packaging remain later work.

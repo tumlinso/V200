@@ -189,6 +189,47 @@ class FixtureTests(unittest.TestCase):
                     "facade_owner", self.fixture, [preload, initializer], env,
                     facade_mode="pair", selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"])
 
+    def test_cuda_graph_opt_in_is_matched_but_frontdoor_flag_is_facade_only(self) -> None:
+        env = {"PATH": "/bin", "CUDA_VISIBLE_DEVICES": "GPU-a,GPU-b",
+               "V200_GRAPH_CAPTURE": "stale", "GGML_CUDA_DISABLE_GRAPHS": "1"}
+        native = consumer._clean_environment(
+            "native_pair", self.fixture, None, env,
+            selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"],
+            cuda_graphs_enabled=True)
+        self.assertEqual(native["GGML_CUDA_DISABLE_GRAPHS"], "0")
+        self.assertNotIn("V200_GRAPH_CAPTURE", native)
+        with tempfile.TemporaryDirectory() as directory:
+            preloads = [Path(directory) / name for name in
+                        ("libv200_frontdoor.so", "libv200_pair_init.so")]
+            for path in preloads:
+                path.touch()
+            facade = consumer._clean_environment(
+                "facade_owner", self.fixture, preloads, env,
+                facade_mode="pair", selected_uuids=["GPU-aaaaaaaa", "GPU-bbbbbbbb"],
+                cuda_graphs_enabled=True)
+            self.assertEqual(facade["GGML_CUDA_DISABLE_GRAPHS"], "0")
+            self.assertEqual(facade["V200_GRAPH_CAPTURE"], "1")
+
+    def test_graph_records_remain_inside_the_strict_memory_ledger_contract(self) -> None:
+        budget = 12288 * 1024 * 1024
+        record = {"schema": "v200-frontdoor-ledger/v1", "event": "graph_capture_rewrite",
+                  "mode": "pair", "anchor_uuid": "GPU-aaaaaaaa",
+                  "peer_uuid": "GPU-bbbbbbbb", "qualification_id": "q-1",
+                  "owner_budget_bytes": [budget, budget], "owner_used_bytes": [100, 200],
+                  "live_allocation_count": 1, "live_reservation_count": 0,
+                  "cleanup_pending_count": 0, "graph_handle": "0x1",
+                  "graph_matched_nodes": 2, "graph_rewritten_nodes": 1,
+                  "graph_status": 0}
+        cleanup = dict(record, event="cuda_free", owner_used_bytes=[0, 0],
+                       live_allocation_count=0, graph_matched_nodes=0,
+                       graph_rewritten_nodes=0)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "profile.jsonl"
+            path.write_text(json.dumps(record) + "\n" + json.dumps(cleanup) + "\n")
+            result = consumer._read_profile_log(path, ["GPU-aaaaaaaa", "GPU-bbbbbbbb"], budget)
+            self.assertEqual(result["status"], "PASS")
+            self.assertEqual(result["graph_records"], [record])
+
     def test_cli_preserves_single_preload_and_accepts_initializer_as_second(self) -> None:
         args = consumer._parse_args([
             "--workload", "smoke", "--control", "facade_owner",
@@ -197,6 +238,12 @@ class FixtureTests(unittest.TestCase):
             "--output-dir", "/tmp/v200-test", "--execute"])
         self.assertEqual([path.name for path in args.preloads],
                          ["libv200_frontdoor.so", "libv200_pair_init.so"])
+
+    def test_cli_exposes_opt_in_cuda_graph_mode(self) -> None:
+        args = consumer._parse_args([
+            "--workload", "smoke", "--control", "facade_owner",
+            "--output-dir", "/tmp/v200-test", "--cuda-graphs"])
+        self.assertTrue(args.cuda_graphs)
 
     def test_pair_profile_log_is_hash_recorded_and_budget_checked(self) -> None:
         budget = 12288 * 1024 * 1024
@@ -324,6 +371,7 @@ class LauncherPlanTests(unittest.TestCase):
                       plan["bounded_child_argv"])
         self.assertEqual(plan["static_memory_preflight"][0]["control"], "facade_owner")
         self.assertTrue(plan["static_memory_preflight"][0]["fits_static_preflight"])
+        self.assertFalse(plan["cuda_graphs_enabled"])
         default_plan = serve_launcher._make_plan("serve", self.uuids, "default-serve")
         self.assertEqual(default_plan["duration_seconds"], serve_launcher.SERVE_DEFAULT_SECONDS)
         self.assertEqual(default_plan["endpoint"], "http://127.0.0.1:8080")
@@ -402,6 +450,22 @@ class LauncherPlanTests(unittest.TestCase):
         args = serve_launcher._parse_args(["--pair-compute", "--workload", "resident_capacity"])
         self.assertTrue(args.pair_compute)
         self.assertEqual(args.workload, "resident_capacity")
+
+    def test_cuda_graph_opt_in_is_explicit_and_keeps_default_graph_off(self) -> None:
+        default = serve_launcher._make_plan("preview", self.uuids, "graph-default")
+        self.assertFalse(default["cuda_graphs_enabled"])
+        self.assertNotIn("--cuda-graphs", default["bounded_child_argv"])
+        enabled = serve_launcher._make_plan(
+            "preview", self.uuids, "graph-enabled", workload_name="resident_capacity",
+            pair_compute=True, cuda_graphs_enabled=True)
+        self.assertTrue(enabled["cuda_graphs_enabled"])
+        self.assertIn("--cuda-graphs", enabled["bounded_child_argv"])
+        self.assertIn("V200_PAIR_COMPUTE=1", enabled["bounded_child_argv"])
+        self.assertIn("src/operators/graph_rewrite.cpp", enabled["controller_spec"]["paths"])
+        self.assertIn("opt-in enabled", enabled["graph_policy"])
+        args = serve_launcher._parse_args(["--cuda-graphs", "--pair-compute"])
+        self.assertTrue(args.cuda_graphs)
+        self.assertTrue(args.pair_compute)
 
     def test_service_duration_and_pair_overrides_fail_closed(self) -> None:
         with self.assertRaisesRegex(serve_launcher.LaunchError, "between 1 and 3000"):

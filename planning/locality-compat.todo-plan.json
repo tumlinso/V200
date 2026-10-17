@@ -1,0 +1,117 @@
+{
+  "schema_version": 3,
+  "project": {
+    "name": "V200"
+  },
+  "tasks": [
+    {
+      "id": "V200-09",
+      "kind": "task",
+      "title": "Optimize pair locality and NVLink use with a small cost policy",
+      "objective": "Choose data ownership and communication that improve complete application work rather than merely saturating NVLink. Read planning/v200-bootstrap/tasks/V200-09.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Policy choices have explicit full-path cost and legality inputs; unknown cases take the qualified conservative route.\",\"No assumed six-links-per-peer, arbitrary multi-hop forwarding or coherent writable aliases.\",\"B05 comparisons are prepared; a failed locality hypothesis can be rejected without building new infrastructure.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D04\",\"D05\"],\"recommended_start\":\"Compare remote reads, staging, owner computation and justified replicas for the qualified operation. Account for canonicalization and owner-memory interference. Retain shards only at known compatible boundaries. Use deterministic measured thresholds before any adaptive system. Dual host ingress is optional only if loader time matters and page locality is available.\",\"research_refs\":[\"A-R07\",\"A-E18\",\"A-E20\",\"A-E21\",\"A-E19\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-09.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-09\",\"outputs\":[\"src/placement/\",\"include/v200/placement/\",\"tests/placement/\",\"docs/v200/placement.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. See B05 and decision D04.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"Placement policy/range/version-invalidation checks\"],\"gpu\":\"B05 in V200-12; a narrow B03 regression only after changed code.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17: V200-07 and08 accepted at d0a81e8/a22190c. Extend actual operator/consumer vertical path in existing modules; no mandatory new placement/compat abstraction. 09 implement NVLink-efficient physical-owner routing inclwholeexpertbanks, no peropCPU routing-ID copy where ownershipprovable; narrow costs basedexistingVoltaatlas and actualselectedshape. 10 addcompatibilityonlyfor actualconsumer/launchpath, evaluategraphswithqualifiedpairoperation safely. No consumerpatch/hiddenoffload/numericweakening. UseHPC12.9/controllerfinitechecks; preservebaseline. Prior prerequisite receiptsretained; do notupsertterminaltasks.",
+      "depends_on": [],
+      "checkpoints": [
+        {
+          "id": "V200-09-READY",
+          "title": "V200-09-READY"
+        }
+      ],
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "src",
+          "include/v200",
+          "tests",
+          "scripts/v200",
+          "scripts/qualification",
+          "benchmarks/fixtures",
+          "docs/v200",
+          "README.md",
+          "evidence/B03",
+          "evidence/B05",
+          "evidence/operators"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap",
+          "planning/EXECUTION_PLAN.md",
+          "build-support",
+          "evidence/foundation",
+          "evidence/B04"
+        ]
+      }
+    },
+    {
+      "id": "V200-10",
+      "kind": "task",
+      "title": "Close the observed compatibility profile and targeted regressions",
+      "objective": "Extend the first profile only where actual consumer behavior or a chosen second fixture requires it, preserving ordinary CUDA semantics. Read planning/v200-bootstrap/tasks/V200-10.md and planning/v200-bootstrap/contracts/EXECUTION_CHARTER.md.",
+      "notes": "preledger_provenance={\"category\":\"outcome\",\"completion_condition\":[\"Compatibility matrix distinguishes tested/unsupported/unqualified for exact stack and binary profiles.\",\"Graph and async-lifetime regressions are covered where supported; disabling a required feature is disclosed.\",\"No broad compatibility claim is based only on one model running.\"],\"experimental\":true,\"explicit_out_of_scope\":[\"Driver/firmware/system changes without separate authorization\",\"Any nonselected hypothetical branch\"],\"failure_cases\":\"A bounded negative result informs the relevant decision; it does not count as the missing product capability. Block the affected outcome and retain independent CPU work. Ask the user before a material external-contract change.\",\"forbidden_shortcuts\":[\"No fake capacity/feature/SM semantics.\",\"No treating CPU checks or compilation as GPU qualification.\",\"No broad retesting campaign or new scheduler as prerequisite.\"],\"implementation_mechanism\":{\"agent_freedom\":\"Choose local design, tests and decomposition from source and measurements; preserve the external contract.\",\"decision_checkpoints\":[\"D01\",\"D08\"],\"recommended_start\":\"Cover observed graph capture/replay/update, library workspaces/pointer modes, stream behavior, module state and diagnostics. Essential first-consumer features already belong to V200-06. Add the narrowest second consumer/kernel family that tests generality. IPC, cooperative grids and MPS remain explicit unsupported features unless made part of the selected profile.\",\"research_refs\":[\"W-ENTRY\",\"W-CUDA12\",\"W-LLAMA-CUDA\"],\"task_sheet\":\"planning/v200-bootstrap/tasks/V200-10.md\"},\"inputs\":[\"Accepted project charter and prerequisite outcome receipts\",\"Current source and exact application/stack identity\"],\"invariants\":[\"Ordinary single logical device per physical pair; no silent product downgrade.\",\"Correctness, memory ordering, lifetime and numeric contract are mandatory.\",\"GPU execution uses approved bounded bundles and existing controller; no foreign workload interruption.\"],\"negative_result_acceptable\":false,\"original_task_id\":\"V200-10\",\"outputs\":[\"src/compat/\",\"tests/compat/\",\"docs/v200/compatibility.md\"],\"parallelism\":\"Root may delegate nonoverlapping implementation after interface agreement.\",\"performance_evidence\":\"Keep timed boundary and matched useful work explicit; null for not measured. Do not manufacture a performance claim from source inspection.\",\"permitted_read_scope\":[\"planning/v200-bootstrap/\",\"docs/v200\"],\"preledger_package_digest\":\"9047147ff09882e2d9728bbe8c461f12209767064d2bf55a22a562678fd88f94\",\"suggested_lane\":\"implementer\",\"validation\":{\"cpu\":[\"ABI/graph/handle contract fixtures\"],\"gpu\":[\"B03\"],\"gpu_subset\":\"B03 selected regression subset\",\"limit\":\"No all-framework test matrix.\"},\"workstream\":\"V200 single-device product\"}\n2026-10-17: V200-07 and08 accepted at d0a81e8/a22190c. Extend actual operator/consumer vertical path in existing modules; no mandatory new placement/compat abstraction. 09 implement NVLink-efficient physical-owner routing inclwholeexpertbanks, no peropCPU routing-ID copy where ownershipprovable; narrow costs basedexistingVoltaatlas and actualselectedshape. 10 addcompatibilityonlyfor actualconsumer/launchpath, evaluategraphswithqualifiedpairoperation safely. No consumerpatch/hiddenoffload/numericweakening. UseHPC12.9/controllerfinitechecks; preservebaseline. Prior prerequisite receiptsretained; do notupsertterminaltasks.",
+      "depends_on": [
+        {
+          "type": "task",
+          "task_id": "V200-09"
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "V200-10-READY",
+          "title": "V200-10-READY"
+        }
+      ],
+      "scope": {
+        "exclusive_paths": [
+          "CMakeLists.txt",
+          "src",
+          "include/v200",
+          "tests",
+          "scripts/v200",
+          "scripts/qualification",
+          "benchmarks/fixtures",
+          "docs/v200",
+          "README.md",
+          "evidence/B03",
+          "evidence/B05",
+          "evidence/operators"
+        ],
+        "read_paths": [
+          "planning/v200-bootstrap",
+          "planning/EXECUTION_PLAN.md",
+          "build-support",
+          "evidence/foundation",
+          "evidence/B04"
+        ]
+      }
+    }
+  ],
+  "runs": [
+    {
+      "id": "V200-LOCALITY-COMPAT-1",
+      "root_task_id": "V200-09",
+      "charter": {
+        "objective": "Expand useful physical-owner compute and NVLink locality, then grow compatibility required by real consumer",
+        "boundaries": [
+          "Unchangedconsumer; originalkernelarithmetic; no model-parallelbackend; finiteadmittedGPUchecks"
+        ],
+        "invariants": [
+          "Preserve actualcapacity/dualcompute baseline",
+          "Nographreplaypathmaybypass peerjoinor allocationlifetimes",
+          "No newgenericpolicyframeworkbeforeconcreteoperationneedsit"
+        ]
+      },
+      "lanes": [
+        {
+          "id": "V200-LOCALITY-COMPAT-1-MAIN",
+          "role": "implementer",
+          "tasks": [
+            "V200-09",
+            "V200-10"
+          ],
+          "workspace": {
+            "mode": "exclusive"
+          }
+        }
+      ]
+    }
+  ]
+}

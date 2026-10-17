@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "project_root": "/home/tumlinson/V200",
+  "command_cwd": "/home/tumlinson/V200",
+  "recipe": "baseline",
+  "toolchain": {
+    "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9",
+    "require_sanitizer": false
+  },
+  "resources": {
+    "gpu_uuids": [
+      "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+      "GPU-d745da9c-7649-8334-41f1-483afa6f3206"
+    ],
+    "gpus": 2,
+    "cpu_threads": 4,
+    "ram_bytes": 34359738368,
+    "isolate_nvlink_domain": true,
+    "isolate_pcie_root": false
+  },
+  "argv": [
+    "python3",
+    "/home/tumlinson/V200/scripts/v200/bounded_runner.py",
+    "--project-root",
+    "/home/tumlinson/V200",
+    "--seconds",
+    "300",
+    "--allocation-cap-mib",
+    "12288",
+    "--evidence-dir",
+    "/home/tumlinson/V200/evidence/B03/locality-r1",
+    "--bundle",
+    "B03",
+    "--expected-uuid",
+    "GPU-21131915-1488-23af-38dd-1743ae1f5cc8",
+    "--expected-uuid",
+    "GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "--",
+    "env",
+    "V200_DEVICE_UUIDS=GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206",
+    "V200_PAIR_COMPUTE=1",
+    "V200_OPERATOR_VERIFY=1",
+    "python3",
+    "/home/tumlinson/V200/tests/consumer/run_consumer.py",
+    "--workload",
+    "resident_capacity",
+    "--control",
+    "facade_owner",
+    "--preload-library",
+    "/home/tumlinson/V200/build/src/frontdoor/libv200_frontdoor.so",
+    "--preload-library",
+    "/home/tumlinson/V200/build/src/integration/libv200_pair_init.so",
+    "--preload-library",
+    "/home/tumlinson/V200/build/src/operators/libv200_operators.so",
+    "--output-dir",
+    "/home/tumlinson/V200/evidence/B03/locality-r1/consumer",
+    "--execute"
+  ],
+  "timeout": 325,
+  "build_timeout": 900,
+  "paths": [
+    "tests/consumer/run_consumer.py",
+    "benchmarks/fixtures/llama-server-v200.json",
+    "docs/v200/source-profile.json",
+    "docs/v200/consumer-profile.json",
+    "src/frontdoor",
+    "src/memory",
+    "src/execution",
+    "src/integration",
+    "include/v200",
+    "scripts/v200",
+    "src/operators",
+    "tests/operators",
+    "docs/v200/operator-profile.json",
+    "planning/locality-compat.todo-plan.json"
+  ],
+  "binary_paths": [
+    "build/src/frontdoor/libv200_frontdoor.so",
+    "build/src/integration/libv200_pair_init.so",
+    "build/src/operators/libv200_operators.so"
+  ],
+  "benchmark": {
+    "build_argv": [
+      "cmake",
+      "--build",
+      "build",
+      "--target",
+      "v200_frontdoor",
+      "v200_pair_init",
+      "v200_operators",
+      "--parallel",
+      "4"
+    ]
+  }
+}

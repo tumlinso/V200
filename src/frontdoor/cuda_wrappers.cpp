@@ -3,6 +3,7 @@
 #include "v200/frontdoor/abi_profile.hpp"
 #include "v200/execution/owner_execution_c.h"
 #include "v200/memory/api.h"
+#include "v200/operators/graph_rewrite.hpp"
 #include "v200/operators/launch.hpp"
 
 #include <cuda_runtime_api.h>
@@ -13,6 +14,7 @@
 #include <atomic>
 #include <cerrno>
 #include <cctype>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -81,6 +83,38 @@ std::shared_mutex tracked_use_gate;
 std::mutex stream_gate_mutex;
 std::map<uint64_t, std::shared_ptr<std::mutex>> stream_gates;
 thread_local bool profile_initializing = false;
+thread_local bool capture_native_forward = false;
+
+struct GraphRewriteInfo {
+    size_t matched_nodes = 0;
+    size_t rewritten_nodes = 0;
+    cudaError_t status = cudaSuccess;
+};
+
+std::mutex graph_info_mutex;
+std::map<cudaGraph_t, GraphRewriteInfo> captured_graph_info;
+std::map<cudaGraphExec_t, GraphRewriteInfo> graph_exec_info;
+std::atomic<uint64_t> graph_replay_log_count{0};
+
+bool graph_capture_enabled() noexcept {
+    const char *enabled = std::getenv("V200_GRAPH_CAPTURE");
+    return pair_mode() && enabled != nullptr && std::strcmp(enabled, "1") == 0;
+}
+
+class CaptureNativeForwardScope {
+public:
+    CaptureNativeForwardScope() noexcept : previous_(capture_native_forward) {
+        capture_native_forward = true;
+    }
+    ~CaptureNativeForwardScope() { capture_native_forward = previous_; }
+    CaptureNativeForwardScope(const CaptureNativeForwardScope &) = delete;
+    CaptureNativeForwardScope &operator=(const CaptureNativeForwardScope &) = delete;
+private:
+    bool previous_;
+};
+
+void write_graph_profile_snapshot(const char *event_name, uintptr_t handle,
+                                  const GraphRewriteInfo &info);
 
 std::shared_ptr<std::mutex> gate_for_stream(void *stream) {
     const uint64_t id = stream_id(stream);
@@ -514,6 +548,31 @@ auto dispatch_async(void *stream, Call &&call) -> decltype(call(stream)) {
     using Result = decltype(call(stream));
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return frontdoor_error<Result>(profile);
+
+    // CUDA capture rejects the completion-event insertion performed by the
+    // ordinary submission path. With graph support explicitly enabled, query
+    // capture state and preserve the caller's native anchor operation exactly;
+    // one tracked graph launch accounts for all captured memory uses on replay.
+    if (graph_capture_enabled()) {
+        using IsCapturing = cudaError_t (CUDARTAPI *)(cudaStream_t, cudaStreamCaptureStatus *);
+        auto is_capturing = next_fn<IsCapturing>("cudaStreamIsCapturing");
+        if (is_capturing == nullptr) return frontdoor_error<Result>(CUDA_ERROR_NOT_SUPPORTED);
+        cudaStreamCaptureStatus status = cudaStreamCaptureStatusNone;
+        cudaError_t query_status;
+        {
+            InternalCallScope bypass;
+            query_status = is_capturing(reinterpret_cast<cudaStream_t>(stream), &status);
+        }
+        if (query_status != cudaSuccess) return static_cast<Result>(query_status);
+        if (status == cudaStreamCaptureStatusInvalidated)
+            return static_cast<Result>(cudaErrorStreamCaptureInvalidated);
+        if (status == cudaStreamCaptureStatusActive) {
+            CaptureNativeForwardScope capture_scope;
+            InternalCallScope bypass;
+            return call(stream);
+        }
+    }
+
     std::shared_lock<std::shared_mutex> outer(tracked_use_gate);
     auto stream_gate = gate_for_stream(stream);
     std::lock_guard<std::mutex> stream_lock(*stream_gate);
@@ -1119,7 +1178,8 @@ cudaError_t CUDARTAPI cudaLaunchKernel(const void *function, dim3 grid, dim3 blo
     if (prepared != cudaSuccess) return prepared;
     return dispatch_async(stream, [=](void *native_stream) {
         const char *enabled = std::getenv("V200_PAIR_COMPUTE");
-        if (pair_mode() && enabled != nullptr && std::strcmp(enabled, "1") == 0) {
+        if (!capture_native_forward && pair_mode() && enabled != nullptr &&
+            std::strcmp(enabled, "1") == 0) {
             const auto operator_launch = reinterpret_cast<OperatorTryLaunch>(
                 lookup_v200("v200_operator_try_launch"));
             if (operator_launch != nullptr) {
@@ -1342,19 +1402,37 @@ cudaError_t CUDARTAPI cudaGraphLaunch(cudaGraphExec_t graph, cudaStream_t stream
     using Fn = cudaError_t (CUDARTAPI *)(cudaGraphExec_t, cudaStream_t);
     auto real = next_fn<Fn>("cudaGraphLaunch");
     if (internal_call()) return real ? real(graph, stream) : cudaErrorNotSupported;
-    if (pair_mode()) return cudaErrorNotSupported;
+    if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
     const cudaError_t prepared = prepare_runtime_call();
     if (prepared != cudaSuccess) return prepared;
     if (!real) return cudaErrorNotSupported;
-    return dispatch_async(stream, [=](void *native_stream) {
+    const cudaError_t result = dispatch_async(stream, [=](void *native_stream) {
         return real(graph, reinterpret_cast<cudaStream_t>(native_stream));
     });
+    if (result == cudaSuccess && pair_mode() && graph_capture_enabled()) {
+        // A bounded sample proves that the executable was replayed without
+        // turning every inference launch into synchronous profile-file I/O.
+        if (graph_replay_log_count.fetch_add(1, std::memory_order_relaxed) < 16) {
+            GraphRewriteInfo info{};
+            {
+                std::lock_guard<std::mutex> lock(graph_info_mutex);
+                const auto found = graph_exec_info.find(graph);
+                if (found != graph_exec_info.end()) info = found->second;
+            }
+            write_graph_profile_snapshot("graph_replay", reinterpret_cast<uintptr_t>(graph), info);
+        }
+    }
+    return result;
 }
 
 cudaError_t CUDARTAPI cudaStreamBeginCapture(cudaStream_t stream, enum cudaStreamCaptureMode mode) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaStream_t, enum cudaStreamCaptureMode);
     auto real = next_fn<Fn>("cudaStreamBeginCapture");
-    if (pair_mode()) return cudaErrorNotSupported;
+    if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
+    if (pair_mode()) {
+        const cudaError_t prepared = prepare_async_call();
+        if (prepared != cudaSuccess) return prepared;
+    }
     InternalCallScope bypass;
     return real ? real(stream, mode) : cudaErrorNotSupported;
 }
@@ -1362,9 +1440,51 @@ cudaError_t CUDARTAPI cudaStreamBeginCapture(cudaStream_t stream, enum cudaStrea
 cudaError_t CUDARTAPI cudaStreamEndCapture(cudaStream_t stream, cudaGraph_t *graph) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaStream_t, cudaGraph_t *);
     auto real = next_fn<Fn>("cudaStreamEndCapture");
-    if (pair_mode()) return cudaErrorNotSupported;
-    InternalCallScope bypass;
-    return real ? real(stream, graph) : cudaErrorNotSupported;
+    if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
+    if (real == nullptr) return cudaErrorNotSupported;
+    if (graph != nullptr) *graph = nullptr;
+    cudaError_t result;
+    {
+        InternalCallScope bypass;
+        result = real(stream, graph);
+    }
+    if (result != cudaSuccess || !pair_mode() || !graph_capture_enabled() ||
+        graph == nullptr || *graph == nullptr) return result;
+
+    GraphRewriteInfo info{};
+    const char *pair_compute = std::getenv("V200_PAIR_COMPUTE");
+    if (pair_compute != nullptr && std::strcmp(pair_compute, "1") == 0) {
+        using RewriteGraph = decltype(&v200_operator_rewrite_captured_graph);
+        auto rewrite = reinterpret_cast<RewriteGraph>(
+            lookup_v200("v200_operator_rewrite_captured_graph"));
+        if (rewrite == nullptr) {
+            result = cudaErrorNotSupported;
+        } else {
+            InternalCallScope bypass;
+            result = rewrite(*graph, &info.matched_nodes, &info.rewritten_nodes);
+        }
+        info.status = result;
+        if (result != cudaSuccess) {
+            // A rewrite may have updated earlier nodes before a later node
+            // fails. Never expose such a partially rewritten graph to llama.
+            using Destroy = cudaError_t (CUDARTAPI *)(cudaGraph_t);
+            auto destroy = next_fn<Destroy>("cudaGraphDestroy");
+            if (destroy != nullptr) {
+                InternalCallScope bypass;
+                (void)destroy(*graph);
+            }
+            *graph = nullptr;
+            write_graph_profile_snapshot("graph_capture_rewrite", 0, info);
+            return result;
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(graph_info_mutex);
+        captured_graph_info[*graph] = info;
+    }
+    write_graph_profile_snapshot("graph_capture_rewrite",
+                                 reinterpret_cast<uintptr_t>(*graph), info);
+    return cudaSuccess;
 }
 
 cudaError_t CUDARTAPI cudaStreamIsCapturing(cudaStream_t stream,
@@ -1372,7 +1492,7 @@ cudaError_t CUDARTAPI cudaStreamIsCapturing(cudaStream_t stream,
     using Fn = cudaError_t (CUDARTAPI *)(cudaStream_t, enum cudaStreamCaptureStatus *);
     auto real = next_fn<Fn>("cudaStreamIsCapturing");
     if (internal_call()) return real ? real(stream, status) : cudaErrorNotSupported;
-    if (pair_mode()) return cudaErrorNotSupported;
+    if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
     InternalCallScope bypass;
     return real ? real(stream, status) : cudaErrorNotSupported;
 }
@@ -1381,18 +1501,81 @@ cudaError_t CUDARTAPI cudaGraphInstantiate(cudaGraphExec_t *graph_exec, cudaGrap
                                            unsigned long long flags) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaGraphExec_t *, cudaGraph_t, unsigned long long);
     auto real = next_fn<Fn>("cudaGraphInstantiate");
-    if (pair_mode()) return cudaErrorNotSupported;
-    InternalCallScope bypass;
-    return real ? real(graph_exec, graph, flags) : cudaErrorNotSupported;
+    if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
+    if (real == nullptr) return cudaErrorNotSupported;
+    cudaError_t result;
+    {
+        InternalCallScope bypass;
+        result = real(graph_exec, graph, flags);
+    }
+    if (result == cudaSuccess && pair_mode() && graph_capture_enabled() &&
+        graph_exec != nullptr && *graph_exec != nullptr) {
+        GraphRewriteInfo info{};
+        {
+            std::lock_guard<std::mutex> lock(graph_info_mutex);
+            const auto found = captured_graph_info.find(graph);
+            if (found != captured_graph_info.end()) info = found->second;
+            graph_exec_info[*graph_exec] = info;
+        }
+        write_graph_profile_snapshot("graph_instantiate",
+                                     reinterpret_cast<uintptr_t>(*graph_exec), info);
+    }
+    return result;
 }
 
 cudaError_t CUDARTAPI cudaGraphExecUpdate(cudaGraphExec_t graph_exec, cudaGraph_t graph,
                                           cudaGraphExecUpdateResultInfo *result_info) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaGraphExec_t, cudaGraph_t, cudaGraphExecUpdateResultInfo *);
     auto real = next_fn<Fn>("cudaGraphExecUpdate");
-    if (pair_mode()) return cudaErrorNotSupported;
+    if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
+    if (real == nullptr) return cudaErrorNotSupported;
+    cudaError_t result;
+    {
+        InternalCallScope bypass;
+        result = real(graph_exec, graph, result_info);
+    }
+    const bool update_accepted = result == cudaSuccess &&
+        (result_info == nullptr || result_info->result == cudaGraphExecUpdateSuccess);
+    if (update_accepted && pair_mode() && graph_capture_enabled()) {
+        GraphRewriteInfo info{};
+        {
+            std::lock_guard<std::mutex> lock(graph_info_mutex);
+            const auto found = captured_graph_info.find(graph);
+            if (found != captured_graph_info.end()) info = found->second;
+            graph_exec_info[graph_exec] = info;
+        }
+        write_graph_profile_snapshot("graph_exec_update",
+                                     reinterpret_cast<uintptr_t>(graph_exec), info);
+    }
+    return result;
+}
+
+cudaError_t CUDARTAPI cudaGraphDestroy(cudaGraph_t graph) {
+    using Fn = cudaError_t (CUDARTAPI *)(cudaGraph_t);
+    auto real = next_fn<Fn>("cudaGraphDestroy");
+    if (internal_call()) return real ? real(graph) : cudaErrorNotSupported;
+    if (real == nullptr) return cudaErrorNotSupported;
     InternalCallScope bypass;
-    return real ? real(graph_exec, graph, result_info) : cudaErrorNotSupported;
+    const cudaError_t result = real(graph);
+    if (result == cudaSuccess && pair_mode() && graph_capture_enabled()) {
+        std::lock_guard<std::mutex> lock(graph_info_mutex);
+        captured_graph_info.erase(graph);
+    }
+    return result;
+}
+
+cudaError_t CUDARTAPI cudaGraphExecDestroy(cudaGraphExec_t graph_exec) {
+    using Fn = cudaError_t (CUDARTAPI *)(cudaGraphExec_t);
+    auto real = next_fn<Fn>("cudaGraphExecDestroy");
+    if (internal_call()) return real ? real(graph_exec) : cudaErrorNotSupported;
+    if (real == nullptr) return cudaErrorNotSupported;
+    InternalCallScope bypass;
+    const cudaError_t result = real(graph_exec);
+    if (result == cudaSuccess && pair_mode() && graph_capture_enabled()) {
+        std::lock_guard<std::mutex> lock(graph_info_mutex);
+        graph_exec_info.erase(graph_exec);
+    }
+    return result;
 }
 
 } // extern "C"
@@ -1888,6 +2071,60 @@ void write_profile_snapshot(const char *event_name) {
         static_cast<unsigned long long>(usage.live_allocation_count),
         static_cast<unsigned long long>(usage.live_reservation_count),
         static_cast<unsigned long long>(usage.cleanup_pending_count));
+    if (count <= 0 || static_cast<size_t>(count) >= sizeof(line)) return;
+    std::lock_guard<std::mutex> lock(profile_log_mutex);
+    const int fd = open(path, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0600);
+    if (fd < 0) return;
+    size_t written = 0;
+    while (written < static_cast<size_t>(count)) {
+        const ssize_t result = write(fd, line + written, static_cast<size_t>(count) - written);
+        if (result < 0 && errno == EINTR) continue;
+        if (result <= 0) break;
+        written += static_cast<size_t>(result);
+    }
+    close(fd);
+}
+
+void write_graph_profile_snapshot(const char *event_name, uintptr_t handle,
+                                  const GraphRewriteInfo &info) {
+    const char *path = std::getenv("V200_PROFILE_LOG");
+    if (path == nullptr || path[0] == '\0') return;
+    auto get_profile = memory_fn<CUresult (*)(v200_memory_pair_profile *)>("v200_memory_get_profile");
+    auto get_usage = memory_fn<CUresult (*)(v200_memory_usage_info *)>("v200_memory_get_usage");
+    if (get_profile == nullptr || get_usage == nullptr) return;
+    v200_memory_pair_profile profile{};
+    profile.abi_version = V200_MEMORY_ABI_VERSION;
+    profile.struct_size = sizeof(profile);
+    v200_memory_usage_info usage{};
+    usage.abi_version = V200_MEMORY_ABI_VERSION;
+    usage.struct_size = sizeof(usage);
+    if (get_profile(&profile) != CUDA_SUCCESS || get_usage(&usage) != CUDA_SUCCESS) return;
+
+    const std::string event = json_string(event_name == nullptr ? "graph" : event_name, 128);
+    const std::string anchor = json_string(profile.owner_uuid[0], sizeof(profile.owner_uuid[0]));
+    const std::string peer = json_string(profile.owner_uuid[1], sizeof(profile.owner_uuid[1]));
+    const std::string qualification = json_string(profile.qualification_id, sizeof(profile.qualification_id));
+    char line[2304];
+    const int count = std::snprintf(line, sizeof(line),
+        "{\"schema\":\"v200-frontdoor-ledger/v1\",\"event\":%s,\"mode\":\"%s\","
+        "\"anchor_uuid\":%s,\"peer_uuid\":%s,\"qualification_id\":%s,"
+        "\"owner_budget_bytes\":[%llu,%llu],\"owner_used_bytes\":[%llu,%llu],"
+        "\"live_allocation_count\":%llu,\"live_reservation_count\":%llu,"
+        "\"cleanup_pending_count\":%llu,\"graph_handle\":\"0x%llx\","
+        "\"graph_matched_nodes\":%llu,\"graph_rewritten_nodes\":%llu,"
+        "\"graph_status\":%d}\n",
+        event.c_str(), mode_name(current_mode()), anchor.c_str(), peer.c_str(), qualification.c_str(),
+        static_cast<unsigned long long>(usage.owner_budget_bytes[0]),
+        static_cast<unsigned long long>(usage.owner_budget_bytes[1]),
+        static_cast<unsigned long long>(usage.owner_used_bytes[0]),
+        static_cast<unsigned long long>(usage.owner_used_bytes[1]),
+        static_cast<unsigned long long>(usage.live_allocation_count),
+        static_cast<unsigned long long>(usage.live_reservation_count),
+        static_cast<unsigned long long>(usage.cleanup_pending_count),
+        static_cast<unsigned long long>(handle),
+        static_cast<unsigned long long>(info.matched_nodes),
+        static_cast<unsigned long long>(info.rewritten_nodes),
+        static_cast<int>(info.status));
     if (count <= 0 || static_cast<size_t>(count) >= sizeof(line)) return;
     std::lock_guard<std::mutex> lock(profile_log_mutex);
     const int fd = open(path, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0600);
