@@ -8,4 +8,4 @@ Archive: `V200_Todo_Bootstrap.zip`, 66 files, 343,567 expanded bytes.
 
 Archive SHA256: `8683ad0fca152a7f833f0215ccae1f7564da65256db957b37c275b75bfb1b0a8`.
 
-The package has been checked and canonically recompiled. Its Todo plan has not been applied, and no operational V200 layer has been implemented here.
+The package has been checked, canonically recompiled, and applied to V200 Todo authority. See [bootstrap status](BOOTSTRAP_STATUS.md) for the adopted identity and verification. No operational V200 layer has been implemented here.
