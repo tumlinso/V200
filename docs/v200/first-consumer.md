@@ -70,4 +70,6 @@ ctest --test-dir /home/tumlinson/V200/build --output-on-failure
 
 CTest does not execute GPU work. Live checks use the supported CUDA controller and finite bundle specifications. Build and run as the project owner; the desktop sandbox may separately restrict loopback tests, GPU inspection or authority writes.
 
+V200-06 completed with host gate `47e9a99e-9228-45fc-a557-9a76af7e9de7` and retained-evidence gate `8e5431ba-23ab-432c-a856-fda9f2a42ce1`. The latter passed 184 artifact checks, including the independent service/client record. The verifier also rejected a changed raw output in a temporary test copy.
+
 The next product milestone is useful fully resident llama payload beyond one V100's capacity, followed by measured dispatch/locality optimization. The dormant capacity fixture is a candidate, not successful evidence. Two logical pairs, broader CUDA coverage and packaging remain later work.

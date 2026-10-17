@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T12:42:06Z",
+  "generated_at": "2026-10-17T12:43:12Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 65,
+  "project_revision": 70,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 65,
+    "project_revision": 70,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -89,10 +89,10 @@
       {
         "id": "V200-06-READY",
         "metadata_json": "{}",
-        "reached_at": null,
-        "revision": 63,
+        "reached_at": "2026-10-17T12:43:12Z",
+        "revision": 70,
         "revoked_at": null,
-        "state": "pending",
+        "state": "reached",
         "task_id": "V200-06",
         "title": "V200-06-READY"
       },
@@ -848,6 +848,56 @@
         "revision": 65,
         "seq": 65,
         "timestamp": "2026-10-17T12:42:06Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-06-HOST",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-06-HOST\"}",
+        "revision": 66,
+        "seq": 66,
+        "timestamp": "2026-10-17T12:43:09Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-06-HOST",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"47e9a99e-9228-45fc-a557-9a76af7e9de7\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 67,
+        "seq": 67,
+        "timestamp": "2026-10-17T12:43:12Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-06-RETAINED-EVIDENCE",
+        "entity_type": "gate",
+        "event_type": "gate.started",
+        "payload_json": "{\"gate_id\": \"V200-06-RETAINED-EVIDENCE\"}",
+        "revision": 68,
+        "seq": 68,
+        "timestamp": "2026-10-17T12:43:12Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-06-RETAINED-EVIDENCE",
+        "entity_type": "gate",
+        "event_type": "gate.completed",
+        "payload_json": "{\"evidence_id\": \"8e5431ba-23ab-432c-a856-fda9f2a42ce1\", \"status\": \"passed\", \"valid\": true}",
+        "revision": 69,
+        "seq": 69,
+        "timestamp": "2026-10-17T12:43:12Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-06",
+        "entity_type": "task",
+        "event_type": "task.completed",
+        "payload_json": "{\"completion_revision\": 70, \"disposition\": \"implemented\", \"reached_checkpoints\": [\"V200-06-READY\"]}",
+        "revision": 70,
+        "seq": 70,
+        "timestamp": "2026-10-17T12:43:12Z"
       }
     ],
     "evidence": [
@@ -888,6 +938,19 @@
         "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','-S','.','-B','build','-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9','-DV200_EXECUTION_BUILD_GPU_SMOKE=ON','-DV200_INTEGRATION_BUILD_GPU_SMOKE=ON','-DBUILD_TESTING=ON'],check=True); subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"e0977176ff815f6eaecdd2caa1d62895e6837098d62febdc7faac64a274efb80\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','-S','.','-B','build','-DCUDAToolkit_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9','-DV200_EXECUTION_BUILD_GPU_SMOKE=ON','-DV200_INTEGRATION_BUILD_GPU_SMOKE=ON','-DBUILD_TESTING=ON'],check=True); subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"81f872839aed3bcd186b882dd7ab3996c9f6a5794281c15bd34a20a328244c0b\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"CMakeLists.txt\", \"benchmarks/fixtures/llama-server-v200.json\", \"docs/v200/runtime-init.md\", \"evidence/B02/execution-r2.controller-evidence.json\", \"evidence/B02/execution-r2.controller-result.json\", \"evidence/B02/execution-r2.host-release.json\", \"evidence/B02/execution-r2/execution.json\", \"evidence/B02/execution-r2/stderr.txt\", \"evidence/B02/execution-r2/stdout.txt\", \"evidence/B02/execution/acceptance.json\", \"evidence/B02/execution/controller-evidence.json\", \"evidence/B02/execution/controller-result.json\", \"evidence/B02/execution/execution.json\", \"evidence/B02/execution/host-release.json\", \"evidence/B02/execution/stderr.txt\", \"evidence/B02/execution/stdout.txt\", \"evidence/B02/frontdoor-profile.jsonl\", \"evidence/B02/frontdoor.controller-evidence.json\", \"evidence/B02/frontdoor.controller-result.json\", \"evidence/B02/frontdoor/execution.json\", \"evidence/B02/frontdoor/stderr.txt\", \"evidence/B02/frontdoor/stdout.txt\", \"evidence/B02/pair-memory.controller-evidence.json\", \"evidence/B02/pair-memory.controller-result.json\", \"evidence/B02/pair-memory/execution.json\", \"evidence/B02/pair-memory/stderr.txt\", \"evidence/B02/pair-memory/stdout.txt\", \"evidence/B03/native.controller-evidence.json\", \"evidence/B03/native.controller-result.json\", \"evidence/B03/native.host-release.json\", \"evidence/B03/native/consumer/smoke-native_single-1792239954218618376.json\", \"evidence/B03/native/consumer/smoke-native_single-1792239954218618376.log\", \"evidence/B03/native/execution.json\", \"evidence/B03/native/stderr.txt\", \"evidence/B03/native/stdout.txt\", \"include/v200/core/runtime_init.h\", \"include/v200/core/runtime_init.hpp\", \"planning/runtime-integration-v3.todo-plan.json\", \"scripts/qualification/B02.execution.controller.json\", \"scripts/qualification/B02.frontdoor.controller.json\", \"scripts/qualification/B02.pair-memory.controller.json\", \"scripts/qualification/B03.facade.controller.json\", \"scripts/qualification/B03.native.controller.json\", \"scripts/v200/bounded_runner.py\", \"scripts/v200/serve.py\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/integration/CMakeLists.txt\", \"src/integration/runtime_init.cpp\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/execution/owner_execution_gpu_smoke.cpp\", \"tests/integration/pair_memory_gpu_smoke.cpp\", \"tests/integration/runtime_init_test.cpp\", \"todo-status.md\", \"todos.md\", \"todos/v200-01.md\", \"todos/v200-02.md\", \"todos/v200-03.md\", \"todos/v200-04.md\", \"todos/v200-05.md\", \"todos/v200-06.md\", \"todos/v200-07.md\", \"todos/v200-08.md\", \"todos/v200-09.md\", \"todos/v200-10.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\", \"todos/v200-i01.md\", \"todos/v200-q01.md\"], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"c4ca5296b7776e45e653d19be7a89dc4b32169f526b1ab9bd83c2d3c625d88f1\"}, {\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/core\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/execution\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/integration\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/execution\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"4cbbd10387917891bcd9e9e3b8da9971fab17ee5\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 58}",
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/3abe4830-f220-4361-9f29-3e0e98c45e16",
         "revision": 59,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T12:43:12Z",
+        "gate_id": "V200-06-HOST",
+        "id": "47e9a99e-9228-45fc-a557-9a76af7e9de7",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"86fda0f9d9728384c63f3ffcceb4cd05c39f5426a0fd2798b4abe7b6f577a481\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"c4ca5296b7776e45e653d19be7a89dc4b32169f526b1ab9bd83c2d3c625d88f1\"}, {\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"include/v200\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/integration\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/execution\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration\", \"sha256\": \"missing\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 66}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/47e9a99e-9228-45fc-a557-9a76af7e9de7",
+        "revision": 67,
         "status": "passed"
       },
       {
@@ -940,6 +1003,19 @@
         "metadata_json": "{\"argv\": [\"python3\", \"tests/memory/run_cpu_gate.py\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"f9b150c0bc02d343c5c1c504aeca2e286b3082a2d3b99b416b651ac147952035\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/memory/run_cpu_gate.py\"], \"cwd\": \".\", \"env\": {\"PYTHONDONTWRITEBYTECODE\": \"1\"}, \"timeout\": 1200}, \"diff_fingerprint\": \"193fe28da991c35b43509216e8c57e3370e2603105855a080e821cd0f6a70bb9\", \"dirty_paths\": [\".todo-orchestrator/state.snapshot.json\", \"benchmarks/fixtures/llama-server-v200.json\", \"docs/v200/completion-contract.md\", \"docs/v200/consumer-profile.json\", \"docs/v200/memory-contract.md\", \"include/v200/execution/owner_execution.hpp\", \"include/v200/execution/owner_execution_c.h\", \"include/v200/frontdoor/abi_profile.hpp\", \"include/v200/frontdoor/runtime.h\", \"include/v200/memory/api.h\", \"include/v200/memory/manager.hpp\", \"src/execution/CMakeLists.txt\", \"src/execution/owner_execution.cpp\", \"src/execution/owner_execution_c.cpp\", \"src/frontdoor/CMakeLists.txt\", \"src/frontdoor/abi_profile.cpp\", \"src/frontdoor/audit.cpp\", \"src/frontdoor/cuda_wrappers.cpp\", \"src/frontdoor/runtime_state.cpp\", \"src/frontdoor/runtime_state.hpp\", \"src/memory/CMakeLists.txt\", \"src/memory/manager.cpp\", \"src/memory/planner.cpp\", \"tests/abi/abi_profile_test.cpp\", \"tests/consumer/CMakeLists.txt\", \"tests/consumer/fake_server.py\", \"tests/consumer/run_consumer.py\", \"tests/consumer/test_consumer.py\", \"tests/execution/owner_execution_gpu_smoke.cpp\", \"tests/execution/owner_execution_test.cpp\", \"tests/memory/CMakeLists.txt\", \"tests/memory/run_cpu_gate.py\", \"tests/memory/test_memory.cpp\", \"todo-status.md\", \"todos.md\", \"todos/v200-01.md\", \"todos/v200-02.md\", \"todos/v200-03.md\", \"todos/v200-04.md\", \"todos/v200-05.md\", \"todos/v200-06.md\", \"todos/v200-07.md\", \"todos/v200-08.md\", \"todos/v200-09.md\", \"todos/v200-10.md\", \"todos/v200-11.md\", \"todos/v200-12.md\", \"todos/v200-13.md\", \"todos/v200-14.md\", \"todos/v200-q01.md\"], \"files\": [{\"path\": \"docs/v200/memory-contract.md\", \"sha256\": \"9611bf64d7c2086cba99405c694d62a66cc6b5b2b2a66047789c78910d3078a9\"}, {\"path\": \"include/v200/memory\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"16bfa6a59d518c9c7bafa77b67976b51ac4f5502\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 28}",
         "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/86cd9075-ecc4-4506-9915-152d5faa42b2",
         "revision": 32,
+        "status": "passed"
+      },
+      {
+        "checkpoint_id": null,
+        "claim_id": null,
+        "content_hash": null,
+        "created_at": "2026-10-17T12:43:12Z",
+        "gate_id": "V200-06-RETAINED-EVIDENCE",
+        "id": "8e5431ba-23ab-432c-a856-fda9f2a42ce1",
+        "kind": "command",
+        "metadata_json": "{\"argv\": [\"python3\", \"tests/integration/first_consumer.py\", \"--service\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"e28dc27f1b142776a3e7d1d29373d39445f8ba8254146d79be470bd04a4930cc\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/integration/first_consumer.py\", \"--service\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"docs/v200/consumer-profile.json\", \"sha256\": \"f6bb541df61c98d613cbd07e4519bf32b2300ef2a042ed6f844b0d00d2a14d65\"}, {\"path\": \"docs/v200/source-profile.json\", \"sha256\": \"bfef13e2eace6c775f6840ce0a555544a5d7a41a1fcc87a0acc126c5a8a485f0\"}, {\"path\": \"evidence/B02\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03\", \"sha256\": \"missing\"}, {\"path\": \"evidence/V200-SERVE\", \"sha256\": \"missing\"}, {\"path\": \"evidence/foundation\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration/first_consumer.py\", \"sha256\": \"d811994d5cb6db016f85382f090c7113ed7376e0432c3e6ca4957fc509fed617\"}], \"interfaces\": [], \"recorded_git_head\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 68}",
+        "path": "/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/8e5431ba-23ab-432c-a856-fda9f2a42ce1",
+        "revision": 69,
         "status": "passed"
       },
       {
@@ -1130,27 +1206,27 @@
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\", \"input_paths\": [\"CMakeLists.txt\", \"include/v200\", \"src/frontdoor\", \"src/memory\", \"src/execution\", \"src/integration\", \"tests/integration\", \"tests/consumer\", \"tests/execution\", \"tests/memory\", \"tests/abi\", \"scripts/v200\", \"benchmarks/fixtures\"], \"timeout_seconds\": 180}",
         "id": "V200-06-HOST",
-        "input_fingerprint": null,
-        "last_run_at": null,
+        "input_fingerprint": "86fda0f9d9728384c63f3ffcceb4cd05c39f5426a0fd2798b4abe7b6f577a481",
+        "last_run_at": "2026-10-17T12:43:12Z",
         "required": 1,
-        "revision": 65,
-        "status": "pending",
+        "revision": 67,
+        "status": "passed",
         "task_id": "V200-06",
         "type": "command",
-        "valid": 0
+        "valid": 1
       },
       {
         "checkpoint_id": null,
         "config_json": "{\"argv\": [\"python3\", \"tests/integration/first_consumer.py\", \"--service\"], \"cwd\": \".\", \"input_paths\": [\"tests/integration/first_consumer.py\", \"evidence/B02\", \"evidence/B03\", \"evidence/V200-SERVE\", \"evidence/foundation\", \"docs/v200/consumer-profile.json\", \"docs/v200/source-profile.json\"], \"timeout_seconds\": 60}",
         "id": "V200-06-RETAINED-EVIDENCE",
-        "input_fingerprint": null,
-        "last_run_at": null,
+        "input_fingerprint": "e28dc27f1b142776a3e7d1d29373d39445f8ba8254146d79be470bd04a4930cc",
+        "last_run_at": "2026-10-17T12:43:12Z",
         "required": 1,
-        "revision": 65,
-        "status": "pending",
+        "revision": 69,
+        "status": "passed",
         "task_id": "V200-06",
         "type": "command",
-        "valid": 0
+        "valid": 1
       },
       {
         "checkpoint_id": null,
@@ -1216,6 +1292,16 @@
         "payload_json": "{\"authority_commit\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-05-READY\", \"reached_at\": \"2026-10-17T12:06:42Z\", \"state\": \"reached\"}], \"completion_commit\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\", \"completion_gates\": [{\"evidence_id\": \"dae5f7fa-1cd2-43e3-809d-27217789ed3a\", \"evidence_revision\": 30, \"id\": \"V200-05-CONSUMER-CPU\", \"input_fingerprint\": \"8caa262fb8d352ec87c7bd116fe3574d3288020a5447e74f04312644dca72891\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\"}], \"completion_revision\": 31, \"finalized_checkpoints\": [\"V200-05-READY\"], \"gates\": [{\"id\": \"V200-05-CONSUMER-CPU\", \"input_fingerprint\": \"8caa262fb8d352ec87c7bd116fe3574d3288020a5447e74f04312644dca72891\", \"last_run_at\": \"2026-10-17T12:06:42Z\", \"revision\": 30, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \".todo-orchestrator/state.snapshot.json | 1268 ++++++++++++++++++++++++++++----\\n todo-status.md                         |   13 +-\\n todos.md                               |   13 +-\\n todos/v200-01.md                       |   10 +-\\n todos/v200-02.md                       |   17 +-\\n todos/v200-03.md                       |   17 +-\\n todos/v200-04.md                       |   17 +-\\n todos/v200-05.md                       |   17 +-\\n todos/v200-06.md                       |   14 +-\\n todos/v200-07.md                       |    2 +\\n todos/v200-08.md                       |    2 +\\n todos/v200-09.md                       |    2 +\\n todos/v200-10.md                       |    2 +\\n todos/v200-11.md                       |    2 +\\n todos/v200-12.md                       |    2 +\\n todos/v200-13.md                       |    2 +\\n todos/v200-14.md                       |    2 +\\n 17 files changed, 1212 insertions(+), 190 deletions(-)\", \"git_head\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"V200-05 CPU-ready consumer fixture: existingQwen3Coder30Bmodelhashverified, exactbinary+8DSOschecked; explicit28GPUlayers/ctx2048fittingoffload vs all-layercapacity fixture, fixedCPU4 andsettings. FiniteownedprocessHTTP/cleanup/memoryguard harness, repeatedpreloadDSOs+exactbudget/profileJSONLreceipt, deterministicexactoracle and matchednative/facadecontrols. Rootreviewed lifetime/identity/memoryguardcode;16CPUtests passed inrequiredgate evidence61c4b7bd-ddd7-4b90-b667-f748bb6ad7d9. No application/GPUrun; runtime proofremains06.\", \"producer_commit\": \"df0bc70df7ef55eee1c51af3867a13a4b7fb4366\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-05\"}",
         "revision": 31,
         "task_id": "V200-05"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T12:43:12Z",
+        "id": "8bd839c3-10a6-4df7-867d-11f71837f532",
+        "kind": "complete",
+        "note": "First usable T1 restricted preview delivered; installed llama executable unchanged, graph-off/28GPUlayers/2048ctx partialCPU offload explicit; T2 target remains. NativeB03f2b89fd2 and facadeB03aa82e8d5 return exact2; facadeledgerpositiveandzeroonshutdown. Foregroundservice547cfd3a serves20s, independenthealth+OpenAIchatclient exact2, cleanserverexit+releasedpair. HPC SDK CUDA12.9 pinned inbuilds/controller/launcher. B01/B02accepted receipts retained, rejected attempts preserved. Required host and artifact-only gates verify testedprofile; nofullresidentcapacity, dualcompute, arbitrarykernel or speedclaim. Userlaunch python3 /home/tumlinson/V200/scripts/v200/serve.py --execute defaults30minloopback8080. OptionalGPUinferenceleftinactive, workflowserviceactive, noGPUprocessleft.",
+        "payload_json": "{\"authority_commit\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-06-READY\", \"reached_at\": \"2026-10-17T12:43:12Z\", \"state\": \"reached\"}], \"completion_commit\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\", \"completion_gates\": [{\"evidence_id\": \"47e9a99e-9228-45fc-a557-9a76af7e9de7\", \"evidence_revision\": 67, \"id\": \"V200-06-HOST\", \"input_fingerprint\": \"86fda0f9d9728384c63f3ffcceb4cd05c39f5426a0fd2798b4abe7b6f577a481\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\"}, {\"evidence_id\": \"8e5431ba-23ab-432c-a856-fda9f2a42ce1\", \"evidence_revision\": 69, \"id\": \"V200-06-RETAINED-EVIDENCE\", \"input_fingerprint\": \"e28dc27f1b142776a3e7d1d29373d39445f8ba8254146d79be470bd04a4930cc\", \"status\": \"passed\", \"valid\": true, \"validation_git_head\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\"}], \"completion_revision\": 70, \"finalized_checkpoints\": [\"V200-06-READY\"], \"gates\": [{\"id\": \"V200-06-HOST\", \"input_fingerprint\": \"86fda0f9d9728384c63f3ffcceb4cd05c39f5426a0fd2798b4abe7b6f577a481\", \"last_run_at\": \"2026-10-17T12:43:12Z\", \"revision\": 67, \"status\": \"passed\", \"valid\": 1}, {\"id\": \"V200-06-RETAINED-EVIDENCE\", \"input_fingerprint\": \"e28dc27f1b142776a3e7d1d29373d39445f8ba8254146d79be470bd04a4930cc\", \"last_run_at\": \"2026-10-17T12:43:12Z\", \"revision\": 69, \"status\": \"passed\", \"valid\": 1}], \"git_diffstat\": \"\", \"git_head\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"First usable T1 restricted preview delivered; installed llama executable unchanged, graph-off/28GPUlayers/2048ctx partialCPU offload explicit; T2 target remains. NativeB03f2b89fd2 and facadeB03aa82e8d5 return exact2; facadeledgerpositiveandzeroonshutdown. Foregroundservice547cfd3a serves20s, independenthealth+OpenAIchatclient exact2, cleanserverexit+releasedpair. HPC SDK CUDA12.9 pinned inbuilds/controller/launcher. B01/B02accepted receipts retained, rejected attempts preserved. Required host and artifact-only gates verify testedprofile; nofullresidentcapacity, dualcompute, arbitrarykernel or speedclaim. Userlaunch python3 /home/tumlinson/V200/scripts/v200/serve.py --execute defaults30minloopback8080. OptionalGPUinferenceleftinactive, workflowserviceactive, noGPUprocessleft.\", \"producer_commit\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-06\"}",
+        "revision": 70,
+        "task_id": "V200-06"
       },
       {
         "claim_id": null,
@@ -2080,6 +2166,32 @@
         "validation_git_head": "df0bc70df7ef55eee1c51af3867a13a4b7fb4366"
       },
       {
+        "completion_git_head": "02d58dc016e8acae8aedee025f7cc6c5ce9144fa",
+        "completion_revision": 70,
+        "evidence_id": "47e9a99e-9228-45fc-a557-9a76af7e9de7",
+        "evidence_revision": 67,
+        "gate_id": "V200-06-HOST",
+        "input_fingerprint": "86fda0f9d9728384c63f3ffcceb4cd05c39f5426a0fd2798b4abe7b6f577a481",
+        "provenance_json": "{\"claim_id\": \"7cec8aa1-7798-4d34-af18-4a65ea51bd21\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"86fda0f9d9728384c63f3ffcceb4cd05c39f5426a0fd2798b4abe7b6f577a481\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"-c\", \"import subprocess; subprocess.run(['cmake','--build','build','--parallel','4'],check=True); subprocess.run(['ctest','--test-dir','build','--output-on-failure'],check=True)\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"CMakeLists.txt\", \"sha256\": \"c4ca5296b7776e45e653d19be7a89dc4b32169f526b1ab9bd83c2d3c625d88f1\"}, {\"path\": \"benchmarks/fixtures\", \"sha256\": \"missing\"}, {\"path\": \"include/v200\", \"sha256\": \"missing\"}, {\"path\": \"scripts/v200\", \"sha256\": \"missing\"}, {\"path\": \"src/execution\", \"sha256\": \"missing\"}, {\"path\": \"src/frontdoor\", \"sha256\": \"missing\"}, {\"path\": \"src/integration\", \"sha256\": \"missing\"}, {\"path\": \"src/memory\", \"sha256\": \"missing\"}, {\"path\": \"tests/abi\", \"sha256\": \"missing\"}, {\"path\": \"tests/consumer\", \"sha256\": \"missing\"}, {\"path\": \"tests/execution\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration\", \"sha256\": \"missing\"}, {\"path\": \"tests/memory\", \"sha256\": \"missing\"}], \"interfaces\": [], \"recorded_git_head\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 66}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/47e9a99e-9228-45fc-a557-9a76af7e9de7\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-06",
+        "valid": 1,
+        "validation_git_head": "02d58dc016e8acae8aedee025f7cc6c5ce9144fa"
+      },
+      {
+        "completion_git_head": "02d58dc016e8acae8aedee025f7cc6c5ce9144fa",
+        "completion_revision": 70,
+        "evidence_id": "8e5431ba-23ab-432c-a856-fda9f2a42ce1",
+        "evidence_revision": 69,
+        "gate_id": "V200-06-RETAINED-EVIDENCE",
+        "input_fingerprint": "e28dc27f1b142776a3e7d1d29373d39445f8ba8254146d79be470bd04a4930cc",
+        "provenance_json": "{\"claim_id\": \"7cec8aa1-7798-4d34-af18-4a65ea51bd21\", \"evidence_content_hash\": null, \"evidence_kind\": \"command\", \"evidence_metadata\": {\"argv\": [\"python3\", \"tests/integration/first_consumer.py\", \"--service\"], \"environment\": {}, \"expected_exit_code\": 0, \"input_fingerprint\": \"e28dc27f1b142776a3e7d1d29373d39445f8ba8254146d79be470bd04a4930cc\", \"inputs\": {\"command_contract\": {\"argv\": [\"python3\", \"tests/integration/first_consumer.py\", \"--service\"], \"cwd\": \".\"}, \"diff_fingerprint\": \"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\", \"dirty_paths\": [], \"files\": [{\"path\": \"docs/v200/consumer-profile.json\", \"sha256\": \"f6bb541df61c98d613cbd07e4519bf32b2300ef2a042ed6f844b0d00d2a14d65\"}, {\"path\": \"docs/v200/source-profile.json\", \"sha256\": \"bfef13e2eace6c775f6840ce0a555544a5d7a41a1fcc87a0acc126c5a8a485f0\"}, {\"path\": \"evidence/B02\", \"sha256\": \"missing\"}, {\"path\": \"evidence/B03\", \"sha256\": \"missing\"}, {\"path\": \"evidence/V200-SERVE\", \"sha256\": \"missing\"}, {\"path\": \"evidence/foundation\", \"sha256\": \"missing\"}, {\"path\": \"tests/integration/first_consumer.py\", \"sha256\": \"d811994d5cb6db016f85382f090c7113ed7376e0432c3e6ca4957fc509fed617\"}], \"interfaces\": [], \"recorded_git_head\": \"02d58dc016e8acae8aedee025f7cc6c5ce9144fa\", \"static_path\": null}, \"locks\": [], \"resources\": [], \"returncode\": 0, \"started_revision\": 68}, \"evidence_path\": \"/home/tumlinson/V200/.git/todo-orchestrator/6c6463a7-0f66-4e12-813f-c17e46185775/evidence/8e5431ba-23ab-432c-a856-fda9f2a42ce1\", \"source\": \"completion_transaction\"}",
+        "status": "passed",
+        "task_id": "V200-06",
+        "valid": 1,
+        "validation_git_head": "02d58dc016e8acae8aedee025f7cc6c5ce9144fa"
+      },
+      {
         "completion_git_head": "8b6b9a80bcea6edc2eace40e87198b49184bad59",
         "completion_revision": 62,
         "evidence_id": "9b617037-45f4-411a-b988-7bdeabac6912",
@@ -2456,9 +2568,9 @@
       },
       {
         "attention_reason": null,
-        "completion_commit": null,
-        "completion_git_head": null,
-        "completion_revision": null,
+        "completion_commit": "02d58dc016e8acae8aedee025f7cc6c5ce9144fa",
+        "completion_git_head": "02d58dc016e8acae8aedee025f7cc6c5ce9144fa",
+        "completion_revision": 70,
         "created_at": "2026-10-17T11:40:58Z",
         "id": "V200-06",
         "kind": "integration",
@@ -2470,14 +2582,14 @@
         "parallel_policy": "serial",
         "parent_id": null,
         "priority": 0,
-        "result": null,
+        "result": "implemented",
         "result_policy_json": "{}",
-        "revision": 64,
-        "status": "in_progress",
+        "revision": 70,
+        "status": "done",
         "tags_json": "[]",
         "title": "Deliver the first real single-device consumer",
-        "updated_at": "2026-10-17T12:35:41Z",
-        "version": 4
+        "updated_at": "2026-10-17T12:43:12Z",
+        "version": 5
       },
       {
         "attention_reason": null,
@@ -3466,12 +3578,12 @@
       },
       {
         "activated_at": "2026-10-17T12:35:41Z",
-        "completed_at": null,
+        "completed_at": "2026-10-17T12:43:12Z",
         "enqueued_at": "2026-10-17T11:49:55Z",
         "lane_id": "V200-RUN-1-06",
         "position": 0,
-        "revision": 64,
-        "state": "active",
+        "revision": 70,
+        "state": "completed",
         "task_id": "V200-06"
       },
       {
@@ -3691,11 +3803,11 @@
         "created_at": "2026-10-17T11:49:55Z",
         "id": "V200-RUN-1-06",
         "parent_lane_id": "V200-RUN-1-COORD",
-        "revision": 64,
+        "revision": 70,
         "role": "implementer",
         "run_id": "V200-RUN-1",
-        "state": "active",
-        "updated_at": "2026-10-17T12:35:41Z",
+        "state": "closed",
+        "updated_at": "2026-10-17T12:43:12Z",
         "workspace_mode": "exclusive"
       },
       {
@@ -3791,10 +3903,10 @@
         "completed_at": null,
         "created_at": "2026-10-17T11:49:55Z",
         "id": "V200-RUN-1",
-        "revision": 8,
+        "revision": 70,
         "root_task_id": "V200-06",
-        "status": "active",
-        "updated_at": "2026-10-17T11:49:55Z"
+        "status": "completed",
+        "updated_at": "2026-10-17T12:43:12Z"
       },
       {
         "active_charter_version": 1,

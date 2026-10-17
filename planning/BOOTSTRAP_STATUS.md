@@ -11,7 +11,7 @@ evidence. It does not replace Todo authority.
   manifest-listed file hashes passed at adoption. Package files remain
   unchanged under [v200-bootstrap/](v200-bootstrap/README.md).
 - Repository: `/home/tumlinson/V200`, branch `main`; runtime foundation commit
-  `8b6b9a8`. Origin is `https://github.com/tumlinso/V200.git`; no push is
+  `8b6b9a8`, first-delivery source commit `02d58dc`. Origin is `https://github.com/tumlinso/V200.git`; no push is
   recorded.
 - Project Control workspace/repository: `v200` / `v200`. Todo project UUID:
   `6c6463a7-0f66-4e12-813f-c17e46185775`. The original 14-outcome plan was
@@ -20,7 +20,8 @@ evidence. It does not replace Todo authority.
 
 ## Current work and profiles
 
-V200-01 through V200-05, Q01 and I01 are complete. Run 1 / V200-06 is active.
+V200-01 through V200-06, Q01 and I01 are complete. The first-delivery run is closed
+at Todo revision 70, with no active claim. V200-07 is the next capacity outcome.
 The existing llama-server source, binary, native fixture and profiles are
 pinned in [source profile](../docs/v200/source-profile.json) and
 [consumer profile](../docs/v200/consumer-profile.json). The selected toolkit
@@ -69,5 +70,7 @@ facade behavior.
   and [client](../evidence/V200-SERVE/first-service-client.json).
 
 The restricted first preview is usable; [quickstart and limits](../docs/v200/first-consumer.md)
-are available. V200-06 is closing its artifact/host acceptance gates. Application
+are available. V200-06 passed its host gate (`47e9a99e-9228-45fc-a557-9a76af7e9de7`)
+and retained-evidence gate (`8e5431ba-23ab-432c-a856-fda9f2a42ce1`). The artifact-only
+verifier passed 184 checks, including the service/client chain. Application
 capacity beyond one V100, useful dual-GPU compute and speedup remain unqualified.

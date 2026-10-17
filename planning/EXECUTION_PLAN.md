@@ -22,7 +22,7 @@ graph-off and partial-offload restrictions are explicit in the
 
 ## Current implementation
 
-- V200-01 through V200-05, Q01 and I01 are complete. Run 1 / V200-06 is active.
+- V200-01 through V200-06, Q01 and I01 are complete. The first-delivery run is closed.
 - Source, consumer and native-control identities are pinned in
   [source profile](../docs/v200/source-profile.json) and
   [consumer profile](../docs/v200/consumer-profile.json). The selected HPC SDK
@@ -43,8 +43,8 @@ fixture details.
 
 ## Next work
 
-1. Close V200-06's artifact/host gates and use the restricted preview in projects;
-   keep its tested profile and limits visible as it evolves.
+1. Use the restricted preview in projects and keep its tested profile and limits
+   visible as it evolves. V200-06's host and retained-evidence gates passed.
 2. Prove useful llama-server payload above the available memory of either one
    V100, with both physical owners' bytes recorded and no CPU offload or hidden
    host oversubscription. The 96 MiB allocator check does not satisfy this.

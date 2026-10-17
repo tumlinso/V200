@@ -13,6 +13,6 @@ The archive contains 66 files and 343,567 expanded bytes. Archive SHA-256:
 
 The first restricted llama-server preview passed native/facade completion,
 live health/chat access, and clean foreground shutdown. See the
-[usage and evidence](../docs/v200/first-consumer.md). V200-01 through V200-05,
-Q01 and I01 are complete; run 1 / V200-06 is closing acceptance. Application
+[usage and evidence](../docs/v200/first-consumer.md). V200-01 through V200-06,
+Q01 and I01 are complete; the first-delivery run is closed. Application
 capacity beyond one V100 and useful dual-GPU compute remain unqualified.
