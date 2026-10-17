@@ -13,11 +13,14 @@ namespace {
 constexpr char kPair[] =
     "GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206";
 constexpr char kB01[] = "8426eab5-278d-4687-ab7d-f5ec937e46ec";
+constexpr char kPair1[] =
+    "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505,GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a";
+constexpr char kB01Pair1[] = "1c97d504-468e-434c-81ea-112a4bb83e74";
 constexpr std::uint64_t kMiB = 1024ull * 1024ull;
 constexpr std::uint64_t kGiB = 1024ull * 1024ull * 1024ull;
 
 struct Fake {
-  std::array<CUdevice, 2> devices{{20, 10}};  // Enumeration order differs from owner order.
+  std::array<CUdevice, 4> devices{{20, 10, 40, 30}};  // Enumeration order differs from owner order.
   int device_count{2};
   CUdevice fail_retain_device{-1};
   int attach_error{V200_EXECUTION_OK};
@@ -29,6 +32,9 @@ struct Fake {
   int release_count{};
   int attach_count{};
   int detach_count{};
+  int register_count{};
+  std::array<uint64_t, 2> registered_logical_devices{};
+  uint64_t attached_logical_device{};
   int event_sync_count{};
   v200_execution_handle *attached_handle{};
   CUcontext current{reinterpret_cast<CUcontext>(0x777)};
@@ -67,7 +73,17 @@ void write_uuid(CUuuid *uuid, CUdevice device) {
   static constexpr unsigned char owner1[16] = {
       0xd7, 0x45, 0xda, 0x9c, 0x76, 0x49, 0x83, 0x34,
       0x41, 0xf1, 0x48, 0x3a, 0xfa, 0x6f, 0x32, 0x06};
-  std::memcpy(uuid->bytes, device == 10 ? owner0 : owner1, sizeof(uuid->bytes));
+  static constexpr unsigned char pair1_owner0[16] = {
+      0xcf, 0x22, 0xc4, 0x1f, 0x5b, 0x58, 0x77, 0xb1,
+      0x35, 0x35, 0x8f, 0xad, 0xd1, 0xca, 0x65, 0x05};
+  static constexpr unsigned char pair1_owner1[16] = {
+      0x6c, 0x1c, 0xac, 0x7f, 0xa3, 0x60, 0x0a, 0xef,
+      0xba, 0x98, 0x28, 0x28, 0xbf, 0xd1, 0xdb, 0x1a};
+  const unsigned char *bytes = device == 10 ? owner0
+                                : device == 20 ? owner1
+                                : device == 30 ? pair1_owner0
+                                               : pair1_owner1;
+  std::memcpy(uuid->bytes, bytes, sizeof(uuid->bytes));
 }
 
 CUresult CUDAAPI fake_device_uuid(CUuuid *uuid, CUdevice device) {
@@ -117,7 +133,8 @@ CUresult CUDAAPI fake_granularity(size_t *value, const CUmemAllocationProp *,
 CUresult CUDAAPI fake_memory_info(size_t *free, size_t *total) {
   if (free == nullptr || total == nullptr) return CUDA_ERROR_INVALID_VALUE;
   const auto context_value = reinterpret_cast<std::uintptr_t>(g_fake->current);
-  const std::size_t owner = context_value == 0xa0a ? 0u : 1u;
+  const std::size_t owner =
+      context_value == 0xa0a || context_value == 0xa1e ? 0u : 1u;
   *free = g_fake->physical_free[owner];
   *total = g_fake->physical_total;
   ++g_fake->memory_info_calls;
@@ -167,11 +184,17 @@ int fake_stream_synchronize(void *, void *) { return CUDA_SUCCESS; }
 int fake_stream_wait_event(void *, void *, void *, unsigned) { return CUDA_SUCCESS; }
 int fake_register_owner(v200_execution_handle *handle, uint64_t device,
                         uint32_t owner, void *context) {
+  auto &f = *g_fake;
+  if (f.register_count < static_cast<int>(f.registered_logical_devices.size())) {
+    f.registered_logical_devices[static_cast<std::size_t>(f.register_count)] = device;
+  }
+  ++f.register_count;
   return v200_execution_register_owner(handle, device, owner, context);
 }
 int fake_attach(v200_execution_handle *handle, uint64_t device, uint32_t owner) {
   ++g_fake->attach_count;
   g_fake->attached_handle = handle;
+  g_fake->attached_logical_device = device;
   if (g_fake->attach_error != V200_EXECUTION_OK) return g_fake->attach_error;
   int status = v200_execution_register_stream(handle, device, 1, owner,
                                               reinterpret_cast<void *>(1));
@@ -255,8 +278,15 @@ v200::core::RuntimeInitApi make_api(Fake *state) {
 }
 
 v200::core::RuntimeInitInputs inputs(const char *budget0 = "64",
-                                     const char *budget1 = "64") {
-  return {kPair, kB01, budget0, budget1};
+                                     const char *budget1 = "64",
+                                     std::uint64_t logical_device_id = 1) {
+  return {kPair, kB01, budget0, budget1, logical_device_id};
+}
+
+v200::core::RuntimeInitInputs pair1_inputs(
+    std::uint64_t logical_device_id = 2,
+    const char *budget0 = "64", const char *budget1 = "64") {
+  return {kPair1, kB01Pair1, budget0, budget1, logical_device_id};
 }
 
 int enqueue_ok(void *, void *) { return CUDA_SUCCESS; }
@@ -276,6 +306,25 @@ void test_rejects_wrong_proof_before_cuda() {
     assert(state.retained_count == 0);
     assert(!manager.is_configured());
   }
+}
+
+void test_pair_proof_requires_its_bound_logical_device_id() {
+  Fake state{};
+  state.device_count = 4;
+  g_fake = &state;
+  v200::memory::MemoryManager pair0_manager;
+  v200::core::RuntimeInitializer pair0(pair0_manager);
+  auto api = make_api(&state);
+  assert(pair0.initialize(inputs("64", "64", 2), api) ==
+         CUDA_ERROR_INVALID_VALUE);
+  assert(state.init_calls == 0);
+  assert(!pair0_manager.is_configured());
+
+  v200::memory::MemoryManager pair1_manager(1);
+  v200::core::RuntimeInitializer pair1(pair1_manager);
+  assert(pair1.initialize(pair1_inputs(1), api) == CUDA_ERROR_INVALID_VALUE);
+  assert(state.init_calls == 0);
+  assert(!pair1_manager.is_configured());
 }
 
 void test_rejects_bad_budget_before_cuda() {
@@ -377,6 +426,10 @@ void test_success_maps_order_budgets_contexts_and_completion_bridge() {
     assert(state.init_calls == 1);
     assert(state.retained_count == 2);
     assert(state.attach_count == 1);
+    assert(state.register_count == 2);
+    assert(state.registered_logical_devices[0] == 1 &&
+           state.registered_logical_devices[1] == 1);
+    assert(state.attached_logical_device == 1);
     assert(state.current == reinterpret_cast<CUcontext>(0x777));
 
     v200_memory_pair_profile profile{};
@@ -464,16 +517,71 @@ void test_pair_initialization_rejects_owner_without_reserve_headroom() {
   assert(state.retained_count == 0);
 }
 
+void test_second_qualified_pair_initializes_at_logical_device_two() {
+  Fake state{};
+  state.device_count = 4;
+  state.physical_free = {{6 * kGiB, 11 * kGiB}};
+  g_fake = &state;
+  v200::memory::MemoryManager manager(1);
+  {
+    v200::core::RuntimeInitializer initializer(manager);
+    auto api = make_api(&state);
+    assert(initializer.initialize(pair1_inputs(2, "12288", "12288"), api) ==
+           CUDA_SUCCESS);
+    assert(initializer.initialized());
+    assert(state.init_calls == 1);
+    assert(state.retained_count == 2);
+    assert(state.register_count == 2);
+    assert(state.registered_logical_devices[0] == 2 &&
+           state.registered_logical_devices[1] == 2);
+    assert(state.attached_logical_device == 2);
+
+    v200_memory_pair_profile profile{};
+    profile.abi_version = V200_MEMORY_ABI_VERSION;
+    profile.struct_size = sizeof(profile);
+    assert(manager.get_profile(&profile) == CUDA_SUCCESS);
+    assert(profile.owner_device[0] == 30 && profile.owner_device[1] == 40);
+    assert(profile.owner_budget_bytes[0] == 5 * kGiB);
+    assert(profile.owner_budget_bytes[1] == 10 * kGiB);
+    assert(std::strcmp(profile.owner_uuid[0],
+                       "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505") == 0);
+    assert(std::strcmp(profile.owner_uuid[1],
+                       "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a") == 0);
+    assert(std::strcmp(profile.qualification_id, kB01Pair1) == 0);
+  }
+  assert(state.retained_count == 0);
+  assert(state.release_count == 2);
+  assert(state.detach_count == 1);
+}
+
+void test_second_pair_rejects_wrong_receipt_before_cuda() {
+  Fake state{};
+  state.device_count = 4;
+  g_fake = &state;
+  v200::memory::MemoryManager manager(1);
+  v200::core::RuntimeInitializer initializer(manager);
+  auto api = make_api(&state);
+  auto invalid = pair1_inputs();
+  invalid.b01_evidence_id = "unqualified";
+  assert(initializer.initialize(invalid, api) == CUDA_ERROR_INVALID_VALUE);
+  assert(state.init_calls == 0);
+  assert(state.retained_count == 0);
+  assert(!manager.is_configured());
+}
+
 }  // namespace
 
 int main() {
   test_rejects_wrong_proof_before_cuda();
+  test_pair_proof_requires_its_bound_logical_device_id();
   test_rejects_bad_budget_before_cuda();
   test_releases_first_context_if_second_retain_fails();
   test_attach_failure_rolls_back_contexts_and_execution();
   test_success_maps_order_budgets_contexts_and_completion_bridge();
   test_startup_budgets_are_capped_by_live_headroom_after_reserve();
   test_pair_initialization_rejects_owner_without_reserve_headroom();
+  test_second_qualified_pair_initializes_at_logical_device_two();
+  test_second_pair_rejects_wrong_receipt_before_cuda();
   test_uncertain_context_restore_preserves_primary_contexts();
   test_pop_error_dominates_granularity_error_and_preserves_contexts();
   std::puts("runtime initializer host tests passed");

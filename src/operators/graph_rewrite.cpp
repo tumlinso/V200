@@ -9,8 +9,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <new>
+#include <tuple>
 #include <vector>
 
 namespace {
@@ -64,17 +66,48 @@ struct RuntimeApi {
 struct PersistentPeerContext {
   std::mutex mutex;
   DriverApi driver{};
+  CUdevice anchor_device = -1;
   CUdevice peer_device = -1;
+  CUcontext anchor_context{};
   CUcontext context{};
   bool retained = false;
 };
 
-PersistentPeerContext &peer_context_state() {
-  // The context reference is intentionally process-lifetime. Graph execs can
-  // retain peer CUfunction handles until their owning application destroys
-  // them, and a CUDA teardown destructor would race Runtime shutdown.
-  static PersistentPeerContext *state = new PersistentPeerContext();
-  return *state;
+struct PairKey {
+  CUdevice anchor_device = -1;
+  CUdevice peer_device = -1;
+  CUcontext anchor_context{};
+
+  bool operator<(const PairKey &other) const noexcept {
+    return std::make_tuple(anchor_device, peer_device,
+                           reinterpret_cast<uintptr_t>(anchor_context)) <
+           std::make_tuple(other.anchor_device, other.peer_device,
+                           reinterpret_cast<uintptr_t>(other.anchor_context));
+  }
+};
+
+std::mutex peer_states_mutex;
+std::map<PairKey, std::unique_ptr<PersistentPeerContext>> peer_states;
+
+PersistentPeerContext *peer_context_state(
+    const DriverApi &driver, const v200_memory_pair_profile &profile,
+    CUcontext anchor_context) noexcept {
+  const PairKey key{profile.owner_device[0], profile.owner_device[1],
+                    anchor_context};
+  std::lock_guard<std::mutex> lock(peer_states_mutex);
+  auto found = peer_states.find(key);
+  if (found != peer_states.end()) return found->second.get();
+  try {
+    auto state = std::make_unique<PersistentPeerContext>();
+    state->driver = driver;
+    state->anchor_device = profile.owner_device[0];
+    state->peer_device = profile.owner_device[1];
+    state->anchor_context = anchor_context;
+    found = peer_states.emplace(key, std::move(state)).first;
+    return found->second.get();
+  } catch (const std::bad_alloc &) {
+    return nullptr;
+  }
 }
 
 template <typename Function>
@@ -140,12 +173,14 @@ cudaError_t map_driver_error(CUresult result) noexcept {
   }
 }
 
-cudaError_t load_pair_profile(v200_memory_pair_profile *profile) noexcept {
+cudaError_t load_pair_profile(uint32_t pair_index,
+                              v200_memory_pair_profile *profile) noexcept {
   if (profile == nullptr) return cudaErrorInvalidValue;
   std::memset(profile, 0, sizeof(*profile));
   profile->abi_version = V200_MEMORY_ABI_VERSION;
   profile->struct_size = sizeof(*profile);
-  const CUresult result = v200_memory_get_profile(profile);
+  const CUresult result =
+      v200_memory_get_profile_for_pair(pair_index, profile);
   if (result != CUDA_SUCCESS) return map_driver_error(result);
   if (profile->abi_version != V200_MEMORY_ABI_VERSION ||
       profile->struct_size < sizeof(*profile) ||
@@ -251,19 +286,26 @@ cudaError_t rewrite_graph(cudaGraph_t graph, std::size_t *matched_nodes,
       compute_opt_in == nullptr || std::strcmp(compute_opt_in, "1") != 0)
     return cudaSuccess;
 
+  const uint32_t pair_index = v200_memory_current_pair();
+  if (pair_index > 1) return cudaErrorInvalidDevice;
+
   v200_memory_pair_profile profile{};
-  cudaError_t status = load_pair_profile(&profile);
+  cudaError_t status = load_pair_profile(pair_index, &profile);
   if (status != cudaSuccess) return status;
 
-  PersistentPeerContext &peer_state = peer_context_state();
-  std::lock_guard<std::mutex> state_lock(peer_state.mutex);
-  resolve_driver(&peer_state.driver);
-  if (!peer_state.driver.context_ready() || !peer_state.driver.graph_ready())
+  DriverApi driver{};
+  resolve_driver(&driver);
+  if (!driver.context_ready() || !driver.graph_ready())
     return cudaErrorNotSupported;
-
   CUcontext anchor_context = nullptr;
-  status = ensure_anchor_context(peer_state.driver, profile, &anchor_context);
+  status = ensure_anchor_context(driver, profile, &anchor_context);
   if (status != cudaSuccess) return status;
+
+  PersistentPeerContext *peer_state_ptr =
+      peer_context_state(driver, profile, anchor_context);
+  if (peer_state_ptr == nullptr) return cudaErrorMemoryAllocation;
+  PersistentPeerContext &peer_state = *peer_state_ptr;
+  std::lock_guard<std::mutex> state_lock(peer_state.mutex);
 
   RuntimeApi runtime{};
   resolve_runtime(&runtime);

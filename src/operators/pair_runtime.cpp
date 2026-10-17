@@ -4,7 +4,11 @@
 #include "v200/memory/api.h"
 
 #include <cstring>
+#include <map>
+#include <memory>
 #include <mutex>
+#include <new>
+#include <tuple>
 
 namespace v200::operators {
 namespace {
@@ -45,6 +49,7 @@ struct DriverApi {
 };
 
 struct PairState {
+  std::mutex mutex;
   DriverApi api{};
   CUdevice owner_device[2]{};
   CUcontext anchor_context{};
@@ -56,8 +61,29 @@ struct PairState {
   bool initialized = false;
 };
 
-std::mutex pair_mutex;
-PairState pair_state;
+struct PairKey {
+  CUdevice owner0 = -1;
+  CUdevice owner1 = -1;
+  CUcontext anchor_context{};
+
+  bool operator<(const PairKey &other) const noexcept {
+    return std::make_tuple(owner0, owner1,
+                           reinterpret_cast<uintptr_t>(anchor_context)) <
+           std::make_tuple(other.owner0, other.owner1,
+                           reinterpret_cast<uintptr_t>(other.anchor_context));
+  }
+};
+
+struct PairRegistry {
+  std::mutex mutex;
+  DriverApi api{};
+  std::map<PairKey, std::unique_ptr<PairState>> states;
+};
+
+PairRegistry &pair_registry() {
+  static PairRegistry *registry = new PairRegistry();
+  return *registry;
+}
 
 template <typename Function>
 Function driver_symbol(const char *name, const char *fallback = nullptr) noexcept {
@@ -89,6 +115,43 @@ void resolve_driver_api(DriverApi *api) noexcept {
   api->event_record = driver_symbol<DriverApi::EventRecord>("cuEventRecord");
   api->stream_wait_event =
       driver_symbol<DriverApi::StreamWaitEvent>("cuStreamWaitEvent");
+}
+
+CUresult pair_state_for_profile(const v200_memory_pair_profile &profile,
+                                PairState **state_out) noexcept {
+  if (state_out == nullptr) return CUDA_ERROR_INVALID_VALUE;
+  *state_out = nullptr;
+  PairRegistry &registry = pair_registry();
+  std::lock_guard<std::mutex> lock(registry.mutex);
+  resolve_driver_api(&registry.api);
+  if (!registry.api.ready()) return CUDA_ERROR_NOT_SUPPORTED;
+
+  CUcontext anchor_context = nullptr;
+  CUresult result = registry.api.context_get_current(&anchor_context);
+  if (result != CUDA_SUCCESS) return result;
+  if (anchor_context == nullptr) return CUDA_ERROR_INVALID_CONTEXT;
+  CUdevice current_device = -1;
+  result = registry.api.context_get_device(&current_device);
+  if (result != CUDA_SUCCESS) return result;
+  if (current_device != profile.owner_device[0]) return CUDA_ERROR_INVALID_DEVICE;
+
+  const PairKey key{profile.owner_device[0], profile.owner_device[1],
+                    anchor_context};
+  auto found = registry.states.find(key);
+  if (found == registry.states.end()) {
+    try {
+      auto state = std::make_unique<PairState>();
+      state->api = registry.api;
+      state->owner_device[0] = profile.owner_device[0];
+      state->owner_device[1] = profile.owner_device[1];
+      state->anchor_context = anchor_context;
+      found = registry.states.emplace(key, std::move(state)).first;
+    } catch (const std::bad_alloc &) {
+      return CUDA_ERROR_OUT_OF_MEMORY;
+    }
+  }
+  *state_out = found->second.get();
+  return CUDA_SUCCESS;
 }
 
 cudaError_t to_cuda_error(CUresult result) noexcept {
@@ -180,11 +243,8 @@ CUresult initialize_pair(PairState &state,
   resolve_driver_api(&state.api);
   if (!state.api.ready()) return CUDA_ERROR_NOT_SUPPORTED;
 
-  if (state.owner_device[0] == 0 && state.owner_device[1] == 0) {
-    state.owner_device[0] = profile.owner_device[0];
-    state.owner_device[1] = profile.owner_device[1];
-  } else if (state.owner_device[0] != profile.owner_device[0] ||
-             state.owner_device[1] != profile.owner_device[1]) {
+  if (state.owner_device[0] != profile.owner_device[0] ||
+      state.owner_device[1] != profile.owner_device[1]) {
     return CUDA_ERROR_INVALID_DEVICE;
   }
 
@@ -197,7 +257,6 @@ CUresult initialize_pair(PairState &state,
   result = state.api.context_get_device(&current_device);
   if (result != CUDA_SUCCESS) return result;
   if (current_device != profile.owner_device[0]) return CUDA_ERROR_INVALID_DEVICE;
-  if (state.anchor_context == nullptr) state.anchor_context = current;
   if (current != state.anchor_context) return CUDA_ERROR_INVALID_CONTEXT;
   if (state.initialized) return CUDA_SUCCESS;
 
@@ -221,12 +280,13 @@ CUresult initialize_pair(PairState &state,
   return CUDA_SUCCESS;
 }
 
-cudaError_t validate_profile(v200_memory_pair_profile *profile) noexcept {
+cudaError_t validate_profile(uint32_t pair_index,
+                             v200_memory_pair_profile *profile) noexcept {
   if (profile == nullptr) return cudaErrorInvalidValue;
   std::memset(profile, 0, sizeof(*profile));
   profile->abi_version = V200_MEMORY_ABI_VERSION;
   profile->struct_size = sizeof(*profile);
-  const CUresult result = v200_memory_get_profile(profile);
+  const CUresult result = v200_memory_get_profile_for_pair(pair_index, profile);
   if (result != CUDA_SUCCESS) return to_cuda_error(result);
   if (profile->abi_version != V200_MEMORY_ABI_VERSION ||
       profile->struct_size < sizeof(*profile) ||
@@ -296,9 +356,10 @@ cudaError_t launch_owner_partitions(
       host_function == nullptr || native_launch == nullptr || !valid_grid(block))
     return cudaErrorInvalidValue;
 
-  std::lock_guard<std::mutex> lock(pair_mutex);
+  const uint32_t pair_index = v200_memory_current_pair();
+  if (pair_index > 1) return cudaErrorInvalidDevice;
   v200_memory_pair_profile profile{};
-  const cudaError_t profile_status = validate_profile(&profile);
+  const cudaError_t profile_status = validate_profile(pair_index, &profile);
   if (profile_status != cudaSuccess) return profile_status;
 
   const OwnerPartition *anchor_part = nullptr;
@@ -324,7 +385,11 @@ cudaError_t launch_owner_partitions(
                          anchor_part->arguments, shared_bytes, anchor_stream);
   }
 
-  PairState &state = pair_state;
+  PairState *state_ptr = nullptr;
+  const CUresult selected = pair_state_for_profile(profile, &state_ptr);
+  if (selected != CUDA_SUCCESS) return to_cuda_error(selected);
+  PairState &state = *state_ptr;
+  std::lock_guard<std::mutex> lock(state.mutex);
   const CUresult initialized = initialize_pair(state, profile);
   if (initialized != CUDA_SUCCESS) return to_cuda_error(initialized);
 

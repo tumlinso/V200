@@ -20,7 +20,6 @@
 namespace v200::core {
 namespace {
 
-constexpr std::uint64_t kLogicalDevice = 1;
 constexpr std::uint32_t kAnchorOwner = 0;
 constexpr std::uint64_t kMiB = 1024ull * 1024ull;
 constexpr std::uint64_t kGiB = 1024ull * 1024ull * 1024ull;
@@ -28,9 +27,14 @@ constexpr std::uint64_t kMaxOwnerBudgetMiB = 12288;
 constexpr std::uint64_t kPhysicalReserveBytes = kGiB;
 constexpr char kExpectedUuid0[] = "GPU-21131915-1488-23af-38dd-1743ae1f5cc8";
 constexpr char kExpectedUuid1[] = "GPU-d745da9c-7649-8334-41f1-483afa6f3206";
+constexpr char kExpectedUuid2[] = "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505";
+constexpr char kExpectedUuid3[] = "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a";
 constexpr char kExpectedB01[] = "8426eab5-278d-4687-ab7d-f5ec937e46ec";
+constexpr char kExpectedB01Pair1[] = "1c97d504-468e-434c-81ea-112a4bb83e74";
 constexpr char kExpectedPair[] =
     "GPU-21131915-1488-23af-38dd-1743ae1f5cc8,GPU-d745da9c-7649-8334-41f1-483afa6f3206";
+constexpr char kExpectedPair1[] =
+    "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505,GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a";
 
 bool parse_uuid(std::string_view text, CUuuid *out) noexcept {
   if (out == nullptr || text.size() != 40 || text.substr(0, 4) != "GPU-") return false;
@@ -86,14 +90,46 @@ std::string format_uuid(const CUuuid &uuid) {
 bool expected_input(const RuntimeInitInputs &inputs,
                     std::array<CUuuid, 2> *uuids) noexcept {
   if (inputs.ordered_uuid_pair == nullptr || inputs.b01_evidence_id == nullptr ||
-      inputs.ordered_uuid_pair[0] == '\0' || inputs.b01_evidence_id[0] == '\0') {
+      inputs.ordered_uuid_pair[0] == '\0' || inputs.b01_evidence_id[0] == '\0' ||
+      inputs.logical_device_id == 0) {
     return false;
   }
   const std::string_view ordered(inputs.ordered_uuid_pair);
-  return ordered == std::string_view(kExpectedPair) &&
-         std::string_view(inputs.b01_evidence_id) == std::string_view(kExpectedB01) &&
-         parse_uuid(kExpectedUuid0, &(*uuids)[0]) &&
-         parse_uuid(kExpectedUuid1, &(*uuids)[1]);
+  const std::string_view evidence(inputs.b01_evidence_id);
+  if (ordered == std::string_view(kExpectedPair)) {
+    return inputs.logical_device_id == 1 &&
+           evidence == std::string_view(kExpectedB01) &&
+           parse_uuid(kExpectedUuid0, &(*uuids)[0]) &&
+           parse_uuid(kExpectedUuid1, &(*uuids)[1]);
+  }
+  if (ordered == std::string_view(kExpectedPair1)) {
+    return inputs.logical_device_id == 2 &&
+           kExpectedB01Pair1[0] != '\0' &&
+           evidence == std::string_view(kExpectedB01Pair1) &&
+           parse_uuid(kExpectedUuid2, &(*uuids)[0]) &&
+           parse_uuid(kExpectedUuid3, &(*uuids)[1]);
+  }
+  return false;
+}
+
+bool split_exact_list(const char *text, std::array<std::string_view, 4> *items,
+                      std::size_t *count) noexcept {
+  if (text == nullptr || items == nullptr || count == nullptr) return false;
+  const std::string_view value(text);
+  if (value.empty()) return false;
+  std::size_t begin = 0;
+  std::size_t used = 0;
+  while (begin <= value.size()) {
+    const std::size_t comma = value.find(',', begin);
+    const std::size_t end = comma == std::string_view::npos ? value.size() : comma;
+    if (end == begin || used == items->size()) return false;
+    (*items)[used++] = value.substr(begin, end - begin);
+    if (comma == std::string_view::npos) break;
+    begin = comma + 1;
+  }
+  if (used != 2 && used != 4) return false;
+  *count = used;
+  return true;
 }
 
 bool parse_budget(const char *text, std::uint64_t *bytes) noexcept {
@@ -575,10 +611,12 @@ class RuntimeInitializer::Impl final {
     if (handle_ == nullptr) return fail(CUDA_ERROR_OUT_OF_MEMORY);
     for (std::size_t owner = 0; owner < 2; ++owner) {
       const int registered = api_.register_owner(
-          handle_, kLogicalDevice, static_cast<std::uint32_t>(owner), contexts_[owner]);
+          handle_, inputs.logical_device_id,
+          static_cast<std::uint32_t>(owner), contexts_[owner]);
       if (registered != V200_EXECUTION_OK) return fail(CUDA_ERROR_NOT_SUPPORTED);
     }
-    const int attached = api_.attach_frontdoor(handle_, kLogicalDevice, kAnchorOwner);
+    const int attached = api_.attach_frontdoor(
+        handle_, inputs.logical_device_id, kAnchorOwner);
     if (attached != V200_EXECUTION_OK) return fail(CUDA_ERROR_NOT_SUPPORTED);
     attached_ = true;
 
@@ -736,17 +774,60 @@ bool RuntimeInitializer::initialized() const noexcept {
 namespace {
 
 struct ProcessRuntime final {
-  ProcessRuntime() : initializer(v200::memory::default_manager()) {}
+  explicit ProcessRuntime(v200::memory::MemoryManager &pair_manager)
+      : initializer(pair_manager) {}
 
-  CUresult run() noexcept {
+  CUresult run(std::uint32_t pair_index) {
     if (!v200::core::pair_mode_requested()) return CUDA_ERROR_INVALID_VALUE;
+    if (pair_index > 1) return CUDA_ERROR_INVALID_VALUE;
+
+    std::array<std::string_view, 4> ordered_uuids{};
+    std::size_t uuid_count = 0;
+    if (!v200::core::split_exact_list(
+            std::getenv("V200_DEVICE_UUIDS"), &ordered_uuids, &uuid_count) ||
+        (uuid_count == 2 && pair_index != 0)) {
+      return CUDA_ERROR_INVALID_VALUE;
+    }
+
+    const std::size_t offset = static_cast<std::size_t>(pair_index) * 2;
+    std::string ordered_pair;
+    ordered_pair.reserve(82);
+    ordered_pair.append(ordered_uuids[offset]);
+    ordered_pair.push_back(',');
+    ordered_pair.append(ordered_uuids[offset + 1]);
+
+    const char *single_evidence = std::getenv("V200_B01_EVIDENCE_ID");
+    const char *pair_evidence = std::getenv("V200_B01_EVIDENCE_IDS");
+    std::string evidence_id;
+    if (uuid_count == 2) {
+      if (pair_evidence != nullptr && pair_evidence[0] != '\0') {
+        return CUDA_ERROR_INVALID_VALUE;
+      }
+      if (single_evidence == nullptr || single_evidence[0] == '\0') {
+        return CUDA_ERROR_INVALID_VALUE;
+      }
+      evidence_id = single_evidence;
+    } else {
+      if (single_evidence != nullptr && single_evidence[0] != '\0') {
+        return CUDA_ERROR_INVALID_VALUE;
+      }
+      std::array<std::string_view, 4> evidence_ids{};
+      std::size_t evidence_count = 0;
+      if (!v200::core::split_exact_list(pair_evidence, &evidence_ids,
+                                        &evidence_count) || evidence_count != 2) {
+        return CUDA_ERROR_INVALID_VALUE;
+      }
+      evidence_id = evidence_ids[pair_index];
+    }
+
     if (!bindings.load()) return CUDA_ERROR_NOT_SUPPORTED;
     api = bindings.make_api();
     const v200::core::RuntimeInitInputs inputs{
-        std::getenv("V200_DEVICE_UUIDS"),
-        std::getenv("V200_B01_EVIDENCE_ID"),
+        ordered_pair.c_str(),
+        evidence_id.c_str(),
         std::getenv("V200_OWNER0_BUDGET_MIB"),
-        std::getenv("V200_OWNER1_BUDGET_MIB")};
+        std::getenv("V200_OWNER1_BUDGET_MIB"),
+        static_cast<std::uint64_t>(pair_index) + 1};
     return initializer.initialize(inputs, api);
   }
 
@@ -758,10 +839,23 @@ struct ProcessRuntime final {
 }  // namespace
 
 extern "C" V200_CORE_API CUresult CUDAAPI v200_initialize_profile(void) {
-  static ProcessRuntime *runtime = new (std::nothrow) ProcessRuntime();
-  if (runtime == nullptr) return CUDA_ERROR_OUT_OF_MEMORY;
+  return v200_initialize_profile_pair(0);
+}
+
+extern "C" V200_CORE_API CUresult CUDAAPI
+v200_initialize_profile_pair(std::uint32_t pair_index) {
+  if (pair_index > 1) return CUDA_ERROR_INVALID_VALUE;
+  static std::mutex runtime_mutex;
+  static std::array<ProcessRuntime *, 2> runtimes{};
+  std::lock_guard<std::mutex> lock(runtime_mutex);
   try {
-    return runtime->run();
+    if (runtimes[pair_index] == nullptr) {
+      auto *manager = v200::memory::manager_for_pair(pair_index);
+      if (manager == nullptr) return CUDA_ERROR_NOT_SUPPORTED;
+      runtimes[pair_index] = new (std::nothrow) ProcessRuntime(*manager);
+      if (runtimes[pair_index] == nullptr) return CUDA_ERROR_OUT_OF_MEMORY;
+    }
+    return runtimes[pair_index]->run(pair_index);
   } catch (...) {
     return CUDA_ERROR_UNKNOWN;
   }

@@ -613,6 +613,125 @@ void test_submission_lease_closes_retain_race() {
     assert(fake.mappings.size() == 1 && fake.handles.size() == 1);
 }
 
+void test_pair_local_registry_routes_by_owner() {
+    FakeDriver fake0;
+    FakeDriver fake1;
+    fake1.next_address = 0x30000000;
+    auto profile0 = make_profile();
+    auto profile1 = make_profile();
+    profile1.owner_budget_bytes[0] = 16;
+    profile1.owner_budget_bytes[1] = 18;
+    auto driver0 = make_driver(fake0);
+    auto driver1 = make_driver(fake1);
+
+    auto *pair0 = v200::memory::manager_for_pair(0);
+    auto *pair1 = v200::memory::manager_for_pair(1);
+    assert(pair0 != nullptr && pair1 != nullptr && pair0 != pair1);
+    assert(v200::memory::manager_for_pair(2) == nullptr);
+    assert(pair0->configure(profile0, driver0) == CUDA_SUCCESS);
+    assert(pair1->configure(profile1, driver1) == CUDA_SUCCESS);
+    assert(v200_memory_current_pair() == 0);
+    assert(v200_memory_select_pair(2) == CUDA_ERROR_INVALID_DEVICE);
+    assert(v200_memory_select_pair(1) == CUDA_SUCCESS);
+    assert(v200_memory_current_pair() == 1);
+
+    v200_memory_pair_profile queried_profile{};
+    queried_profile.struct_size = sizeof(queried_profile);
+    assert(v200_memory_get_profile_for_pair(0, &queried_profile) == CUDA_SUCCESS);
+    assert(queried_profile.owner_budget_bytes[0] == profile0.owner_budget_bytes[0]);
+    queried_profile = {};
+    queried_profile.struct_size = sizeof(queried_profile);
+    assert(v200_memory_get_profile(&queried_profile) == CUDA_SUCCESS);
+    assert(queried_profile.owner_budget_bytes[0] == 16);
+
+    void *pointer0 = nullptr;
+    void *pointer1 = nullptr;
+    assert(v200_memory_select_pair(0) == CUDA_SUCCESS);
+    assert(v200_memory_allocate(8, 0, &pointer0) == CUDA_SUCCESS);
+    assert(v200_memory_select_pair(1) == CUDA_SUCCESS);
+    assert(v200_memory_allocate(8, 0, &pointer1) == CUDA_SUCCESS);
+    assert(pointer0 != pointer1);
+
+    v200_memory_usage_info usage0{};
+    usage0.struct_size = sizeof(usage0);
+    v200_memory_usage_info usage1{};
+    usage1.struct_size = sizeof(usage1);
+    assert(v200_memory_get_usage_for_pair(0, &usage0) == CUDA_SUCCESS);
+    assert(v200_memory_get_usage_for_pair(1, &usage1) == CUDA_SUCCESS);
+    assert(usage0.owner_used_bytes[0] == 12 && usage1.owner_used_bytes[0] == 12);
+    assert(usage0.owner_budget_bytes[0] == 20 && usage1.owner_budget_bytes[0] == 16);
+
+    v200_allocation_info info{};
+    info.struct_size = sizeof(info);
+    assert(v200_memory_query_for_pair(0, pointer0, &info) == CUDA_SUCCESS);
+    assert(v200_memory_owns_pointer_for_pair(1, pointer0) == 0);
+    assert(v200_memory_owns_pointer_for_pair(1, pointer1) == 1);
+    assert(v200_memory_owns_range_for_pair(1, pointer1, 8) == 1);
+    assert(v200_memory_owns_range_for_pair(1, pointer1, 13) == 0);
+    assert(v200_memory_query(pointer0, &info) == CUDA_SUCCESS); // Selected pair is 1.
+
+    FakeCompletion completion0;
+    FakeCompletion completion1;
+    completion0.complete = true;
+    completion1.complete = true;
+    pair0->set_completion_provider(&completion0);
+    pair1->set_completion_provider(&completion1);
+    assert(v200_memory_retain_use_for_pair(1, pointer1, 9, 1, 1) == CUDA_SUCCESS);
+    assert(completion1.retains == 1 && completion0.retains == 0);
+    uint64_t lease0 = 0;
+    uint64_t lease1 = 0;
+    assert(v200_memory_begin_submission_for_pair(0, &lease0) == CUDA_SUCCESS);
+    assert(v200_memory_begin_submission_for_pair(1, &lease1) == CUDA_SUCCESS);
+    assert(lease0 != 0 && lease1 != 0);
+    assert(v200_memory_end_submission_for_pair(0, lease0, 1) == CUDA_SUCCESS);
+    assert(v200_memory_end_submission_for_pair(1, lease1, 1) == CUDA_SUCCESS);
+
+    // Freeing pair 1 while pair 0 is selected must update pair 1's ledger and driver.
+    assert(v200_memory_select_pair(0) == CUDA_SUCCESS);
+    assert(v200_memory_release(pointer1) == CUDA_SUCCESS);
+    assert(v200_memory_get_usage_for_pair(1, &usage1) == CUDA_SUCCESS);
+    assert(usage1.owner_used_bytes[0] == 0);
+    assert(v200_memory_get_usage_for_pair(0, &usage0) == CUDA_SUCCESS);
+    assert(usage0.owner_used_bytes[0] == 12);
+    assert(fake1.mappings.empty() && fake1.handles.empty() && fake1.reservations.empty());
+
+    CUmemAllocationProp prop{};
+    prop.type = CU_MEM_ALLOCATION_TYPE_PINNED;
+    prop.location.type = CU_MEM_LOCATION_TYPE_DEVICE;
+    prop.location.id = 0;
+    CUdeviceptr reservation0 = 0;
+    CUdeviceptr reservation1 = 0;
+    assert(v200_memory_select_pair(0) == CUDA_SUCCESS);
+    assert(v200_memory_vmm_address_reserve(&reservation0, 12, 0, 0, 0) == CUDA_SUCCESS);
+    CUmemGenericAllocationHandle handle0 = 0;
+    assert(v200_memory_vmm_create(&handle0, 12, &prop, 0) == CUDA_SUCCESS);
+    assert(v200_memory_select_pair(1) == CUDA_SUCCESS);
+    assert(v200_memory_vmm_address_reserve(&reservation1, 12, 0, 0, 0) == CUDA_SUCCESS);
+    CUmemGenericAllocationHandle handle1 = 0;
+    assert(v200_memory_vmm_create(&handle1, 12, &prop, 0) == CUDA_SUCCESS);
+    assert(handle0 != handle1);
+    assert(v200_memory_owns_handle(handle0) == 1 && v200_memory_owns_handle(handle1) == 1);
+
+    // Address and handle owners must agree; synthetic handles remain pair-unique
+    // even though both fake native drivers issued native handle 1.
+    assert(v200_memory_vmm_map(reservation0, 12, 0, handle1, 0) == CUDA_ERROR_INVALID_DEVICE);
+    assert(v200_memory_vmm_map(reservation1, 12, 0, handle1, 0) == CUDA_SUCCESS);
+    assert(v200_memory_select_pair(0) == CUDA_SUCCESS);
+    assert(v200_memory_vmm_release(handle1) == CUDA_SUCCESS);
+    assert(v200_memory_vmm_unmap(reservation1, 12) == CUDA_SUCCESS);
+    assert(v200_memory_vmm_address_free(reservation1, 12) == CUDA_SUCCESS);
+    assert(v200_memory_vmm_release(handle0) == CUDA_SUCCESS);
+    assert(v200_memory_vmm_address_free(reservation0, 12) == CUDA_SUCCESS);
+    assert(fake1.reservations.empty());
+    assert(fake0.reservations.size() == 1); // Pair 0 allocation remains live here.
+
+    assert(v200_memory_release(pointer0) == CUDA_SUCCESS);
+    assert(fake0.reservations.empty());
+    pair0->set_completion_provider(nullptr);
+    pair1->set_completion_provider(nullptr);
+    assert(v200_memory_select_pair(0) == CUDA_SUCCESS);
+}
+
 } // namespace
 
 int main() {
@@ -628,5 +747,6 @@ int main() {
     test_stream_coalesce_release_failure_fail_stops();
     test_unqualified_owner_local_access();
     test_submission_lease_closes_retain_race();
+    test_pair_local_registry_routes_by_owner();
     std::cout << "v200 memory tests passed\n";
 }

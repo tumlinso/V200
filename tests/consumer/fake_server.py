@@ -48,4 +48,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 server = ThreadingHTTPServer(("127.0.0.1", int(sys.argv[1])), Handler)
+if os.environ.get("V200_FAKE_EXIT_ON_TERM"):
+    import signal
+    signal.signal(signal.SIGTERM, lambda *_args: os._exit(139))
 server.serve_forever(poll_interval=0.2)

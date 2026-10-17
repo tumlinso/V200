@@ -1,0 +1,22 @@
+{
+  "id": "foreground:b96a7ddf-3ee6-44f3-b961-6b405553aa12",
+  "owner_kind": "foreground",
+  "project_root": "/home/tumlinson/V200",
+  "job_id": null,
+  "attempt_id": null,
+  "service_id": null,
+  "pid": 504154,
+  "process_start": "1890663",
+  "state": "released",
+  "preempt_requested": 0,
+  "priority_class": "clean_cuda_foreground",
+  "preemptible": 0,
+  "residency_protected": 0,
+  "residency_metadata_json": "{}",
+  "residency_release_verified": 0,
+  "cpu_threads": 4,
+  "ram_bytes": 34359738368,
+  "acquired_at": 1792248770.7062554,
+  "heartbeat_at": 1792248779.6208873,
+  "resources": []
+}

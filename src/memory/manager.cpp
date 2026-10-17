@@ -15,6 +15,8 @@
 namespace v200::memory {
 namespace {
 
+thread_local uint32_t selected_pair_index = 0;
+
 bool checked_add_u64(CUdeviceptr base, size_t bytes, CUdeviceptr *end) noexcept {
     const auto amount = static_cast<CUdeviceptr>(bytes);
     if (end == nullptr || amount > std::numeric_limits<CUdeviceptr>::max() - base) {
@@ -178,6 +180,7 @@ struct MemoryManager::Impl {
     };
 
     mutable std::mutex mutex;
+    const uint32_t pair_index;
     bool configured = false;
     bool completion_fail_stopped = false;
     v200_memory_pair_profile profile{};
@@ -193,6 +196,8 @@ struct MemoryManager::Impl {
     std::condition_variable submissions_changed;
     std::map<CUdeviceptr, uint64_t> allocations_by_base;
     std::map<CUdeviceptr, size_t> reservations;
+
+    explicit Impl(uint32_t pair) : pair_index(pair) {}
 
     CUresult configured_status() const noexcept {
         return configured ? CUDA_SUCCESS : CUDA_ERROR_NOT_INITIALIZED;
@@ -585,9 +590,12 @@ struct MemoryManager::Impl {
     }
 
     CUmemGenericAllocationHandle new_public_handle() noexcept {
-        constexpr uint64_t tag = UINT64_C(0xF200000000000000);
+        constexpr uint64_t base_tag = UINT64_C(0xF200000000000000);
+        constexpr uint64_t pair_tag_bit = UINT64_C(0x0080000000000000);
+        constexpr uint64_t id_mask = UINT64_C(0x007FFFFFFFFFFFFF);
+        const uint64_t tag = base_tag | (pair_index == 1 ? pair_tag_bit : 0);
         for (;;) {
-            const CUmemGenericAllocationHandle candidate = tag | (next_handle_id++ & UINT64_C(0x00FFFFFFFFFFFFFF));
+            const CUmemGenericAllocationHandle candidate = tag | (next_handle_id++ & id_mask);
             if (candidate != 0 && handles.find(candidate) == handles.end()) {
                 return candidate;
             }
@@ -622,12 +630,13 @@ struct MemoryManager::Impl {
     }
 };
 
-MemoryManager::MemoryManager() : impl_(new Impl) {}
+MemoryManager::MemoryManager(uint32_t pair_index) : impl_(new Impl(pair_index)) {}
 MemoryManager::~MemoryManager() = default;
 
 CUresult MemoryManager::configure(const v200_memory_pair_profile &profile,
                                   const v200_memory_driver_api &driver) {
     std::lock_guard<std::mutex> lock(impl_->mutex);
+    if (impl_->pair_index > 1) return CUDA_ERROR_INVALID_DEVICE;
     if (!profile_valid(profile) || !driver_complete(driver)) {
         return CUDA_ERROR_INVALID_VALUE;
     }
@@ -850,6 +859,19 @@ bool MemoryManager::owns_pointer(const void *ptr) const {
     return record != impl_->records.end() &&
            checked_add_u64(record->second.base, record->second.mapped_bytes, &end) &&
            address >= record->second.base && address < end;
+}
+
+bool MemoryManager::owns_pointer_range(const void *ptr, size_t size) const {
+    if (ptr == nullptr || size == 0) return false;
+    const CUdeviceptr address = static_cast<CUdeviceptr>(reinterpret_cast<uintptr_t>(ptr));
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return impl_->configured && impl_->find_record_for_pointer(address, size) != nullptr;
+}
+
+bool MemoryManager::owns_reservation_range(CUdeviceptr ptr, size_t size) const {
+    if (size == 0) return false;
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return impl_->configured && impl_->range_in_reservation(ptr, size);
 }
 
 CUresult MemoryManager::get_profile(v200_memory_pair_profile *out) const {
@@ -1401,10 +1423,65 @@ CUresult MemoryManager::retry_cleanup() {
     return first_error;
 }
 
-MemoryManager &default_manager() {
-    static MemoryManager manager;
-    return manager;
+MemoryManager *manager_for_pair(uint32_t pair_index) noexcept {
+    if (pair_index > 1) return nullptr;
+    static std::array<MemoryManager, 2> managers{{MemoryManager(0), MemoryManager(1)}};
+    return &managers[pair_index];
 }
+
+MemoryManager &default_manager() {
+    return *manager_for_pair(0);
+}
+
+namespace {
+
+struct OwnerRoute {
+    MemoryManager *manager = nullptr;
+    bool found = false;
+    bool ambiguous = false;
+};
+
+template <typename Predicate>
+OwnerRoute find_unique_owner(Predicate predicate) {
+    OwnerRoute route;
+    for (uint32_t i = 0; i != 2; ++i) {
+        MemoryManager *candidate = manager_for_pair(i);
+        if (candidate != nullptr && predicate(*candidate)) {
+            if (route.found) {
+                route.manager = nullptr;
+                route.ambiguous = true;
+                return route;
+            }
+            route.manager = candidate;
+            route.found = true;
+        }
+    }
+    return route;
+}
+
+OwnerRoute pointer_owner(const void *ptr) {
+    return find_unique_owner([&](const MemoryManager &manager) {
+        return manager.owns_pointer(ptr);
+    });
+}
+
+OwnerRoute reservation_owner(CUdeviceptr ptr, size_t size) {
+    return find_unique_owner([&](const MemoryManager &manager) {
+        return manager.owns_reservation_range(ptr, size);
+    });
+}
+
+OwnerRoute handle_owner(CUmemGenericAllocationHandle handle) {
+    return find_unique_owner([&](const MemoryManager &manager) {
+        return manager.owns_handle(handle);
+    });
+}
+
+MemoryManager &selected_manager() {
+    return *manager_for_pair(selected_pair_index);
+}
+
+} // namespace
 
 } // namespace v200::memory
 
@@ -1415,12 +1492,22 @@ CUresult v200_memory_configure(const v200_memory_pair_profile *profile,
     if (profile == nullptr || driver == nullptr) {
         return CUDA_ERROR_INVALID_VALUE;
     }
-    return v200::memory::default_manager().configure(*profile, *driver);
+    return v200::memory::selected_manager().configure(*profile, *driver);
+}
+
+CUresult v200_memory_select_pair(uint32_t pair_index) {
+    if (pair_index > 1) return CUDA_ERROR_INVALID_DEVICE;
+    v200::memory::selected_pair_index = pair_index;
+    return CUDA_SUCCESS;
+}
+
+uint32_t v200_memory_current_pair(void) {
+    return v200::memory::selected_pair_index;
 }
 
 CUresult v200_memory_allocate_on(CUdevice preferred_device, size_t bytes,
                                  size_t alignment, void **device_ptr) {
-    return v200::memory::default_manager().allocate(preferred_device, bytes, alignment, device_ptr);
+    return v200::memory::selected_manager().allocate(preferred_device, bytes, alignment, device_ptr);
 }
 
 CUresult v200_memory_allocate(size_t bytes, size_t alignment, void **device_ptr) {
@@ -1433,27 +1520,55 @@ CUresult v200_memory_allocate(size_t bytes, size_t alignment, void **device_ptr)
         }
         return status;
     }
-    return v200::memory::default_manager().allocate(profile.default_owner, bytes, alignment, device_ptr);
+    return v200::memory::selected_manager().allocate(profile.default_owner, bytes, alignment, device_ptr);
 }
 
 int v200_memory_is_configured(void) {
-    return v200::memory::default_manager().is_configured() ? 1 : 0;
+    return v200::memory::selected_manager().is_configured() ? 1 : 0;
 }
 
 CUresult v200_memory_get_profile(v200_memory_pair_profile *out) {
-    return v200::memory::default_manager().get_profile(out);
+    return v200::memory::selected_manager().get_profile(out);
+}
+
+CUresult v200_memory_get_profile_for_pair(uint32_t pair_index,
+                                          v200_memory_pair_profile *out) {
+    auto *manager = v200::memory::manager_for_pair(pair_index);
+    return manager == nullptr ? CUDA_ERROR_INVALID_DEVICE : manager->get_profile(out);
 }
 
 CUresult v200_memory_release(void *device_ptr) {
-    return v200::memory::default_manager().release(device_ptr);
+    const auto route = v200::memory::pointer_owner(device_ptr);
+    if (route.ambiguous) return CUDA_ERROR_INVALID_DEVICE;
+    return (route.found ? route.manager : &v200::memory::selected_manager())->release(device_ptr);
 }
 
 CUresult v200_memory_query(const void *ptr, v200_allocation_info *out) {
-    return v200::memory::default_manager().query(ptr, out);
+    const auto route = v200::memory::pointer_owner(ptr);
+    if (route.ambiguous) return CUDA_ERROR_INVALID_DEVICE;
+    return (route.found ? route.manager : &v200::memory::selected_manager())->query(ptr, out);
 }
 
 int v200_memory_owns_pointer(const void *ptr) {
-    return v200::memory::default_manager().owns_pointer(ptr) ? 1 : 0;
+    const auto route = v200::memory::pointer_owner(ptr);
+    return route.found || route.ambiguous ? 1 : 0;
+}
+
+CUresult v200_memory_query_for_pair(uint32_t pair_index, const void *ptr,
+                                    v200_allocation_info *out) {
+    auto *manager = v200::memory::manager_for_pair(pair_index);
+    return manager == nullptr ? CUDA_ERROR_INVALID_DEVICE : manager->query(ptr, out);
+}
+
+int v200_memory_owns_pointer_for_pair(uint32_t pair_index, const void *ptr) {
+    auto *manager = v200::memory::manager_for_pair(pair_index);
+    return manager != nullptr && manager->owns_pointer(ptr) ? 1 : 0;
+}
+
+int v200_memory_owns_range_for_pair(uint32_t pair_index, const void *ptr,
+                                    size_t size) {
+    auto *manager = v200::memory::manager_for_pair(pair_index);
+    return manager != nullptr && manager->owns_pointer_range(ptr, size) ? 1 : 0;
 }
 
 CUresult v200_memory_retain_use(const void *ptr, uint64_t logical_stream_id,
@@ -1462,78 +1577,139 @@ CUresult v200_memory_retain_use(const void *ptr, uint64_t logical_stream_id,
         return CUDA_ERROR_INVALID_VALUE;
     }
     const auto address = static_cast<CUdeviceptr>(reinterpret_cast<uintptr_t>(ptr));
-    return v200::memory::default_manager().retain_use(
+    const auto route = v200::memory::pointer_owner(ptr);
+    if (route.ambiguous) return CUDA_ERROR_INVALID_DEVICE;
+    if (route.found && route.manager != &v200::memory::selected_manager()) {
+        return CUDA_ERROR_INVALID_DEVICE;
+    }
+    return (route.found ? route.manager : &v200::memory::selected_manager())->retain_use(
         address, logical_stream_id, {token_slot, token_generation});
+}
+
+CUresult v200_memory_retain_use_for_pair(uint32_t pair_index, const void *ptr,
+                                         uint64_t logical_stream_id,
+                                         uint64_t token_slot,
+                                         uint64_t token_generation) {
+    if (ptr == nullptr) return CUDA_ERROR_INVALID_VALUE;
+    auto *manager = v200::memory::manager_for_pair(pair_index);
+    if (manager == nullptr) return CUDA_ERROR_INVALID_DEVICE;
+    const auto address = static_cast<CUdeviceptr>(reinterpret_cast<uintptr_t>(ptr));
+    return manager->retain_use(address, logical_stream_id,
+                               {token_slot, token_generation});
 }
 
 CUresult v200_memory_retain_all_use(uint64_t logical_stream_id,
                                     uint64_t token_slot,
                                     uint64_t token_generation) {
-    return v200::memory::default_manager().retain_all_use(
+    return v200::memory::selected_manager().retain_all_use(
         logical_stream_id, {token_slot, token_generation});
 }
 
 CUresult v200_memory_begin_submission(uint64_t *lease) {
-    return v200::memory::default_manager().begin_submission(lease);
+    return v200::memory::selected_manager().begin_submission(lease);
 }
 
 CUresult v200_memory_end_submission(uint64_t lease, int completion_recorded) {
     if (completion_recorded != 0 && completion_recorded != 1) {
         return CUDA_ERROR_INVALID_VALUE;
     }
-    return v200::memory::default_manager().end_submission(lease,
+    return v200::memory::selected_manager().end_submission(lease,
                                                           completion_recorded != 0);
 }
 
+CUresult v200_memory_begin_submission_for_pair(uint32_t pair_index,
+                                               uint64_t *lease) {
+    auto *manager = v200::memory::manager_for_pair(pair_index);
+    return manager == nullptr ? CUDA_ERROR_INVALID_DEVICE : manager->begin_submission(lease);
+}
+
+CUresult v200_memory_end_submission_for_pair(uint32_t pair_index,
+                                             uint64_t lease,
+                                             int completion_recorded) {
+    if (completion_recorded != 0 && completion_recorded != 1) {
+        return CUDA_ERROR_INVALID_VALUE;
+    }
+    auto *manager = v200::memory::manager_for_pair(pair_index);
+    return manager == nullptr ? CUDA_ERROR_INVALID_DEVICE
+                              : manager->end_submission(lease, completion_recorded != 0);
+}
+
 CUresult v200_memory_get_usage(v200_memory_usage_info *out) {
-    return v200::memory::default_manager().get_usage(out);
+    return v200::memory::selected_manager().get_usage(out);
+}
+
+CUresult v200_memory_get_usage_for_pair(uint32_t pair_index,
+                                        v200_memory_usage_info *out) {
+    auto *manager = v200::memory::manager_for_pair(pair_index);
+    return manager == nullptr ? CUDA_ERROR_INVALID_DEVICE : manager->get_usage(out);
 }
 
 CUresult v200_memory_vmm_get_granularity(size_t *granularity,
                                          const CUmemAllocationProp *prop,
                                          CUmemAllocationGranularity_flags option) {
-    return v200::memory::default_manager().vmm_get_granularity(granularity, prop, option);
+    return v200::memory::selected_manager().vmm_get_granularity(granularity, prop, option);
 }
 
 CUresult v200_memory_vmm_address_reserve(CUdeviceptr *ptr, size_t size,
                                          size_t alignment, CUdeviceptr requested,
                                          unsigned long long flags) {
-    return v200::memory::default_manager().vmm_address_reserve(ptr, size, alignment, requested, flags);
+    return v200::memory::selected_manager().vmm_address_reserve(ptr, size, alignment, requested, flags);
 }
 
 CUresult v200_memory_vmm_address_free(CUdeviceptr ptr, size_t size) {
-    return v200::memory::default_manager().vmm_address_free(ptr, size);
+    const auto route = v200::memory::reservation_owner(ptr, size);
+    if (route.ambiguous) return CUDA_ERROR_INVALID_DEVICE;
+    return (route.found ? route.manager : &v200::memory::selected_manager())->vmm_address_free(ptr, size);
 }
 
 CUresult v200_memory_vmm_create(CUmemGenericAllocationHandle *handle, size_t size,
                                 const CUmemAllocationProp *prop, unsigned long long flags) {
-    return v200::memory::default_manager().vmm_create(handle, size, prop, flags);
+    return v200::memory::selected_manager().vmm_create(handle, size, prop, flags);
 }
 
 CUresult v200_memory_vmm_map(CUdeviceptr ptr, size_t size, size_t offset,
                              CUmemGenericAllocationHandle handle, unsigned long long flags) {
-    return v200::memory::default_manager().vmm_map(ptr, size, offset, handle, flags);
+    const auto reservation = v200::memory::reservation_owner(ptr, size);
+    const auto allocation = v200::memory::handle_owner(handle);
+    if (reservation.ambiguous) {
+        if (!allocation.found) return CUDA_ERROR_INVALID_DEVICE;
+        return allocation.manager->vmm_map(ptr, size, offset, handle, flags);
+    }
+    if (reservation.found && allocation.found && reservation.manager != allocation.manager) {
+        return CUDA_ERROR_INVALID_DEVICE;
+    }
+    if (allocation.ambiguous) return CUDA_ERROR_INVALID_DEVICE;
+    auto *manager = allocation.found ? allocation.manager
+                   : reservation.found ? reservation.manager
+                   : &v200::memory::selected_manager();
+    return manager->vmm_map(ptr, size, offset, handle, flags);
 }
 
 CUresult v200_memory_vmm_set_access(CUdeviceptr ptr, size_t size,
                                     const CUmemAccessDesc *desc, size_t count) {
-    return v200::memory::default_manager().vmm_set_access(ptr, size, desc, count);
+    const auto route = v200::memory::reservation_owner(ptr, size);
+    if (route.ambiguous) return CUDA_ERROR_INVALID_DEVICE;
+    return (route.found ? route.manager : &v200::memory::selected_manager())->vmm_set_access(ptr, size, desc, count);
 }
 
 CUresult v200_memory_vmm_unmap(CUdeviceptr ptr, size_t size) {
-    return v200::memory::default_manager().vmm_unmap(ptr, size);
+    const auto route = v200::memory::reservation_owner(ptr, size);
+    if (route.ambiguous) return CUDA_ERROR_INVALID_DEVICE;
+    return (route.found ? route.manager : &v200::memory::selected_manager())->vmm_unmap(ptr, size);
 }
 
 CUresult v200_memory_vmm_release(CUmemGenericAllocationHandle handle) {
-    return v200::memory::default_manager().vmm_release(handle);
+    const auto route = v200::memory::handle_owner(handle);
+    if (route.ambiguous) return CUDA_ERROR_INVALID_DEVICE;
+    return (route.found ? route.manager : &v200::memory::selected_manager())->vmm_release(handle);
 }
 
 int v200_memory_owns_handle(CUmemGenericAllocationHandle handle) {
-    return v200::memory::default_manager().owns_handle(handle) ? 1 : 0;
+    return v200::memory::handle_owner(handle).found ? 1 : 0;
 }
 
 CUresult v200_memory_retry_cleanup(void) {
-    return v200::memory::default_manager().retry_cleanup();
+    return v200::memory::selected_manager().retry_cleanup();
 }
 
 } // extern "C"

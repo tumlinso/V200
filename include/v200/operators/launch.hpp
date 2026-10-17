@@ -20,10 +20,18 @@ typedef cudaError_t (CUDARTAPI *v200_operator_native_launch_fn)(
 enum {
     V200_OPERATOR_MMVQ_Q4K_PLAIN = 1,
     V200_OPERATOR_MMVQ_Q4K_GATE_FUSED = 2,
+    V200_OPERATOR_MMVQ_Q6K_PLAIN = 3,
+    V200_OPERATOR_MMVQ_Q6K_GATE_FUSED = 4,
 };
 
-/* Return the total number of exact registered Q4_K MMVQ host stubs. If `out`
- * is non-null, fill up to `capacity` entries. This is metadata-only. */
+typedef struct v200_operator_mmvq_kernel_descriptor {
+    std::uint32_t family;
+    std::uint32_t quant_block_elements;
+    std::size_t quant_block_bytes;
+    std::uint32_t minimum_expert_columns;
+    std::uint32_t output_rows_per_block;
+} v200_operator_mmvq_kernel_descriptor;
+
 extern "C" {
 
 /* Return 0 only when the hook made no CUDA calls and the frontdoor should
@@ -37,8 +45,14 @@ V200_OPERATOR_API int v200_operator_try_launch(
 V200_OPERATOR_API std::size_t v200_operator_list_mmvq_host_functions(
     const void **out, std::size_t capacity);
 
+/* Exact source-name classification and quantized row geometry. Returns zero
+ * for any unrecognized kernel name. This metadata path performs no CUDA calls. */
+V200_OPERATOR_API int v200_operator_describe_mmvq_kernel(
+    const char *registered_name,
+    v200_operator_mmvq_kernel_descriptor *descriptor);
+
 /* Classify one exact kernel launch without submitting work. Returns one only
- * when the supported Q4_K expert bank is wholly resident on one proven owner,
+ * when a supported Q4_K or Q6_K expert bank is wholly resident on one owner,
  * its pointers satisfy the current managed-memory contract, and its active
  * weight payload clears the conservative routing threshold. `owner_index`
  * uses profile.owner_device[0/1]. */

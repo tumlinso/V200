@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "project_root": "/home/tumlinson/V200",
+  "command_cwd": "/home/tumlinson/V200",
+  "recipe": "baseline",
+  "toolchain": {
+    "root": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.1/cuda/12.9",
+    "require_sanitizer": false
+  },
+  "resources": {
+    "gpu_uuids": [
+      "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505",
+      "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a"
+    ],
+    "gpus": 2,
+    "cpu_threads": 2,
+    "ram_bytes": 4294967296,
+    "isolate_nvlink_domain": true,
+    "isolate_pcie_root": false
+  },
+  "argv": [
+    "python3",
+    "/home/tumlinson/V200/planning/v200-bootstrap/tools/run_bounded.py",
+    "--project-root",
+    "/home/tumlinson/V200",
+    "--seconds",
+    "90",
+    "--allocation-cap-mib",
+    "512",
+    "--evidence-dir",
+    "/home/tumlinson/V200/evidence/B06/pair1-qualification",
+    "--bundle",
+    "B01",
+    "--expected-uuid",
+    "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505",
+    "--expected-uuid",
+    "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a",
+    "--",
+    "/home/tumlinson/V200/build/planning/v200-bootstrap/examples/v200_pair_probe",
+    "--execute",
+    "--expect-a",
+    "GPU-cf22c41f-5b58-77b1-3535-8fadd1ca6505",
+    "--expect-b",
+    "GPU-6c1cac7f-a360-0aef-ba98-2828bfd1db1a"
+  ],
+  "timeout": 105,
+  "build_timeout": 900,
+  "binary_paths": [
+    "build/planning/v200-bootstrap/examples/v200_pair_probe"
+  ],
+  "paths": [
+    "planning/v200-bootstrap/examples/cuda/pair_vmm_probe.cpp",
+    "planning/v200-bootstrap/examples/include/v200/planning.hpp"
+  ],
+  "benchmark": {
+    "build_argv": [
+      "cmake",
+      "--build",
+      "build",
+      "--target",
+      "v200_pair_probe",
+      "--parallel",
+      "2"
+    ]
+  }
+}

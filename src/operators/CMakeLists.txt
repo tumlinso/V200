@@ -14,7 +14,8 @@ add_library(v200_operators SHARED
   graph_rewrite.cpp
   launch.cpp
   mmvq_plan.cpp
-  pair_runtime.cpp)
+  pair_runtime.cpp
+  ../multi_pair/copy.cpp)
 add_library(v200::operators ALIAS v200_operators)
 set_target_properties(v200_operators PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(v200_operators PRIVATE
@@ -31,4 +32,10 @@ if(BUILD_TESTING)
   target_link_libraries(v200_operator_plan_tests PRIVATE v200::build_options)
   target_include_directories(v200_operator_plan_tests PRIVATE ${CUDAToolkit_INCLUDE_DIRS})
   add_test(NAME v200_operator_mmvq_plan COMMAND v200_operator_plan_tests)
+
+  add_executable(v200_operator_metadata_tests
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../tests/operators/test_operator_metadata.cpp")
+  target_link_libraries(v200_operator_metadata_tests PRIVATE v200::operators)
+  add_test(NAME v200_operator_mmvq_metadata COMMAND v200_operator_metadata_tests)
+
 endif()

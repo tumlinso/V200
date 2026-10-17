@@ -14,6 +14,7 @@
 #include <atomic>
 #include <cerrno>
 #include <cctype>
+#include <chrono>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -64,26 +65,65 @@ extern "C" CUresult CUDAAPI cuStreamWaitEvent_ptsz(CUstream, CUevent, unsigned i
 
 namespace {
 
+void write_multi_pair_copy_event(uint32_t dst_pair, uint32_t src_pair,
+                                 size_t bytes, cudaError_t status,
+                                 double elapsed_ms, const char *route);
+void register_process_exit_snapshot(uint32_t pair);
+
 struct DeviceSelection {
     bool valid = false;
     bool attempted = false;
     int count = 0;
-    int ordinal[2] = {-1, -1};
-    CUdevice device[2] = {-1, -1};
-    CUuuid uuid[2]{};
+    int ordinal[4] = {-1, -1, -1, -1};
+    CUdevice device[4] = {-1, -1, -1, -1};
+    CUuuid uuid[4]{};
     CUresult driver_error = CUDA_ERROR_NOT_INITIALIZED;
 };
 
 std::mutex selection_mutex;
 DeviceSelection selection;
 std::mutex profile_mutex;
-int profile_state = 0; // 0 unseen, 1 initializing, 2 ready, 3 failed
-CUresult profile_error = CUDA_ERROR_NOT_INITIALIZED;
+int profile_state[2] = {0, 0}; // 0 unseen, 1 initializing, 2 ready, 3 failed
+CUresult profile_error[2] = {CUDA_ERROR_NOT_INITIALIZED,
+                              CUDA_ERROR_NOT_INITIALIZED};
 std::shared_mutex tracked_use_gate;
 std::mutex stream_gate_mutex;
 std::map<uint64_t, std::shared_ptr<std::mutex>> stream_gates;
-thread_local bool profile_initializing = false;
+std::mutex event_owner_mutex;
+std::map<uintptr_t, uint32_t> event_owner_pairs;
+thread_local bool profile_initializing[2] = {false, false};
 thread_local bool capture_native_forward = false;
+struct ContextPairRestoreEntry {
+    CUcontext pushed_context = nullptr;
+    uint32_t previous_pair = 0;
+};
+thread_local std::vector<ContextPairRestoreEntry> context_pair_restore_stack;
+
+bool save_context_pair_for_restore(uint32_t previous_pair) noexcept {
+    try {
+        context_pair_restore_stack.push_back({nullptr, previous_pair});
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+void bind_context_pair_restore(CUcontext context) noexcept {
+    if (!context_pair_restore_stack.empty())
+        context_pair_restore_stack.back().pushed_context = context;
+}
+
+void discard_context_pair_restore() noexcept {
+    if (!context_pair_restore_stack.empty()) context_pair_restore_stack.pop_back();
+}
+
+bool take_context_pair_restore(CUcontext context, uint32_t *pair) noexcept {
+    if (pair == nullptr || context_pair_restore_stack.empty() || context == nullptr ||
+        context_pair_restore_stack.back().pushed_context != context) return false;
+    *pair = context_pair_restore_stack.back().previous_pair;
+    context_pair_restore_stack.pop_back();
+    return true;
+}
 
 struct GraphRewriteInfo {
     size_t matched_nodes = 0;
@@ -130,14 +170,14 @@ void forget_stream_gate(void *stream) {
     stream_gates.erase(id);
 }
 
-bool parse_uuid_list(const char *text, std::array<std::array<unsigned char, 16>, 2> &out,
+bool parse_uuid_list(const char *text, std::array<std::array<unsigned char, 16>, 4> &out,
                      int &count) {
     count = 0;
     if (text == nullptr || *text == '\0') return false;
     const char *cursor = text;
     while (*cursor != '\0') {
         while (*cursor == ' ' || *cursor == '\t') ++cursor;
-        if (count == 2 || *cursor == '\0') return false;
+        if (count == 4 || *cursor == '\0') return false;
         if (std::strncmp(cursor, "GPU-", 4) == 0 || std::strncmp(cursor, "gpu-", 4) == 0) cursor += 4;
         std::array<unsigned char, 16> bytes{};
         int digits = 0;
@@ -166,7 +206,7 @@ bool parse_uuid_list(const char *text, std::array<std::array<unsigned char, 16>,
             return false;
         }
     }
-    return count == 1 || count == 2;
+    return count == 1 || count == 2 || count == 4;
 }
 
 template <class Function>
@@ -184,11 +224,11 @@ bool ensure_device_selection() {
         return false;
     }
 
-    std::array<std::array<unsigned char, 16>, 2> wanted{};
+    std::array<std::array<unsigned char, 16>, 4> wanted{};
     int wanted_count = 0;
-    const int expected_count = mode == 2 ? 2 : 1;
     if (!parse_uuid_list(std::getenv("V200_DEVICE_UUIDS"), wanted, wanted_count) ||
-        wanted_count != expected_count) {
+        (mode == 1 && wanted_count != 1) ||
+        (mode == 2 && wanted_count != 2 && wanted_count != 4)) {
         selection.driver_error = CUDA_ERROR_INVALID_VALUE;
         return false;
     }
@@ -228,7 +268,7 @@ bool ensure_device_selection() {
         return false;
     }
 
-    bool found[2] = {false, false};
+    bool found[4] = {false, false, false, false};
     for (int ordinal = 0; ordinal < physical_count; ++ordinal) {
         CUdevice device = -1;
         CUuuid uuid{};
@@ -277,10 +317,20 @@ CUresult device_map_error() {
 }
 
 bool logical_device(int logical, int &ordinal, CUdevice &device) {
-    if (logical != 0 || !ensure_device_selection()) return false;
-    ordinal = selection.ordinal[0];
-    device = selection.device[0];
+    if (!ensure_device_selection()) return false;
+    const uint32_t mode = current_mode();
+    const int logical_count = mode == 2 ? selection.count / 2 : 1;
+    if (logical < 0 || logical >= logical_count) return false;
+    const int selection_index = mode == 2 ? logical * 2 : 0;
+    ordinal = selection.ordinal[selection_index];
+    device = selection.device[selection_index];
     return true;
+}
+
+uint32_t visible_logical_device_count() {
+    if (!ensure_device_selection()) return 0;
+    return current_mode() == 2
+        ? static_cast<uint32_t>(selection.count / 2) : 1u;
 }
 
 bool map_device_id(CUdevice logical, CUdevice &physical) {
@@ -290,10 +340,91 @@ bool map_device_id(CUdevice logical, CUdevice &physical) {
 
 int logical_ordinal_for_physical(int physical) {
     if (!ensure_device_selection()) return -1;
-    for (int i = 0; i < selection.count; ++i) {
-        if (selection.ordinal[i] == physical) return 0;
+    const int logical_count = current_mode() == 2 ? selection.count / 2 : 1;
+    for (int i = 0; i < logical_count; ++i) {
+        const int selection_index = current_mode() == 2 ? i * 2 : 0;
+        if (selection.ordinal[selection_index] == physical) return i;
     }
     return -1;
+}
+
+int pair_index_for_native_device(CUdevice device) {
+    if (!ensure_device_selection()) return -1;
+    const int pair_count = pair_mode() ? selection.count / 2 : 1;
+    for (int pair = 0; pair < pair_count; ++pair) {
+        const int first_owner = pair_mode() ? pair * 2 : 0;
+        const int owner_count = pair_mode() ? 2 : 1;
+        for (int owner = 0; owner < owner_count; ++owner) {
+            if (selection.device[first_owner + owner] == device) return pair;
+        }
+    }
+    return -1;
+}
+
+CUresult pair_index_for_context(CUcontext context, uint32_t *pair_index) {
+    if (context == nullptr || pair_index == nullptr) return CUDA_ERROR_INVALID_VALUE;
+    using GetCurrent = CUresult (CUDAAPI *)(CUcontext *);
+    using Push = CUresult (CUDAAPI *)(CUcontext);
+    using Pop = CUresult (CUDAAPI *)(CUcontext *);
+    using GetDevice = CUresult (CUDAAPI *)(CUdevice *);
+    auto get_current = next_fn<GetCurrent>("cuCtxGetCurrent");
+    auto push = next_fn<Push>("cuCtxPushCurrent_v2");
+    if (push == nullptr) push = next_fn<Push>("cuCtxPushCurrent");
+    auto pop = next_fn<Pop>("cuCtxPopCurrent_v2");
+    if (pop == nullptr) pop = next_fn<Pop>("cuCtxPopCurrent");
+    auto get_device = next_fn<GetDevice>("cuCtxGetDevice");
+    if (get_current == nullptr || push == nullptr || pop == nullptr || get_device == nullptr)
+        return CUDA_ERROR_NOT_SUPPORTED;
+    CUcontext previous = nullptr;
+    CUresult result;
+    {
+        InternalCallScope bypass;
+        result = get_current(&previous);
+    }
+    if (result != CUDA_SUCCESS) return result;
+    {
+        InternalCallScope bypass;
+        result = push(context);
+    }
+    if (result != CUDA_SUCCESS) return result;
+    CUdevice device = -1;
+    {
+        InternalCallScope bypass;
+        result = get_device(&device);
+    }
+    CUcontext popped = nullptr;
+    CUresult pop_status;
+    {
+        InternalCallScope bypass;
+        pop_status = pop(&popped);
+    }
+    if (result == CUDA_SUCCESS && pop_status != CUDA_SUCCESS) result = pop_status;
+    if (result != CUDA_SUCCESS) return result;
+    if (popped != context) return CUDA_ERROR_INVALID_CONTEXT;
+    const int mapped = pair_index_for_native_device(device);
+    if (mapped < 0) return CUDA_ERROR_INVALID_DEVICE;
+    *pair_index = static_cast<uint32_t>(mapped);
+    (void)previous;
+    return CUDA_SUCCESS;
+}
+
+void remember_event_owner(cudaEvent_t event, uint32_t pair) {
+    if (event == nullptr) return;
+    std::lock_guard<std::mutex> lock(event_owner_mutex);
+    event_owner_pairs[reinterpret_cast<uintptr_t>(event)] = pair;
+}
+
+int known_event_owner(cudaEvent_t event) {
+    if (event == nullptr) return -1;
+    std::lock_guard<std::mutex> lock(event_owner_mutex);
+    const auto found = event_owner_pairs.find(reinterpret_cast<uintptr_t>(event));
+    return found == event_owner_pairs.end() ? -1 : static_cast<int>(found->second);
+}
+
+void forget_event_owner(cudaEvent_t event) {
+    if (event == nullptr) return;
+    std::lock_guard<std::mutex> lock(event_owner_mutex);
+    event_owner_pairs.erase(reinterpret_cast<uintptr_t>(event));
 }
 
 cudaError_t cuda_error_for(CUresult result) {
@@ -344,6 +475,18 @@ Function memory_fn(const char *name) {
     return reinterpret_cast<Function>(lookup_v200(name));
 }
 
+int memory_pair_for_range(const void *ptr, size_t size) {
+    if (!pair_mode() || !ensure_device_selection()) return -1;
+    using OwnsRange = int (*)(uint32_t, const void *, size_t);
+    auto owns = memory_fn<OwnsRange>("v200_memory_owns_range_for_pair");
+    if (owns == nullptr) return -1;
+    const uint32_t pair_count = visible_logical_device_count();
+    for (uint32_t pair = 0; pair < pair_count; ++pair) {
+        if (owns(pair, ptr, size) != 0) return static_cast<int>(pair);
+    }
+    return -1;
+}
+
 CUresult ensure_pair_profile();
 cudaError_t prepare_runtime_call();
 
@@ -355,30 +498,173 @@ bool pair_memory_ready() {
 
 bool execution_attached() noexcept { return execution_handle() != nullptr; }
 
+class StreamPairScope {
+public:
+    explicit StreamPairScope(void *stream) noexcept : previous_(current_pair()) {
+        const int owner = stream_owner_pair(stream);
+        if (owner < 0 || static_cast<uint32_t>(owner) == previous_) return;
+        if (select_pair(static_cast<uint32_t>(owner)) != 0) {
+            status_ = cudaErrorInvalidResourceHandle;
+            return;
+        }
+        switched_ = true;
+        status_ = prepare_runtime_call();
+        if (status_ != cudaSuccess) {
+            (void)select_pair(previous_);
+            switched_ = false;
+        }
+    }
+
+    ~StreamPairScope() {
+        if (switched_) {
+            (void)select_pair(previous_);
+            (void)prepare_runtime_call();
+        }
+    }
+
+    cudaError_t status() const noexcept { return status_; }
+    StreamPairScope(const StreamPairScope &) = delete;
+    StreamPairScope &operator=(const StreamPairScope &) = delete;
+
+private:
+    uint32_t previous_ = 0;
+    bool switched_ = false;
+    cudaError_t status_ = cudaSuccess;
+};
+
+class ExplicitPairScope {
+public:
+    explicit ExplicitPairScope(uint32_t pair) noexcept : previous_(current_pair()) {
+        if (!pair_mode() || pair >= visible_logical_device_count()) {
+            status_ = cudaErrorInvalidDevice;
+            return;
+        }
+        if (select_pair(pair) != 0) {
+            status_ = cudaErrorInvalidDevice;
+            return;
+        }
+        switched_ = pair != previous_;
+        status_ = prepare_runtime_call();
+        if (status_ != cudaSuccess && switched_) {
+            (void)select_pair(previous_);
+            switched_ = false;
+        }
+    }
+
+    ~ExplicitPairScope() {
+        if (!switched_) return;
+        (void)select_pair(previous_);
+        (void)prepare_runtime_call();
+    }
+
+    cudaError_t status() const noexcept { return status_; }
+    ExplicitPairScope(const ExplicitPairScope &) = delete;
+    ExplicitPairScope &operator=(const ExplicitPairScope &) = delete;
+
+private:
+    uint32_t previous_ = 0;
+    bool switched_ = false;
+    cudaError_t status_ = cudaSuccess;
+};
+
+class EventPairScope {
+public:
+    explicit EventPairScope(cudaEvent_t event) noexcept : previous_(current_pair()) {
+        const int owner = known_event_owner(event);
+        if (owner < 0 || static_cast<uint32_t>(owner) == previous_) return;
+        if (select_pair(static_cast<uint32_t>(owner)) != 0) {
+            status_ = cudaErrorInvalidResourceHandle;
+            return;
+        }
+        switched_ = true;
+        status_ = prepare_runtime_call();
+        if (status_ != cudaSuccess) {
+            (void)select_pair(previous_);
+            switched_ = false;
+        }
+    }
+
+    ~EventPairScope() {
+        if (!switched_) return;
+        (void)select_pair(previous_);
+        (void)prepare_runtime_call();
+    }
+
+    cudaError_t status() const noexcept { return status_; }
+    EventPairScope(const EventPairScope &) = delete;
+    EventPairScope &operator=(const EventPairScope &) = delete;
+
+private:
+    uint32_t previous_ = 0;
+    bool switched_ = false;
+    cudaError_t status_ = cudaSuccess;
+};
+
+class DriverPairTlsScope {
+public:
+    explicit DriverPairTlsScope(uint32_t pair) noexcept : previous_(current_pair()) {
+        if (pair >= visible_logical_device_count() || select_pair(pair) != 0) {
+            status_ = CUDA_ERROR_INVALID_DEVICE;
+            return;
+        }
+        switched_ = pair != previous_;
+    }
+
+    ~DriverPairTlsScope() {
+        if (switched_) (void)select_pair(previous_);
+    }
+
+    CUresult status() const noexcept { return status_; }
+    DriverPairTlsScope(const DriverPairTlsScope &) = delete;
+    DriverPairTlsScope &operator=(const DriverPairTlsScope &) = delete;
+
+private:
+    uint32_t previous_ = 0;
+    bool switched_ = false;
+    CUresult status_ = CUDA_SUCCESS;
+};
+
 CUresult require_pair_profile() {
     if (!pair_mode()) return CUDA_SUCCESS;
     return ensure_pair_profile();
 }
 
-CUresult ensure_pair_profile() {
+CUresult ensure_pair_profile(uint32_t requested_pair) {
     if (!pair_mode()) return CUDA_ERROR_INVALID_VALUE;
     if (!ensure_device_selection()) return selection.driver_error;
-    if (profile_initializing) return CUDA_ERROR_NOT_INITIALIZED;
+    if (requested_pair >= static_cast<uint32_t>(selection.count / 2))
+        return CUDA_ERROR_INVALID_DEVICE;
+    const uint32_t previous_pair = current_pair();
+    const int selected = select_pair(requested_pair);
+    if (selected != 0) return CUDA_ERROR_INVALID_DEVICE;
+    if (profile_initializing[requested_pair]) return CUDA_ERROR_NOT_INITIALIZED;
     std::lock_guard<std::mutex> lock(profile_mutex);
-    if (profile_state == 2) return CUDA_SUCCESS;
-    if (profile_state == 3 || profile_state == 1) return profile_error;
-    profile_state = 1;
-    profile_initializing = true;
-    using Initialize = CUresult (*)();
-    auto initialize = memory_fn<Initialize>("v200_initialize_profile");
-    if (initialize == nullptr) {
-        profile_error = CUDA_ERROR_NOT_INITIALIZED;
-    } else {
-        InternalCallScope bypass;
-        profile_error = initialize();
+    if (profile_state[requested_pair] == 2) {
+        (void)select_pair(previous_pair);
+        return CUDA_SUCCESS;
     }
-    profile_initializing = false;
-    if (profile_error == CUDA_SUCCESS) {
+    if (profile_state[requested_pair] == 3 || profile_state[requested_pair] == 1) {
+        const CUresult saved = profile_error[requested_pair];
+        (void)select_pair(previous_pair);
+        return saved;
+    }
+    profile_state[requested_pair] = 1;
+    profile_initializing[requested_pair] = true;
+    using InitializePair = CUresult (*)(uint32_t);
+    using InitializeSingle = CUresult (*)();
+    auto initialize_pair = memory_fn<InitializePair>("v200_initialize_profile_pair");
+    auto initialize_single = memory_fn<InitializeSingle>("v200_initialize_profile");
+    if (initialize_pair != nullptr) {
+        InternalCallScope bypass;
+        profile_error[requested_pair] = initialize_pair(requested_pair);
+    } else if (requested_pair == 0 && initialize_single != nullptr) {
+        InternalCallScope bypass;
+        profile_error[requested_pair] = initialize_single();
+    } else {
+        profile_error[requested_pair] = CUDA_ERROR_NOT_INITIALIZED;
+    }
+    profile_initializing[requested_pair] = false;
+    if (profile_error[requested_pair] == CUDA_SUCCESS) {
         auto configured = memory_fn<MemConfigured>("v200_memory_is_configured");
         auto retain_all = memory_fn<MemRetainAllUse>("v200_memory_retain_all_use");
         auto begin = memory_fn<MemBeginSubmission>("v200_memory_begin_submission");
@@ -389,12 +675,23 @@ CUresult ensure_pair_profile() {
         auto forward = memory_fn<Forward>("v200_execution_forward_native");
         if (configured == nullptr || configured() == 0 || retain_all == nullptr ||
             begin == nullptr || end == nullptr || forward == nullptr || !execution_attached()) {
-            profile_error = CUDA_ERROR_NOT_INITIALIZED;
+            profile_error[requested_pair] = CUDA_ERROR_NOT_INITIALIZED;
         }
     }
-    profile_state = profile_error == CUDA_SUCCESS ? 2 : 3;
-    if (profile_error == CUDA_SUCCESS) v200_frontdoor_snapshot("profile_initialized");
-    return profile_error;
+    profile_state[requested_pair] = profile_error[requested_pair] == CUDA_SUCCESS ? 2 : 3;
+    const CUresult result = profile_error[requested_pair];
+    if (result == CUDA_SUCCESS) {
+        v200_frontdoor_snapshot("profile_initialized");
+        // Register after the pair manager and symbol-resolution caches have
+        // been constructed. Its callback then runs before those destructors.
+        register_process_exit_snapshot(requested_pair);
+    }
+    (void)select_pair(previous_pair);
+    return result;
+}
+
+CUresult ensure_pair_profile() {
+    return ensure_pair_profile(current_pair());
 }
 
 CUresult native_owner_free_bytes(CUdevice device, size_t *free_bytes) {
@@ -453,22 +750,25 @@ CUresult native_owner_free_bytes(CUdevice device, size_t *free_bytes) {
     return status;
 }
 
-CUresult pair_memory_capacity(size_t *free_bytes, size_t *total_bytes) {
+CUresult pair_memory_capacity(uint32_t pair_index, size_t *free_bytes,
+                              size_t *total_bytes) {
     if (free_bytes == nullptr || total_bytes == nullptr) return CUDA_ERROR_INVALID_VALUE;
-    const CUresult ready = ensure_pair_profile();
+    const CUresult ready = ensure_pair_profile(pair_index);
     if (ready != CUDA_SUCCESS) return ready;
-    auto get_usage = memory_fn<CUresult (*)(v200_memory_usage_info *)>("v200_memory_get_usage");
-    auto get_profile = memory_fn<CUresult (*)(v200_memory_pair_profile *)>("v200_memory_get_profile");
+    auto get_usage = memory_fn<CUresult (*)(uint32_t, v200_memory_usage_info *)>(
+        "v200_memory_get_usage_for_pair");
+    auto get_profile = memory_fn<CUresult (*)(uint32_t, v200_memory_pair_profile *)>(
+        "v200_memory_get_profile_for_pair");
     if (get_usage == nullptr || get_profile == nullptr) return CUDA_ERROR_NOT_SUPPORTED;
     v200_memory_usage_info usage{};
     usage.abi_version = V200_MEMORY_ABI_VERSION;
     usage.struct_size = sizeof(usage);
-    const CUresult queried = get_usage(&usage);
+    const CUresult queried = get_usage(pair_index, &usage);
     if (queried != CUDA_SUCCESS) return queried;
     v200_memory_pair_profile profile{};
     profile.abi_version = V200_MEMORY_ABI_VERSION;
     profile.struct_size = sizeof(profile);
-    const CUresult profile_status = get_profile(&profile);
+    const CUresult profile_status = get_profile(pair_index, &profile);
     if (profile_status != CUDA_SUCCESS) return profile_status;
 
     uint64_t free_total = 0;
@@ -546,6 +846,9 @@ int execution_forward_thunk(void *user_data, void *native_stream) {
 template <class Call>
 auto dispatch_async(void *stream, Call &&call) -> decltype(call(stream)) {
     using Result = decltype(call(stream));
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess)
+        return frontdoor_error<Result>(driver_error_for(pair_scope.status()));
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return frontdoor_error<Result>(profile);
 
@@ -903,6 +1206,10 @@ int map_runtime_device(int logical, int &physical) {
 cudaError_t prepare_runtime_call() {
     if (!presentation_enabled()) return cudaSuccess;
     if (!ensure_device_selection()) return cuda_error_for(selection.driver_error);
+    int physical = -1;
+    CUdevice selected = -1;
+    if (!logical_device(static_cast<int>(current_pair()), physical, selected))
+        return cudaErrorInvalidDevice;
     using Get = cudaError_t (CUDARTAPI *)(int *);
     using Set = cudaError_t (CUDARTAPI *)(int);
     auto get = next_fn<Get>("cudaGetDevice");
@@ -913,8 +1220,8 @@ cudaError_t prepare_runtime_call() {
         InternalCallScope bypass;
         const cudaError_t result = get(&current);
         if (result != cudaSuccess) return result;
-        if (current == selection.ordinal[0]) return cudaSuccess;
-        return set(selection.ordinal[0]);
+        if (current == physical) return cudaSuccess;
+        return set(physical);
     }
 }
 
@@ -924,8 +1231,8 @@ cudaError_t runtime_device_ordinal(int logical, int &physical) {
         return cudaSuccess;
     }
     if (!ensure_device_selection()) return cuda_error_for(selection.driver_error);
-    if (logical != 0) return cudaErrorInvalidDevice;
-    physical = selection.ordinal[0];
+    CUdevice device = -1;
+    if (!logical_device(logical, physical, device)) return cudaErrorInvalidDevice;
     return cudaSuccess;
 }
 
@@ -943,8 +1250,8 @@ cudaError_t register_created_stream(cudaStream_t *stream) {
         cleanup = destroy(*stream);
     }
     if (cleanup == cudaSuccess) {
-        forget_stream(*stream);
         forget_stream_gate(*stream);
+        forget_stream(*stream);
         *stream = nullptr;
         return cudaErrorNotSupported;
     }
@@ -964,13 +1271,18 @@ CUstream per_thread_tracking_stream(CUstream stream) noexcept {
 
 extern "C" {
 
+int v200_frontdoor_select_pair(uint32_t pair_index) {
+    if (!pair_mode() || pair_index >= visible_logical_device_count()) return -1;
+    return select_pair(pair_index);
+}
+
 cudaError_t CUDARTAPI cudaGetDeviceCount(int *count) {
     using Fn = cudaError_t (CUDARTAPI *)(int *);
     auto real = next_fn<Fn>("cudaGetDeviceCount");
     if (internal_call() || !presentation_enabled()) return real ? real(count) : cudaErrorNotSupported;
     if (count == nullptr) return cudaErrorInvalidValue;
     if (!ensure_device_selection()) return cuda_error_for(selection.driver_error);
-    *count = 1;
+    *count = static_cast<int>(visible_logical_device_count());
     return cudaSuccess;
 }
 
@@ -981,7 +1293,7 @@ cudaError_t CUDARTAPI cudaGetDevice(int *device) {
     if (device == nullptr) return cudaErrorInvalidValue;
     const cudaError_t prepared = prepare_runtime_call();
     if (prepared != cudaSuccess) return prepared;
-    *device = 0;
+    *device = pair_mode() ? static_cast<int>(current_pair()) : 0;
     return cudaSuccess;
 }
 
@@ -993,8 +1305,13 @@ cudaError_t CUDARTAPI cudaSetDevice(int device) {
     const cudaError_t map_result = runtime_device_ordinal(device, physical);
     if (map_result != cudaSuccess) return map_result;
     if (!real) return cudaErrorNotSupported;
+    const uint32_t previous_pair = current_pair();
+    if (pair_mode() && select_pair(static_cast<uint32_t>(device)) != 0)
+        return cudaErrorInvalidDevice;
     InternalCallScope bypass;
-    return real(physical);
+    const cudaError_t result = real(physical);
+    if (result != cudaSuccess && pair_mode()) (void)select_pair(previous_pair);
+    return result;
 }
 
 cudaError_t CUDARTAPI cudaGetDeviceProperties_v2(cudaDeviceProp *properties, int device) {
@@ -1016,7 +1333,8 @@ cudaError_t CUDARTAPI cudaGetDeviceProperties_v2(cudaDeviceProp *properties, int
     if (result != cudaSuccess || properties == nullptr || !pair_mode()) return result;
     size_t free_bytes = 0;
     size_t total_bytes = 0;
-    const CUresult capacity = pair_memory_capacity(&free_bytes, &total_bytes);
+    const CUresult capacity = pair_memory_capacity(static_cast<uint32_t>(device),
+                                                   &free_bytes, &total_bytes);
     (void)free_bytes;
     if (capacity != CUDA_SUCCESS) return cuda_error_for(capacity);
     properties->totalGlobalMem = total_bytes;
@@ -1062,6 +1380,11 @@ cudaError_t CUDARTAPI cudaDeviceCanAccessPeer(int *can_access, int device, int p
     if (mapped != cudaSuccess) return mapped;
     mapped = runtime_device_ordinal(peer_device, physical_peer);
     if (mapped != cudaSuccess) return mapped;
+    if (pair_mode() && device != peer_device && selection.count == 4) {
+        if (can_access == nullptr) return cudaErrorInvalidValue;
+        *can_access = 0;
+        return cudaSuccess;
+    }
     InternalCallScope bypass;
     return real ? real(can_access, physical, physical_peer) : cudaErrorNotSupported;
 }
@@ -1073,6 +1396,9 @@ cudaError_t CUDARTAPI cudaDeviceEnablePeerAccess(int peer_device, unsigned int f
     int physical = -1;
     const cudaError_t mapped = runtime_device_ordinal(peer_device, physical);
     if (mapped != cudaSuccess) return mapped;
+    if (pair_mode() && selection.count == 4 &&
+        static_cast<int>(current_pair()) != peer_device)
+        return cudaErrorPeerAccessUnsupported;
     InternalCallScope bypass;
     return real ? real(physical, flags) : cudaErrorNotSupported;
 }
@@ -1092,7 +1418,9 @@ cudaError_t CUDARTAPI cudaMalloc(void **device_ptr, size_t bytes) {
     auto allocate = memory_fn<MemAllocateOn>("v200_memory_allocate_on");
     void *result = nullptr;
     CUresult allocated = CUDA_ERROR_NOT_SUPPORTED;
-    if (allocate != nullptr) allocated = allocate(selection.device[0], bytes, 0, &result);
+    const size_t anchor_index = pair_mode() ? static_cast<size_t>(current_pair()) * 2 : 0;
+    if (allocate != nullptr && anchor_index < static_cast<size_t>(selection.count))
+        allocated = allocate(selection.device[anchor_index], bytes, 0, &result);
     if (allocated == CUDA_SUCCESS) {
         *device_ptr = result;
         v200_frontdoor_snapshot("cuda_malloc");
@@ -1105,14 +1433,40 @@ cudaError_t CUDARTAPI cudaFree(void *device_ptr) {
     auto real = next_fn<Fn>("cudaFree");
     if (internal_call()) return real ? real(device_ptr) : cudaErrorNotSupported;
     if (pair_mode() && ensure_pair_profile() == CUDA_SUCCESS) {
-        auto owns = memory_fn<MemOwnsPointer>("v200_memory_owns_pointer");
-        if (owns != nullptr && owns(device_ptr) != 0) {
-            const CUresult drained = synchronize_native_anchor();
-            if (drained != CUDA_SUCCESS) return cuda_error_for(drained);
+        using OwnsForPair = int (*)(uint32_t, const void *);
+        auto owns = memory_fn<OwnsForPair>("v200_memory_owns_pointer_for_pair");
+        const uint32_t previous_pair = current_pair();
+        const uint32_t pair_count = visible_logical_device_count();
+        int owner_pair = -1;
+        if (owns != nullptr) {
+            for (uint32_t pair = 0; pair < pair_count; ++pair) {
+                if (owns(pair, device_ptr) != 0) {
+                    owner_pair = static_cast<int>(pair);
+                    break;
+                }
+            }
+        }
+        if (owner_pair >= 0) {
+            if (select_pair(static_cast<uint32_t>(owner_pair)) != 0)
+                return cudaErrorInvalidDevice;
             std::unique_lock<std::shared_mutex> gate(tracked_use_gate);
+            const CUresult prefix = wait_device_prefix();
+            if (prefix != CUDA_SUCCESS) {
+                (void)select_pair(previous_pair);
+                (void)prepare_runtime_call();
+                return cuda_error_for(prefix);
+            }
+            const CUresult drained = synchronize_native_anchor();
+            if (drained != CUDA_SUCCESS) {
+                (void)select_pair(previous_pair);
+                (void)prepare_runtime_call();
+                return cuda_error_for(drained);
+            }
             auto release = memory_fn<MemReleasePointer>("v200_memory_release");
             const CUresult result = release ? release(device_ptr) : CUDA_ERROR_NOT_SUPPORTED;
             v200_frontdoor_snapshot("cuda_free");
+            (void)select_pair(previous_pair);
+            (void)prepare_runtime_call();
             return cuda_error_for(result);
         }
     }
@@ -1143,7 +1497,8 @@ cudaError_t CUDARTAPI cudaMemGetInfo(size_t *free_bytes, size_t *total_bytes) {
         if (free_bytes == nullptr || total_bytes == nullptr) return cudaErrorInvalidValue;
         size_t pair_free = 0;
         size_t pair_total = 0;
-        const CUresult capacity = pair_memory_capacity(&pair_free, &pair_total);
+        const CUresult capacity = pair_memory_capacity(current_pair(), &pair_free,
+                                                       &pair_total);
         if (capacity != CUDA_SUCCESS) return cuda_error_for(capacity);
         *free_bytes = pair_free;
         *total_bytes = pair_total;
@@ -1174,6 +1529,8 @@ cudaError_t CUDARTAPI cudaLaunchKernel(const void *function, dim3 grid, dim3 blo
     if (internal_call() || !real)
         return real ? real(function, grid, block, arguments, shared_bytes, stream)
                     : cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1204,6 +1561,8 @@ cudaError_t CUDARTAPI cudaLaunchCooperativeKernel(const void *function, dim3 gri
     if (internal_call() || !real)
         return real ? real(function, grid, block, arguments, shared_bytes, stream)
                     : cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1217,9 +1576,11 @@ cudaError_t CUDARTAPI cudaLaunchKernelExC(const cudaLaunchConfig_t *config,
     using Fn = cudaError_t (CUDARTAPI *)(const cudaLaunchConfig_t *, const void *, void **);
     auto real = next_fn<Fn>("cudaLaunchKernelExC");
     if (internal_call() || !real) return real ? real(config, function, arguments) : cudaErrorNotSupported;
+    const cudaStream_t stream = config == nullptr ? nullptr : config->stream;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
-    const cudaStream_t stream = config == nullptr ? nullptr : config->stream;
     return dispatch_async(stream, [=](void *native_stream) {
         if (config == nullptr) return real(config, function, arguments);
         cudaLaunchConfig_t redirected = *config;
@@ -1233,6 +1594,8 @@ cudaError_t CUDARTAPI cudaMemcpyAsync(void *dst, const void *src, size_t bytes,
     using Fn = cudaError_t (CUDARTAPI *)(void *, const void *, size_t, enum cudaMemcpyKind, cudaStream_t);
     auto real = next_fn<Fn>("cudaMemcpyAsync");
     if (!real) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1247,6 +1610,8 @@ cudaError_t CUDARTAPI cudaMemcpy2DAsync(void *dst, size_t dpitch, const void *sr
                                          enum cudaMemcpyKind, cudaStream_t);
     auto real = next_fn<Fn>("cudaMemcpy2DAsync");
     if (!real) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1260,6 +1625,67 @@ cudaError_t CUDARTAPI cudaMemcpyPeerAsync(void *dst, int dst_device, const void 
     using Fn = cudaError_t (CUDARTAPI *)(void *, int, const void *, int, size_t, cudaStream_t);
     auto real = next_fn<Fn>("cudaMemcpyPeerAsync");
     if (!real) return cudaErrorNotSupported;
+    if (pair_mode() && ensure_device_selection() && selection.count == 4 &&
+        dst_device != src_device) {
+        if (dst_device < 0 || src_device < 0 ||
+            dst_device >= static_cast<int>(visible_logical_device_count()) ||
+            src_device >= static_cast<int>(visible_logical_device_count()))
+            return cudaErrorInvalidDevice;
+        int stream_owner = stream_owner_pair(stream);
+        const uint32_t stream_pair = stream_owner < 0
+            ? current_pair() : static_cast<uint32_t>(stream_owner);
+        if (stream_pair >= visible_logical_device_count()) return cudaErrorInvalidResourceHandle;
+        ExplicitPairScope destination_scope(static_cast<uint32_t>(dst_device));
+        if (destination_scope.status() != cudaSuccess) return destination_scope.status();
+        int physical_dst = -1;
+        int physical_src = -1;
+        cudaError_t mapped = runtime_device_ordinal(dst_device, physical_dst);
+        if (mapped != cudaSuccess) return mapped;
+        mapped = runtime_device_ordinal(src_device, physical_src);
+        if (mapped != cudaSuccess) return mapped;
+        using TryCopy = int (*)(uint32_t, uint32_t, uint32_t, void *, const void *,
+                                size_t, cudaStream_t, cudaError_t *);
+        auto try_copy = reinterpret_cast<TryCopy>(
+            lookup_v200("v200_multi_pair_try_copy_peer_async"));
+        if (try_copy == nullptr) return cudaErrorNotSupported;
+        const cudaError_t prepared = prepare_async_call();
+        if (prepared != cudaSuccess) return prepared;
+        return dispatch_async(nullptr, [=](void *) {
+            const auto started = std::chrono::steady_clock::now();
+            cudaError_t status = cudaErrorNotSupported;
+            const int handled = try_copy(static_cast<uint32_t>(dst_device),
+                                         static_cast<uint32_t>(src_device), stream_pair,
+                                         dst, src, bytes,
+                                         stream, &status);
+            const char *route = "host_stage";
+            if (handled == 0) {
+                // The hook promises that unhandled ranges have no V200
+                // ownership and that it made no changes, so native fallback
+                // is safe for this narrow case. CUDA associates the supplied
+                // stream with its creating device, which can be the source
+                // pair in llama.cpp's peer-copy path. Temporarily select that
+                // pair while forwarding the original stream, then restore the
+                // destination pair before dispatch_async records its prefix.
+                ExplicitPairScope source_scope(stream_pair);
+                status = source_scope.status();
+                if (status == cudaSuccess) {
+                    status = real(dst, physical_dst, src, physical_src, bytes,
+                                  stream);
+                }
+                route = "native_untracked";
+            } else if (handled != 1) {
+                status = cudaErrorNotSupported;
+                route = "unhandled";
+            }
+            const auto stopped = std::chrono::steady_clock::now();
+            const double elapsed_ms = std::chrono::duration<double, std::milli>(
+                stopped - started).count();
+            write_multi_pair_copy_event(static_cast<uint32_t>(dst_device),
+                                        static_cast<uint32_t>(src_device), bytes,
+                                        status, elapsed_ms, route);
+            return status;
+        });
+    }
     int physical_dst = dst_device;
     int physical_src = src_device;
     if (presentation_enabled()) {
@@ -1281,6 +1707,8 @@ cudaError_t CUDARTAPI cudaMemsetAsync(void *device_ptr, int value, size_t bytes,
     using Fn = cudaError_t (CUDARTAPI *)(void *, int, size_t, cudaStream_t);
     auto real = next_fn<Fn>("cudaMemsetAsync");
     if (!real) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1314,6 +1742,8 @@ cudaError_t CUDARTAPI cudaStreamDestroy(cudaStream_t stream) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaStream_t);
     auto real = next_fn<Fn>("cudaStreamDestroy");
     if (!real) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     std::unique_lock<std::shared_mutex> outer(tracked_use_gate);
@@ -1331,8 +1761,8 @@ cudaError_t CUDARTAPI cudaStreamDestroy(cudaStream_t stream) {
         if (unregistered != V200_EXECUTION_OK) return cudaErrorNotSupported;
     }
     if (result == cudaSuccess) {
-        forget_stream(stream);
         forget_stream_gate(stream);
+        forget_stream(stream);
     }
     return result;
 }
@@ -1341,6 +1771,8 @@ cudaError_t CUDARTAPI cudaStreamSynchronize(cudaStream_t stream) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaStream_t);
     auto real = next_fn<Fn>("cudaStreamSynchronize");
     if (!real) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     std::shared_lock<std::shared_mutex> outer(tracked_use_gate);
@@ -1365,21 +1797,77 @@ cudaError_t CUDARTAPI cudaDeviceSynchronize(void) {
     return real();
 }
 
+cudaError_t CUDARTAPI cudaEventCreate(cudaEvent_t *event) {
+    using Fn = cudaError_t (CUDARTAPI *)(cudaEvent_t *);
+    auto real = next_fn<Fn>("cudaEventCreate");
+    if (internal_call() || !pair_mode()) return real ? real(event) : cudaErrorNotSupported;
+    const cudaError_t prepared = prepare_async_call();
+    if (prepared != cudaSuccess) return prepared;
+    InternalCallScope bypass;
+    const cudaError_t result = real ? real(event) : cudaErrorNotSupported;
+    if (result == cudaSuccess && event != nullptr) remember_event_owner(*event, current_pair());
+    return result;
+}
+
+cudaError_t CUDARTAPI cudaEventCreateWithFlags(cudaEvent_t *event, unsigned int flags) {
+    using Fn = cudaError_t (CUDARTAPI *)(cudaEvent_t *, unsigned int);
+    auto real = next_fn<Fn>("cudaEventCreateWithFlags");
+    if (internal_call() || !pair_mode()) return real ? real(event, flags) : cudaErrorNotSupported;
+    const cudaError_t prepared = prepare_async_call();
+    if (prepared != cudaSuccess) return prepared;
+    InternalCallScope bypass;
+    const cudaError_t result = real ? real(event, flags) : cudaErrorNotSupported;
+    if (result == cudaSuccess && event != nullptr) remember_event_owner(*event, current_pair());
+    return result;
+}
+
+cudaError_t CUDARTAPI cudaEventDestroy(cudaEvent_t event) {
+    using Fn = cudaError_t (CUDARTAPI *)(cudaEvent_t);
+    auto real = next_fn<Fn>("cudaEventDestroy");
+    if (internal_call() || !pair_mode()) return real ? real(event) : cudaErrorNotSupported;
+    EventPairScope pair_scope(event);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
+    const cudaError_t prepared = prepare_async_call();
+    if (prepared != cudaSuccess) return prepared;
+    InternalCallScope bypass;
+    const cudaError_t result = real ? real(event) : cudaErrorNotSupported;
+    if (result == cudaSuccess) forget_event_owner(event);
+    return result;
+}
+
+cudaError_t CUDARTAPI cudaEventQuery(cudaEvent_t event) {
+    using Fn = cudaError_t (CUDARTAPI *)(cudaEvent_t);
+    auto real = next_fn<Fn>("cudaEventQuery");
+    if (internal_call() || !pair_mode()) return real ? real(event) : cudaErrorNotSupported;
+    EventPairScope pair_scope(event);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
+    const cudaError_t prepared = prepare_async_call();
+    if (prepared != cudaSuccess) return prepared;
+    InternalCallScope bypass;
+    return real ? real(event) : cudaErrorNotSupported;
+}
+
 cudaError_t CUDARTAPI cudaEventRecord(cudaEvent_t event, cudaStream_t stream) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaEvent_t, cudaStream_t);
     auto real = next_fn<Fn>("cudaEventRecord");
     if (!real) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
-    return dispatch_async(stream, [=](void *native_stream) {
+    const cudaError_t result = dispatch_async(stream, [=](void *native_stream) {
         return real(event, reinterpret_cast<cudaStream_t>(native_stream));
     });
+    if (result == cudaSuccess && pair_mode()) remember_event_owner(event, current_pair());
+    return result;
 }
 
 cudaError_t CUDARTAPI cudaStreamWaitEvent(cudaStream_t stream, cudaEvent_t event, unsigned int flags) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaStream_t, cudaEvent_t, unsigned int);
     auto real = next_fn<Fn>("cudaStreamWaitEvent");
     if (!real) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1391,6 +1879,8 @@ cudaError_t CUDARTAPI cudaEventSynchronize(cudaEvent_t event) {
     using Fn = cudaError_t (CUDARTAPI *)(cudaEvent_t);
     auto real = next_fn<Fn>("cudaEventSynchronize");
     if (internal_call()) return real ? real(event) : cudaErrorNotSupported;
+    EventPairScope pair_scope(event);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_async_call();
     if (prepared != cudaSuccess) return prepared;
     std::shared_lock<std::shared_mutex> outer(tracked_use_gate);
@@ -1403,6 +1893,8 @@ cudaError_t CUDARTAPI cudaGraphLaunch(cudaGraphExec_t graph, cudaStream_t stream
     auto real = next_fn<Fn>("cudaGraphLaunch");
     if (internal_call()) return real ? real(graph, stream) : cudaErrorNotSupported;
     if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     const cudaError_t prepared = prepare_runtime_call();
     if (prepared != cudaSuccess) return prepared;
     if (!real) return cudaErrorNotSupported;
@@ -1429,6 +1921,8 @@ cudaError_t CUDARTAPI cudaStreamBeginCapture(cudaStream_t stream, enum cudaStrea
     using Fn = cudaError_t (CUDARTAPI *)(cudaStream_t, enum cudaStreamCaptureMode);
     auto real = next_fn<Fn>("cudaStreamBeginCapture");
     if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     if (pair_mode()) {
         const cudaError_t prepared = prepare_async_call();
         if (prepared != cudaSuccess) return prepared;
@@ -1442,6 +1936,8 @@ cudaError_t CUDARTAPI cudaStreamEndCapture(cudaStream_t stream, cudaGraph_t *gra
     auto real = next_fn<Fn>("cudaStreamEndCapture");
     if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
     if (real == nullptr) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     if (graph != nullptr) *graph = nullptr;
     cudaError_t result;
     {
@@ -1493,6 +1989,8 @@ cudaError_t CUDARTAPI cudaStreamIsCapturing(cudaStream_t stream,
     auto real = next_fn<Fn>("cudaStreamIsCapturing");
     if (internal_call()) return real ? real(stream, status) : cudaErrorNotSupported;
     if (pair_mode() && !graph_capture_enabled()) return cudaErrorNotSupported;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return pair_scope.status();
     InternalCallScope bypass;
     return real ? real(stream, status) : cudaErrorNotSupported;
 }
@@ -1590,7 +2088,7 @@ CUresult CUDAAPI cuDeviceGetCount(int *count) {
     if (internal_call() || !presentation_enabled()) return real ? real(count) : CUDA_ERROR_NOT_SUPPORTED;
     if (count == nullptr) return CUDA_ERROR_INVALID_VALUE;
     if (!ensure_device_selection()) return selection.driver_error;
-    *count = 1;
+    *count = static_cast<int>(visible_logical_device_count());
     return CUDA_SUCCESS;
 }
 
@@ -1599,10 +2097,175 @@ CUresult CUDAAPI cuDeviceGet(CUdevice *device, int ordinal) {
     auto real = next_fn<Fn>("cuDeviceGet");
     if (internal_call() || !presentation_enabled()) return real ? real(device, ordinal) : CUDA_ERROR_NOT_SUPPORTED;
     if (device == nullptr) return CUDA_ERROR_INVALID_VALUE;
-    if (ordinal != 0) return CUDA_ERROR_INVALID_DEVICE;
     if (!ensure_device_selection()) return selection.driver_error;
-    *device = selection.device[0];
+    int native_ordinal = -1;
+    CUdevice physical = -1;
+    if (!logical_device(ordinal, native_ordinal, physical))
+        return CUDA_ERROR_INVALID_DEVICE;
+    *device = physical;
     return CUDA_SUCCESS;
+}
+
+CUresult CUDAAPI cuCtxCreate_v2(CUcontext *context, unsigned int flags, CUdevice device) {
+    using Fn = CUresult (CUDAAPI *)(CUcontext *, unsigned int, CUdevice);
+    auto real = next_fn<Fn>("cuCtxCreate_v2");
+    if (internal_call() || !presentation_enabled())
+        return real ? real(context, flags, device) : CUDA_ERROR_NOT_SUPPORTED;
+    if (real == nullptr) return CUDA_ERROR_NOT_SUPPORTED;
+    const int pair = pair_index_for_native_device(device);
+    if (pair < 0) return CUDA_ERROR_INVALID_DEVICE;
+    const uint32_t previous_pair = current_pair();
+    if (!save_context_pair_for_restore(previous_pair)) return CUDA_ERROR_OUT_OF_MEMORY;
+    if (select_pair(static_cast<uint32_t>(pair)) != 0) {
+        discard_context_pair_restore();
+        return CUDA_ERROR_INVALID_DEVICE;
+    }
+    InternalCallScope bypass;
+    const CUresult result = real(context, flags, device);
+    if (result != CUDA_SUCCESS) {
+        discard_context_pair_restore();
+        (void)select_pair(previous_pair);
+    } else {
+        bind_context_pair_restore(context == nullptr ? nullptr : *context);
+    }
+    return result;
+}
+
+CUresult CUDAAPI cuCtxSetCurrent(CUcontext context) {
+    using Fn = CUresult (CUDAAPI *)(CUcontext);
+    using GetCurrent = CUresult (CUDAAPI *)(CUcontext *);
+    auto real = next_fn<Fn>("cuCtxSetCurrent");
+    auto get_current = next_fn<GetCurrent>("cuCtxGetCurrent");
+    if (internal_call() || !presentation_enabled())
+        return real ? real(context) : CUDA_ERROR_NOT_SUPPORTED;
+    if (!real || !get_current) return CUDA_ERROR_NOT_SUPPORTED;
+    CUcontext previous = nullptr;
+    CUresult result;
+    {
+        InternalCallScope bypass;
+        result = get_current(&previous);
+    }
+    if (result != CUDA_SUCCESS) return result;
+    {
+        InternalCallScope bypass;
+        result = real(context);
+    }
+    if (result != CUDA_SUCCESS || context == nullptr) return result;
+    uint32_t pair = 0;
+    result = pair_index_for_context(context, &pair);
+    if (result == CUDA_SUCCESS && select_pair(pair) == 0) return CUDA_SUCCESS;
+    {
+        InternalCallScope bypass;
+        (void)real(previous);
+    }
+    return result == CUDA_SUCCESS ? CUDA_ERROR_INVALID_DEVICE : result;
+}
+
+CUresult CUDAAPI cuCtxPushCurrent_v2(CUcontext context) {
+    using Fn = CUresult (CUDAAPI *)(CUcontext);
+    using Pop = CUresult (CUDAAPI *)(CUcontext *);
+    auto real = next_fn<Fn>("cuCtxPushCurrent_v2");
+    if (real == nullptr) real = next_fn<Fn>("cuCtxPushCurrent");
+    auto pop = next_fn<Pop>("cuCtxPopCurrent_v2");
+    if (pop == nullptr) pop = next_fn<Pop>("cuCtxPopCurrent");
+    if (internal_call() || !presentation_enabled())
+        return real ? real(context) : CUDA_ERROR_NOT_SUPPORTED;
+    if (context == nullptr || real == nullptr || pop == nullptr)
+        return context == nullptr ? CUDA_ERROR_INVALID_CONTEXT : CUDA_ERROR_NOT_SUPPORTED;
+    const uint32_t previous_pair = current_pair();
+    if (!save_context_pair_for_restore(previous_pair)) return CUDA_ERROR_OUT_OF_MEMORY;
+    CUresult result;
+    {
+        InternalCallScope bypass;
+        result = real(context);
+    }
+    if (result != CUDA_SUCCESS) {
+        discard_context_pair_restore();
+        return result;
+    }
+    bind_context_pair_restore(context);
+    uint32_t pair = 0;
+    result = pair_index_for_context(context, &pair);
+    if (result == CUDA_SUCCESS && select_pair(pair) == 0) return CUDA_SUCCESS;
+    CUcontext popped = nullptr;
+    {
+        InternalCallScope bypass;
+        (void)pop(&popped);
+    }
+    discard_context_pair_restore();
+    (void)select_pair(previous_pair);
+    return result == CUDA_SUCCESS ? CUDA_ERROR_INVALID_DEVICE : result;
+}
+
+CUresult CUDAAPI cuCtxPopCurrent_v2(CUcontext *context) {
+    using Fn = CUresult (CUDAAPI *)(CUcontext *);
+    using GetCurrent = CUresult (CUDAAPI *)(CUcontext *);
+    auto real = next_fn<Fn>("cuCtxPopCurrent_v2");
+    if (real == nullptr) real = next_fn<Fn>("cuCtxPopCurrent");
+    auto get_current = next_fn<GetCurrent>("cuCtxGetCurrent");
+    if (internal_call() || !presentation_enabled())
+        return real ? real(context) : CUDA_ERROR_NOT_SUPPORTED;
+    if (real == nullptr || get_current == nullptr) return CUDA_ERROR_NOT_SUPPORTED;
+    CUresult result;
+    {
+        InternalCallScope bypass;
+        result = real(context);
+    }
+    if (result != CUDA_SUCCESS) return result;
+    const CUcontext popped_context = context == nullptr ? nullptr : *context;
+    uint32_t saved_pair = current_pair();
+    const bool has_saved_pair = take_context_pair_restore(popped_context, &saved_pair);
+    CUcontext active = nullptr;
+    {
+        InternalCallScope bypass;
+        result = get_current(&active);
+    }
+    if (result != CUDA_SUCCESS) {
+        if (has_saved_pair) (void)select_pair(saved_pair);
+        return result;
+    }
+    if (active == nullptr) {
+        // A matching Create/Push wrapper saved the previously selected pair.
+        // If no wrapper observed this stack entry, preserve cudaSetDevice's
+        // thread-local default rather than guessing pair 0.
+        return !has_saved_pair || select_pair(saved_pair) == 0
+            ? CUDA_SUCCESS : CUDA_ERROR_INVALID_DEVICE;
+    }
+    uint32_t pair = 0;
+    result = pair_index_for_context(active, &pair);
+    if (result != CUDA_SUCCESS) {
+        if (has_saved_pair) (void)select_pair(saved_pair);
+        return result;
+    }
+    return select_pair(pair) == 0 ? CUDA_SUCCESS : CUDA_ERROR_INVALID_DEVICE;
+}
+
+CUresult CUDAAPI cuDeviceCanAccessPeer(int *can_access, CUdevice device,
+                                       CUdevice peer_device) {
+    using Fn = CUresult (CUDAAPI *)(int *, CUdevice, CUdevice);
+    auto real = next_fn<Fn>("cuDeviceCanAccessPeer");
+    if (internal_call() || !presentation_enabled())
+        return real ? real(can_access, device, peer_device) : CUDA_ERROR_NOT_SUPPORTED;
+    if (can_access == nullptr) return CUDA_ERROR_INVALID_VALUE;
+    const int device_pair = pair_index_for_native_device(device);
+    const int peer_pair = pair_index_for_native_device(peer_device);
+    if (device_pair < 0 || peer_pair < 0) return CUDA_ERROR_INVALID_DEVICE;
+    if (pair_mode() && selection.count == 4 && device_pair != peer_pair) {
+        *can_access = 0;
+        return CUDA_SUCCESS;
+    }
+    InternalCallScope bypass;
+    return real ? real(can_access, device, peer_device) : CUDA_ERROR_NOT_SUPPORTED;
+}
+
+CUresult CUDAAPI cuCtxEnablePeerAccess(CUcontext peer_context, unsigned int flags) {
+    using Fn = CUresult (CUDAAPI *)(CUcontext, unsigned int);
+    auto real = next_fn<Fn>("cuCtxEnablePeerAccess");
+    if (internal_call() || !presentation_enabled())
+        return real ? real(peer_context, flags) : CUDA_ERROR_NOT_SUPPORTED;
+    if (pair_mode() && selection.count == 4) return CUDA_ERROR_PEER_ACCESS_UNSUPPORTED;
+    InternalCallScope bypass;
+    return real ? real(peer_context, flags) : CUDA_ERROR_NOT_SUPPORTED;
 }
 
 CUresult CUDAAPI cuDeviceTotalMem_v2(size_t *bytes, CUdevice device) {
@@ -1616,10 +2279,19 @@ CUresult CUDAAPI cuDeviceTotalMem_v2(size_t *bytes, CUdevice device) {
         return real ? real(bytes, device) : CUDA_ERROR_NOT_SUPPORTED;
     }
     if (!ensure_device_selection()) return selection.driver_error;
-    if (device != selection.device[0]) return CUDA_ERROR_INVALID_DEVICE;
+    int pair_index = -1;
+    const int visible_pairs = selection.count / 2;
+    for (int pair = 0; pair < visible_pairs; ++pair) {
+        if (device == selection.device[pair * 2]) {
+            pair_index = pair;
+            break;
+        }
+    }
+    if (pair_index < 0) return CUDA_ERROR_INVALID_DEVICE;
     size_t free_bytes = 0;
     size_t total_bytes = 0;
-    const CUresult capacity = pair_memory_capacity(&free_bytes, &total_bytes);
+    const CUresult capacity = pair_memory_capacity(static_cast<uint32_t>(pair_index),
+                                                   &free_bytes, &total_bytes);
     (void)free_bytes;
     if (capacity != CUDA_SUCCESS) return capacity;
     *bytes = total_bytes;
@@ -1635,7 +2307,7 @@ CUresult CUDAAPI cuMemGetInfo_v2(size_t *free_bytes, size_t *total_bytes) {
         InternalCallScope bypass;
         return real ? real(free_bytes, total_bytes) : CUDA_ERROR_NOT_SUPPORTED;
     }
-    return pair_memory_capacity(free_bytes, total_bytes);
+    return pair_memory_capacity(current_pair(), free_bytes, total_bytes);
 }
 
 CUresult CUDAAPI cuMemcpyHtoDAsync_v2(CUdeviceptr dst, const void *src, size_t bytes,
@@ -1643,6 +2315,8 @@ CUresult CUDAAPI cuMemcpyHtoDAsync_v2(CUdeviceptr dst, const void *src, size_t b
     using Fn = CUresult (CUDAAPI *)(CUdeviceptr, const void *, size_t, CUstream);
     auto real = next_fn<Fn>("cuMemcpyHtoDAsync_v2");
     if (internal_call() || !real) return real ? real(dst, src, bytes, stream) : CUDA_ERROR_NOT_SUPPORTED;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1655,9 +2329,12 @@ CUresult CUDAAPI cuMemcpyHtoDAsync_v2_ptsz(CUdeviceptr dst, const void *src, siz
     using Fn = CUresult (CUDAAPI *)(CUdeviceptr, const void *, size_t, CUstream);
     auto real = next_fn<Fn>("cuMemcpyHtoDAsync_v2_ptsz");
     if (internal_call() || !real) return real ? real(dst, src, bytes, stream) : CUDA_ERROR_NOT_SUPPORTED;
+    const CUstream tracked = per_thread_tracking_stream(stream);
+    StreamPairScope pair_scope(tracked);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
-    return dispatch_async(per_thread_tracking_stream(stream), [=](void *) {
+    return dispatch_async(tracked, [=](void *) {
         return real(dst, src, bytes, stream);
     });
 }
@@ -1667,6 +2344,8 @@ CUresult CUDAAPI cuMemcpyDtoHAsync_v2(void *dst, CUdeviceptr src, size_t bytes,
     using Fn = CUresult (CUDAAPI *)(void *, CUdeviceptr, size_t, CUstream);
     auto real = next_fn<Fn>("cuMemcpyDtoHAsync_v2");
     if (internal_call() || !real) return real ? real(dst, src, bytes, stream) : CUDA_ERROR_NOT_SUPPORTED;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1679,9 +2358,12 @@ CUresult CUDAAPI cuMemcpyDtoHAsync_v2_ptsz(void *dst, CUdeviceptr src, size_t by
     using Fn = CUresult (CUDAAPI *)(void *, CUdeviceptr, size_t, CUstream);
     auto real = next_fn<Fn>("cuMemcpyDtoHAsync_v2_ptsz");
     if (internal_call() || !real) return real ? real(dst, src, bytes, stream) : CUDA_ERROR_NOT_SUPPORTED;
+    const CUstream tracked = per_thread_tracking_stream(stream);
+    StreamPairScope pair_scope(tracked);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
-    return dispatch_async(per_thread_tracking_stream(stream), [=](void *) {
+    return dispatch_async(tracked, [=](void *) {
         return real(dst, src, bytes, stream);
     });
 }
@@ -1691,6 +2373,8 @@ CUresult CUDAAPI cuMemcpyDtoDAsync_v2(CUdeviceptr dst, CUdeviceptr src, size_t b
     using Fn = CUresult (CUDAAPI *)(CUdeviceptr, CUdeviceptr, size_t, CUstream);
     auto real = next_fn<Fn>("cuMemcpyDtoDAsync_v2");
     if (internal_call() || !real) return real ? real(dst, src, bytes, stream) : CUDA_ERROR_NOT_SUPPORTED;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1703,9 +2387,12 @@ CUresult CUDAAPI cuMemcpyDtoDAsync_v2_ptsz(CUdeviceptr dst, CUdeviceptr src, siz
     using Fn = CUresult (CUDAAPI *)(CUdeviceptr, CUdeviceptr, size_t, CUstream);
     auto real = next_fn<Fn>("cuMemcpyDtoDAsync_v2_ptsz");
     if (internal_call() || !real) return real ? real(dst, src, bytes, stream) : CUDA_ERROR_NOT_SUPPORTED;
+    const CUstream tracked = per_thread_tracking_stream(stream);
+    StreamPairScope pair_scope(tracked);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
-    return dispatch_async(per_thread_tracking_stream(stream), [=](void *) {
+    return dispatch_async(tracked, [=](void *) {
         return real(dst, src, bytes, stream);
     });
 }
@@ -1786,6 +2473,8 @@ CUresult CUDAAPI cuLaunchKernel(CUfunction function,
     if (internal_call() || !real) return real ? real(function, grid_x, grid_y, grid_z,
         block_x, block_y, block_z, shared_bytes, stream, kernel_params, extra)
         : CUDA_ERROR_NOT_SUPPORTED;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1804,9 +2493,12 @@ CUresult CUDAAPI cuLaunchKernel_ptsz(CUfunction function,
     if (internal_call() || !real) return real ? real(function, grid_x, grid_y, grid_z,
         block_x, block_y, block_z, shared_bytes, stream, kernel_params, extra)
         : CUDA_ERROR_NOT_SUPPORTED;
+    const CUstream tracked = per_thread_tracking_stream(stream);
+    StreamPairScope pair_scope(tracked);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
-    return dispatch_async(per_thread_tracking_stream(stream), [=](void *) {
+    return dispatch_async(tracked, [=](void *) {
         return real(function, grid_x, grid_y, grid_z, block_x, block_y, block_z,
                     shared_bytes, stream, kernel_params, extra);
     });
@@ -1816,6 +2508,8 @@ CUresult CUDAAPI cuStreamSynchronize(CUstream stream) {
     using Fn = CUresult (CUDAAPI *)(CUstream);
     auto real = next_fn<Fn>("cuStreamSynchronize");
     if (internal_call() || !real) return real ? real(stream) : CUDA_ERROR_NOT_SUPPORTED;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
     std::shared_lock<std::shared_mutex> outer(tracked_use_gate);
@@ -1831,10 +2525,13 @@ CUresult CUDAAPI cuStreamSynchronize_ptsz(CUstream stream) {
     using Fn = CUresult (CUDAAPI *)(CUstream);
     auto real = next_fn<Fn>("cuStreamSynchronize_ptsz");
     if (internal_call() || !real) return real ? real(stream) : CUDA_ERROR_NOT_SUPPORTED;
+    const CUstream tracked = per_thread_tracking_stream(stream);
+    StreamPairScope pair_scope(tracked);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
     std::shared_lock<std::shared_mutex> outer(tracked_use_gate);
-    const CUstream tracked_stream = per_thread_tracking_stream(stream);
+    const CUstream tracked_stream = tracked;
     auto gate = gate_for_stream(tracked_stream);
     std::lock_guard<std::mutex> stream_lock(*gate);
     const CUresult waited = wait_stream_prefix(tracked_stream);
@@ -1847,6 +2544,8 @@ CUresult CUDAAPI cuStreamWaitEvent(CUstream stream, CUevent event, unsigned int 
     using Fn = CUresult (CUDAAPI *)(CUstream, CUevent, unsigned int);
     auto real = next_fn<Fn>("cuStreamWaitEvent");
     if (internal_call() || !real) return real ? real(stream, event, flags) : CUDA_ERROR_NOT_SUPPORTED;
+    StreamPairScope pair_scope(stream);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
     return dispatch_async(stream, [=](void *native_stream) {
@@ -1858,9 +2557,12 @@ CUresult CUDAAPI cuStreamWaitEvent_ptsz(CUstream stream, CUevent event, unsigned
     using Fn = CUresult (CUDAAPI *)(CUstream, CUevent, unsigned int);
     auto real = next_fn<Fn>("cuStreamWaitEvent_ptsz");
     if (internal_call() || !real) return real ? real(stream, event, flags) : CUDA_ERROR_NOT_SUPPORTED;
+    const CUstream tracked = per_thread_tracking_stream(stream);
+    StreamPairScope pair_scope(tracked);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     const CUresult profile = require_pair_profile();
     if (profile != CUDA_SUCCESS) return profile;
-    return dispatch_async(per_thread_tracking_stream(stream), [=](void *) {
+    return dispatch_async(tracked, [=](void *) {
         return real(stream, event, flags);
     });
 }
@@ -1888,9 +2590,19 @@ extern "C" CUresult CUDAAPI cuMemAddressFree(CUdeviceptr ptr, size_t size) {
         auto real = next_fn<Fn>("cuMemAddressFree");
         return real ? real(ptr, size) : CUDA_ERROR_NOT_SUPPORTED;
     }
+    const int owner = memory_pair_for_range(reinterpret_cast<const void *>(ptr), size);
+    const uint32_t target_pair = owner < 0 ? current_pair() : static_cast<uint32_t>(owner);
+    ExplicitPairScope pair_scope(target_pair);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     if (!pair_memory_ready()) return ensure_pair_profile();
     auto fn = memory_fn<MemVmmAddressFree>("v200_memory_vmm_address_free");
     std::unique_lock<std::shared_mutex> use_lock(tracked_use_gate);
+    if (owner >= 0) {
+        const CUresult waited = wait_device_prefix();
+        if (waited != CUDA_SUCCESS) return waited;
+        const CUresult drained = synchronize_native_anchor();
+        if (drained != CUDA_SUCCESS) return drained;
+    }
     InternalCallScope bypass;
     return fn ? fn(ptr, size) : CUDA_ERROR_NOT_SUPPORTED;
 }
@@ -1940,6 +2652,10 @@ extern "C" CUresult CUDAAPI cuMemMap(CUdeviceptr ptr, size_t size, size_t offset
         auto real = next_fn<Fn>("cuMemMap");
         return real ? real(ptr, size, offset, handle, flags) : CUDA_ERROR_NOT_SUPPORTED;
     }
+    const int owner = memory_pair_for_range(reinterpret_cast<const void *>(ptr), size);
+    const uint32_t target_pair = owner < 0 ? current_pair() : static_cast<uint32_t>(owner);
+    ExplicitPairScope pair_scope(target_pair);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     if (!pair_memory_ready()) return ensure_pair_profile();
     auto fn = memory_fn<MemVmmMap>("v200_memory_vmm_map");
     CUresult result = CUDA_ERROR_NOT_SUPPORTED;
@@ -1966,6 +2682,10 @@ extern "C" CUresult CUDAAPI cuMemSetAccess(CUdeviceptr ptr, size_t size,
         InternalCallScope bypass;
         return real(ptr, size, desc, count);
     }
+    const int owner = memory_pair_for_range(reinterpret_cast<const void *>(ptr), size);
+    const uint32_t target_pair = owner < 0 ? current_pair() : static_cast<uint32_t>(owner);
+    ExplicitPairScope pair_scope(target_pair);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     if (!pair_memory_ready()) return ensure_pair_profile();
     auto fn = memory_fn<MemVmmSetAccess>("v200_memory_vmm_set_access");
     InternalCallScope bypass;
@@ -1978,15 +2698,23 @@ extern "C" CUresult CUDAAPI cuMemUnmap(CUdeviceptr ptr, size_t size) {
         auto real = next_fn<Fn>("cuMemUnmap");
         return real ? real(ptr, size) : CUDA_ERROR_NOT_SUPPORTED;
     }
+    const int owner = memory_pair_for_range(reinterpret_cast<const void *>(ptr), size);
+    const uint32_t target_pair = owner < 0 ? current_pair() : static_cast<uint32_t>(owner);
+    ExplicitPairScope pair_scope(target_pair);
+    if (pair_scope.status() != cudaSuccess) return driver_error_for(pair_scope.status());
     if (!pair_memory_ready()) return ensure_pair_profile();
-    const CUresult drained = synchronize_native_anchor();
-    if (drained != CUDA_SUCCESS) return drained;
     auto fn = memory_fn<MemVmmUnmap>("v200_memory_vmm_unmap");
     CUresult result = CUDA_ERROR_NOT_SUPPORTED;
     {
         std::unique_lock<std::shared_mutex> use_lock(tracked_use_gate);
-        InternalCallScope bypass;
-        result = fn ? fn(ptr, size) : CUDA_ERROR_NOT_SUPPORTED;
+        if (owner >= 0) {
+            result = wait_device_prefix();
+            if (result == CUDA_SUCCESS) result = synchronize_native_anchor();
+        }
+        if (result == CUDA_SUCCESS || owner < 0) {
+            InternalCallScope bypass;
+            result = fn ? fn(ptr, size) : CUDA_ERROR_NOT_SUPPORTED;
+        }
     }
     if (result == CUDA_SUCCESS) v200_frontdoor_snapshot("cu_mem_unmap");
     return result;
@@ -2037,6 +2765,114 @@ std::string json_string(const char *text, size_t limit) {
 }
 
 std::mutex profile_log_mutex;
+std::once_flag exit_snapshot_registration[2];
+
+void write_multi_pair_copy_event(uint32_t dst_pair, uint32_t src_pair,
+                                 size_t bytes, cudaError_t status,
+                                 double elapsed_ms, const char *route) {
+    const char *path = std::getenv("V200_PROFILE_LOG");
+    if (path == nullptr || path[0] == '\0') return;
+    char line[512];
+    const std::string route_json = json_string(route == nullptr ? "unknown" : route, 64);
+    const int count = std::snprintf(line, sizeof(line),
+        "{\"schema\":\"v200-multi-pair-copy/v1\",\"event\":\"cross_pair_copy\","
+        "\"dst_pair\":%u,\"src_pair\":%u,\"bytes\":%llu,\"status\":%d,"
+        "\"route\":%s,\"blocking\":true,\"elapsed_ms\":%.6f}\n",
+        dst_pair, src_pair, static_cast<unsigned long long>(bytes),
+        static_cast<int>(status), route_json.c_str(), elapsed_ms);
+    if (count <= 0 || static_cast<size_t>(count) >= sizeof(line)) return;
+    std::lock_guard<std::mutex> lock(profile_log_mutex);
+    const int fd = open(path, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0600);
+    if (fd < 0) return;
+    size_t written = 0;
+    while (written < static_cast<size_t>(count)) {
+        const ssize_t result = write(fd, line + written, static_cast<size_t>(count) - written);
+        if (result < 0 && errno == EINTR) continue;
+        if (result <= 0) break;
+        written += static_cast<size_t>(result);
+    }
+    close(fd);
+}
+
+void write_exit_pair_snapshot(uint32_t pair) {
+    const char *path = std::getenv("V200_PROFILE_LOG");
+    if (path == nullptr || path[0] == '\0') return;
+    using GetProfile = CUresult (*)(uint32_t, v200_memory_pair_profile *);
+    using GetUsage = CUresult (*)(uint32_t, v200_memory_usage_info *);
+    auto get_profile = memory_fn<GetProfile>("v200_memory_get_profile_for_pair");
+    auto get_usage = memory_fn<GetUsage>("v200_memory_get_usage_for_pair");
+    if (get_profile == nullptr || get_usage == nullptr) return;
+    {
+        std::lock_guard<std::mutex> lock(profile_mutex);
+        if (pair >= 2 || profile_state[pair] != 2) return;
+    }
+    v200_memory_pair_profile profile{};
+    profile.abi_version = V200_MEMORY_ABI_VERSION;
+    profile.struct_size = sizeof(profile);
+    v200_memory_usage_info usage{};
+    usage.abi_version = V200_MEMORY_ABI_VERSION;
+    usage.struct_size = sizeof(usage);
+    if (get_profile(pair, &profile) != CUDA_SUCCESS ||
+        get_usage(pair, &usage) != CUDA_SUCCESS) return;
+    const std::string anchor = json_string(profile.owner_uuid[0], sizeof(profile.owner_uuid[0]));
+    const std::string peer = json_string(profile.owner_uuid[1], sizeof(profile.owner_uuid[1]));
+    const std::string qualification = json_string(profile.qualification_id,
+                                                   sizeof(profile.qualification_id));
+    char line[2048];
+    const int count = std::snprintf(line, sizeof(line),
+        "{\"schema\":\"v200-frontdoor-ledger/v1\",\"event\":\"process_exit_final\","
+        "\"mode\":\"%s\",\"pair_index\":%u,\"anchor_uuid\":%s,\"peer_uuid\":%s,"
+        "\"qualification_id\":%s,\"owner_budget_bytes\":[%llu,%llu],"
+        "\"owner_used_bytes\":[%llu,%llu],\"live_allocation_count\":%llu,"
+        "\"live_reservation_count\":%llu,\"cleanup_pending_count\":%llu}\n",
+        mode_name(current_mode()), pair, anchor.c_str(), peer.c_str(), qualification.c_str(),
+        static_cast<unsigned long long>(usage.owner_budget_bytes[0]),
+        static_cast<unsigned long long>(usage.owner_budget_bytes[1]),
+        static_cast<unsigned long long>(usage.owner_used_bytes[0]),
+        static_cast<unsigned long long>(usage.owner_used_bytes[1]),
+        static_cast<unsigned long long>(usage.live_allocation_count),
+        static_cast<unsigned long long>(usage.live_reservation_count),
+        static_cast<unsigned long long>(usage.cleanup_pending_count));
+    if (count <= 0 || static_cast<size_t>(count) >= sizeof(line)) return;
+    std::lock_guard<std::mutex> lock(profile_log_mutex);
+    const int fd = open(path, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0600);
+    if (fd < 0) return;
+    size_t written = 0;
+    while (written < static_cast<size_t>(count)) {
+        const ssize_t result = write(fd, line + written, static_cast<size_t>(count) - written);
+        if (result < 0 && errno == EINTR) continue;
+        if (result <= 0) break;
+        written += static_cast<size_t>(result);
+    }
+    close(fd);
+}
+
+void write_exit_pair0_snapshot() { write_exit_pair_snapshot(0); }
+void write_exit_pair1_snapshot() { write_exit_pair_snapshot(1); }
+
+void register_process_exit_snapshot(uint32_t pair) {
+    if (pair >= 2) return;
+    // Prime both symbol lookup caches and the manager's pair query path before
+    // registering the callback; function-local static destructors therefore
+    // remain ordered after this final query.
+    using GetProfile = CUresult (*)(uint32_t, v200_memory_pair_profile *);
+    using GetUsage = CUresult (*)(uint32_t, v200_memory_usage_info *);
+    auto get_profile = memory_fn<GetProfile>("v200_memory_get_profile_for_pair");
+    auto get_usage = memory_fn<GetUsage>("v200_memory_get_usage_for_pair");
+    if (get_profile == nullptr || get_usage == nullptr) return;
+    v200_memory_pair_profile profile{};
+    profile.abi_version = V200_MEMORY_ABI_VERSION;
+    profile.struct_size = sizeof(profile);
+    v200_memory_usage_info usage{};
+    usage.abi_version = V200_MEMORY_ABI_VERSION;
+    usage.struct_size = sizeof(usage);
+    if (get_profile(pair, &profile) != CUDA_SUCCESS ||
+        get_usage(pair, &usage) != CUDA_SUCCESS) return;
+    std::call_once(exit_snapshot_registration[pair], [pair] {
+        (void)std::atexit(pair == 0 ? write_exit_pair0_snapshot
+                                    : write_exit_pair1_snapshot);
+    });
+}
 
 void write_profile_snapshot(const char *event_name) {
     const char *path = std::getenv("V200_PROFILE_LOG");

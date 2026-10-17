@@ -643,6 +643,28 @@ while True:
             self.assertEqual(saved["allocation_evidence"]["native_limit_enforcement"],
                              "descriptor-based preflight only; no native allocator ledger")
 
+    def test_correct_response_does_not_hide_failed_server_teardown(self) -> None:
+        fixture, profile = consumer.load_documents()
+        fake = Path(__file__).with_name("fake_server.py")
+
+        def fake_popen(argv: list[str], **kwargs: object) -> subprocess.Popen[bytes]:
+            port = argv[argv.index("--port") + 1]
+            return subprocess.Popen([sys.executable, "-u", str(fake), port], **kwargs)
+
+        with tempfile.TemporaryDirectory() as directory:
+            result = consumer._run_one(
+                "smoke", "native_single", fixture, profile, {"test_identity": "fake"},
+                ["GPU-aaaaaaaa"], Path(directory), preloads=None, monitor=False,
+                environ={**os.environ, "V200_FAKE_EXIT_ON_TERM": "1"},
+                popen_factory=fake_popen)
+            self.assertEqual(result["response"]["normalized_content"], "2")
+            self.assertTrue(result["cleanup"]["no_live_group_members"])
+            self.assertEqual(result["server_process"]["exit_code"], 139)
+            self.assertEqual(result["application_status"], "FAIL")
+            self.assertIn("exited unsuccessfully", result["failure"])
+            saved = json.loads(Path(result["result_path"]).read_text())
+            self.assertEqual(saved["application_status"], "FAIL")
+
     def test_finite_serve_mode_keeps_verified_loopback_server_alive_then_cleans_it(self) -> None:
         fixture, profile = consumer.load_documents()
         fake = Path(__file__).with_name("fake_server.py")

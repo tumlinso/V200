@@ -28,8 +28,23 @@ constexpr const char *q4k_mmvq_name =
     "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb0ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
 constexpr const char *q4k_mmvq_gate_name =
     "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb1ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
+constexpr const char *q6k_mmvq_name =
+    "_Z13mul_mat_vec_qIL9ggml_type14ELi1ELb0ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
+constexpr const char *q6k_mmvq_gate_name =
+    "_Z13mul_mat_vec_qIL9ggml_type14ELi1ELb1ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
+constexpr const char *q4k_mmvq_small_k_name =
+    "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb0ELb1ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
+constexpr const char *q4k_mmvq_gate_small_k_name =
+    "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb1ELb1ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
+constexpr const char *q6k_mmvq_small_k_name =
+    "_Z13mul_mat_vec_qIL9ggml_type14ELi1ELb0ELb1ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
+constexpr const char *q6k_mmvq_gate_small_k_name =
+    "_Z13mul_mat_vec_qIL9ggml_type14ELi1ELb1ELb1ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj";
 constexpr size_t q4k_block_bytes = 144;
 constexpr uint32_t q4k_block_elements = 256;
+constexpr size_t q6k_block_bytes = 210;
+constexpr uint32_t q6k_block_elements = 256;
+constexpr uint32_t minimum_expert_columns = 768;
 constexpr size_t q8_1_block_bytes = 36;
 constexpr uint32_t q8_1_block_elements = 32;
 constexpr size_t minimum_peer_active_weight_bytes = 4 * 1024 * 1024;
@@ -100,7 +115,98 @@ struct OperatorCounters {
     std::atomic<uint64_t> expert_fused_verified_calls{0};
     std::atomic<uint64_t> expert_fused_verified_outputs{0};
     std::atomic<uint64_t> expert_verification_failures{0};
+    std::atomic<uint64_t> expert_extended_peer_owner_calls{0};
+    std::atomic<uint64_t> expert_extended_plain_verified_calls{0};
+    std::atomic<uint64_t> expert_extended_plain_verified_outputs{0};
+    std::atomic<uint64_t> expert_plain_peer_owner_calls{0};
+    std::atomic<uint64_t> expert_fused_peer_owner_calls{0};
 };
+
+struct Q6ExpertCounters {
+    std::atomic<uint64_t> matched_calls{0};
+    std::atomic<uint64_t> anchor_local_calls{0};
+    std::atomic<uint64_t> peer_owner_calls{0};
+    std::atomic<uint64_t> small_peer_fallback_calls{0};
+    std::atomic<uint64_t> rows{0};
+    std::atomic<uint64_t> anchor_rows{0};
+    std::atomic<uint64_t> peer_rows{0};
+    std::atomic<uint64_t> plain_peer_owner_calls{0};
+    std::atomic<uint64_t> fused_peer_owner_calls{0};
+    std::atomic<uint64_t> verified_calls{0};
+    std::atomic<uint64_t> verified_outputs{0};
+    std::atomic<uint64_t> plain_verified_calls{0};
+    std::atomic<uint64_t> plain_verified_outputs{0};
+    std::atomic<uint64_t> fused_verified_calls{0};
+    std::atomic<uint64_t> fused_verified_outputs{0};
+    std::atomic<uint64_t> verification_failures{0};
+};
+
+void append_operator_line(const char *path, const char *line, size_t count) noexcept {
+    if (path == nullptr || line == nullptr || count == 0) return;
+    static std::mutex *write_mutex = new std::mutex();
+    std::lock_guard<std::mutex> lock(*write_mutex);
+    const int fd = open(path, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0600);
+    if (fd < 0) return;
+    size_t written = 0;
+    while (written < count) {
+        const ssize_t result = write(fd, line + written, count - written);
+        if (result < 0 && errno == EINTR) continue;
+        if (result <= 0) break;
+        written += static_cast<size_t>(result);
+    }
+    close(fd);
+}
+
+void write_q6_expert_event(const char *event, const char *route,
+                           const Q6ExpertCounters &counters,
+                           float max_abs_error, int status) noexcept {
+    const char *path = std::getenv("V200_PROFILE_LOG");
+    if (path == nullptr || path[0] == '\0') return;
+    char line[2048];
+    const int count = std::snprintf(
+        line, sizeof(line),
+        "{\"schema\":\"v200-operator-ledger/v1\",\"event\":\"%s\","
+        "\"operation\":\"q6k_mmvq_expert\",\"route\":\"%s\","
+        "\"matched_calls\":%llu,\"anchor_local_calls\":%llu,"
+        "\"peer_owner_calls\":%llu,\"split_calls\":0,"
+        "\"anchor_rows\":%llu,\"peer_rows\":%llu,"
+        "\"verified_rows\":%llu,"
+        "\"q6_expert_matched_calls\":%llu,\"q6_expert_anchor_local_calls\":%llu,"
+        "\"q6_expert_peer_owner_calls\":%llu,\"q6_expert_small_peer_fallback_calls\":%llu,"
+        "\"q6_expert_rows\":%llu,\"q6_expert_anchor_rows\":%llu,"
+        "\"q6_expert_peer_rows\":%llu,\"q6_expert_plain_peer_owner_calls\":%llu,"
+        "\"q6_expert_fused_peer_owner_calls\":%llu,\"q6_expert_verified_calls\":%llu,"
+        "\"q6_expert_verified_outputs\":%llu,\"q6_expert_plain_verified_calls\":%llu,"
+        "\"q6_expert_plain_verified_outputs\":%llu,\"q6_expert_fused_verified_calls\":%llu,"
+        "\"q6_expert_fused_verified_outputs\":%llu,"
+        "\"q6_expert_verification_failures\":%llu,\"max_abs_error\":%.9g,\"status\":%d}\n",
+        event, route,
+        static_cast<unsigned long long>(counters.matched_calls.load()),
+        static_cast<unsigned long long>(counters.anchor_local_calls.load()),
+        static_cast<unsigned long long>(counters.peer_owner_calls.load()),
+        static_cast<unsigned long long>(counters.anchor_rows.load()),
+        static_cast<unsigned long long>(counters.peer_rows.load()),
+        static_cast<unsigned long long>(counters.verified_outputs.load()),
+        static_cast<unsigned long long>(counters.matched_calls.load()),
+        static_cast<unsigned long long>(counters.anchor_local_calls.load()),
+        static_cast<unsigned long long>(counters.peer_owner_calls.load()),
+        static_cast<unsigned long long>(counters.small_peer_fallback_calls.load()),
+        static_cast<unsigned long long>(counters.rows.load()),
+        static_cast<unsigned long long>(counters.anchor_rows.load()),
+        static_cast<unsigned long long>(counters.peer_rows.load()),
+        static_cast<unsigned long long>(counters.plain_peer_owner_calls.load()),
+        static_cast<unsigned long long>(counters.fused_peer_owner_calls.load()),
+        static_cast<unsigned long long>(counters.verified_calls.load()),
+        static_cast<unsigned long long>(counters.verified_outputs.load()),
+        static_cast<unsigned long long>(counters.plain_verified_calls.load()),
+        static_cast<unsigned long long>(counters.plain_verified_outputs.load()),
+        static_cast<unsigned long long>(counters.fused_verified_calls.load()),
+        static_cast<unsigned long long>(counters.fused_verified_outputs.load()),
+        static_cast<unsigned long long>(counters.verification_failures.load()),
+        max_abs_error, status);
+    if (count <= 0 || static_cast<size_t>(count) >= sizeof(line)) return;
+    append_operator_line(path, line, static_cast<size_t>(count));
+}
 
 void write_operator_event(const char *event, const char *route,
                           uint64_t matched_calls, uint64_t anchor_local_calls,
@@ -120,10 +226,15 @@ void write_operator_event(const char *event, const char *route,
                           uint64_t expert_plain_verified_outputs = 0,
                           uint64_t expert_fused_verified_calls = 0,
                           uint64_t expert_fused_verified_outputs = 0,
-                          uint64_t expert_verification_failures = 0) noexcept {
+                          uint64_t expert_verification_failures = 0,
+                          uint64_t expert_extended_peer_owner_calls = 0,
+                          uint64_t expert_extended_plain_verified_calls = 0,
+                          uint64_t expert_extended_plain_verified_outputs = 0,
+                          uint64_t expert_plain_peer_owner_calls = 0,
+                          uint64_t expert_fused_peer_owner_calls = 0) noexcept {
     const char *path = std::getenv("V200_PROFILE_LOG");
     if (path == nullptr || path[0] == '\0') return;
-    char line[1536];
+    char line[2048];
     const int count = std::snprintf(
         line, sizeof(line),
         "{\"schema\":\"v200-operator-ledger/v1\",\"event\":\"%s\","
@@ -141,7 +252,12 @@ void write_operator_event(const char *event, const char *route,
         "\"expert_plain_verified_outputs\":%llu,"
         "\"expert_fused_verified_calls\":%llu,"
         "\"expert_fused_verified_outputs\":%llu,"
-        "\"expert_verification_failures\":%llu}\n",
+        "\"expert_verification_failures\":%llu,"
+        "\"expert_extended_peer_owner_calls\":%llu,"
+        "\"expert_extended_plain_verified_calls\":%llu,"
+        "\"expert_extended_plain_verified_outputs\":%llu,"
+        "\"expert_plain_peer_owner_calls\":%llu,"
+        "\"expert_fused_peer_owner_calls\":%llu}\n",
         event, route,
         static_cast<unsigned long long>(matched_calls),
         static_cast<unsigned long long>(anchor_local_calls),
@@ -163,21 +279,14 @@ void write_operator_event(const char *event, const char *route,
         static_cast<unsigned long long>(expert_plain_verified_outputs),
         static_cast<unsigned long long>(expert_fused_verified_calls),
         static_cast<unsigned long long>(expert_fused_verified_outputs),
-        static_cast<unsigned long long>(expert_verification_failures));
+        static_cast<unsigned long long>(expert_verification_failures),
+        static_cast<unsigned long long>(expert_extended_peer_owner_calls),
+        static_cast<unsigned long long>(expert_extended_plain_verified_calls),
+        static_cast<unsigned long long>(expert_extended_plain_verified_outputs),
+        static_cast<unsigned long long>(expert_plain_peer_owner_calls),
+        static_cast<unsigned long long>(expert_fused_peer_owner_calls));
     if (count <= 0 || static_cast<size_t>(count) >= sizeof(line)) return;
-
-    static std::mutex *write_mutex = new std::mutex();
-    std::lock_guard<std::mutex> lock(*write_mutex);
-    const int fd = open(path, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0600);
-    if (fd < 0) return;
-    size_t written = 0;
-    while (written < static_cast<size_t>(count)) {
-        const ssize_t result = write(fd, line + written, static_cast<size_t>(count) - written);
-        if (result < 0 && errno == EINTR) continue;
-        if (result <= 0) break;
-        written += static_cast<size_t>(result);
-    }
-    close(fd);
+    append_operator_line(path, line, static_cast<size_t>(count));
 }
 
 OperatorCounters &operator_counters() {
@@ -203,7 +312,26 @@ OperatorCounters &operator_counters() {
                 final.expert_plain_verified_outputs.load(),
                 final.expert_fused_verified_calls.load(),
                 final.expert_fused_verified_outputs.load(),
-                final.expert_verification_failures.load());
+                final.expert_verification_failures.load(),
+                final.expert_extended_peer_owner_calls.load(),
+                final.expert_extended_plain_verified_calls.load(),
+                final.expert_extended_plain_verified_outputs.load(),
+                final.expert_plain_peer_owner_calls.load(),
+                final.expert_fused_peer_owner_calls.load());
+        }) == 0;
+    }();
+    (void)exit_report_registered;
+    return counters;
+}
+
+Q6ExpertCounters &q6_expert_counters() {
+    static Q6ExpertCounters counters;
+    static const bool exit_report_registered = [] {
+        return std::atexit([] {
+            write_q6_expert_event("q6k_mmvq_expert_process_exit", "summary",
+                                  q6_expert_counters(), -1.0f,
+                                  q6_expert_counters().verification_failures.load() == 0
+                                      ? 0 : 1);
         }) == 0;
     }();
     (void)exit_report_registered;
@@ -448,13 +576,92 @@ void **argument_addresses(Q4KMmvqArgs &args, std::array<void *, 19> &addresses) 
 enum class MmvqFamily : uint32_t {
     q4k_plain = V200_OPERATOR_MMVQ_Q4K_PLAIN,
     q4k_gate_fused = V200_OPERATOR_MMVQ_Q4K_GATE_FUSED,
+    q6k_plain = V200_OPERATOR_MMVQ_Q6K_PLAIN,
+    q6k_gate_fused = V200_OPERATOR_MMVQ_Q6K_GATE_FUSED,
 };
+
+bool describe_mmvq_name(const char *name,
+                        v200_operator_mmvq_kernel_descriptor *descriptor) noexcept {
+    if (name == nullptr || descriptor == nullptr) return false;
+    v200_operator_mmvq_kernel_descriptor result{};
+    if (std::strcmp(name, q4k_mmvq_name) == 0) {
+        result.family = V200_OPERATOR_MMVQ_Q4K_PLAIN;
+        result.quant_block_elements = q4k_block_elements;
+        result.quant_block_bytes = q4k_block_bytes;
+        result.minimum_expert_columns = minimum_expert_columns;
+        result.output_rows_per_block = 1;
+    } else if (std::strcmp(name, q4k_mmvq_gate_name) == 0) {
+        result.family = V200_OPERATOR_MMVQ_Q4K_GATE_FUSED;
+        result.quant_block_elements = q4k_block_elements;
+        result.quant_block_bytes = q4k_block_bytes;
+        result.minimum_expert_columns = minimum_expert_columns;
+        result.output_rows_per_block = 1;
+    } else if (std::strcmp(name, q4k_mmvq_small_k_name) == 0) {
+        result.family = V200_OPERATOR_MMVQ_Q4K_PLAIN;
+        result.quant_block_elements = q4k_block_elements;
+        result.quant_block_bytes = q4k_block_bytes;
+        result.minimum_expert_columns = minimum_expert_columns;
+        result.output_rows_per_block = 4;
+    } else if (std::strcmp(name, q4k_mmvq_gate_small_k_name) == 0) {
+        result.family = V200_OPERATOR_MMVQ_Q4K_GATE_FUSED;
+        result.quant_block_elements = q4k_block_elements;
+        result.quant_block_bytes = q4k_block_bytes;
+        result.minimum_expert_columns = minimum_expert_columns;
+        result.output_rows_per_block = 4;
+    } else if (std::strcmp(name, q6k_mmvq_name) == 0) {
+        result.family = V200_OPERATOR_MMVQ_Q6K_PLAIN;
+        result.quant_block_elements = q6k_block_elements;
+        result.quant_block_bytes = q6k_block_bytes;
+        result.minimum_expert_columns = minimum_expert_columns;
+        result.output_rows_per_block = 1;
+    } else if (std::strcmp(name, q6k_mmvq_gate_name) == 0) {
+        result.family = V200_OPERATOR_MMVQ_Q6K_GATE_FUSED;
+        result.quant_block_elements = q6k_block_elements;
+        result.quant_block_bytes = q6k_block_bytes;
+        result.minimum_expert_columns = minimum_expert_columns;
+        result.output_rows_per_block = 1;
+    } else if (std::strcmp(name, q6k_mmvq_small_k_name) == 0) {
+        result.family = V200_OPERATOR_MMVQ_Q6K_PLAIN;
+        result.quant_block_elements = q6k_block_elements;
+        result.quant_block_bytes = q6k_block_bytes;
+        result.minimum_expert_columns = minimum_expert_columns;
+        result.output_rows_per_block = 4;
+    } else if (std::strcmp(name, q6k_mmvq_gate_small_k_name) == 0) {
+        result.family = V200_OPERATOR_MMVQ_Q6K_GATE_FUSED;
+        result.quant_block_elements = q6k_block_elements;
+        result.quant_block_bytes = q6k_block_bytes;
+        result.minimum_expert_columns = minimum_expert_columns;
+        result.output_rows_per_block = 4;
+    } else {
+        return false;
+    }
+    *descriptor = result;
+    return true;
+}
+
+bool is_q6_family(MmvqFamily family) noexcept {
+    return family == MmvqFamily::q6k_plain ||
+           family == MmvqFamily::q6k_gate_fused;
+}
+
+bool is_gate_fused_family(MmvqFamily family) noexcept {
+    return family == MmvqFamily::q4k_gate_fused ||
+           family == MmvqFamily::q6k_gate_fused;
+}
+
+bool extended_expert_compute_enabled() noexcept {
+    const char *enabled = std::getenv("V200_EXTENDED_EXPERT_COMPUTE");
+    return enabled != nullptr && std::strcmp(enabled, "1") == 0;
+}
 
 struct ExpertBankCandidate {
     Q4KMmvqArgs args{};
     v200_memory_pair_profile profile{};
     uint32_t owner_index = 0;
     MmvqFamily family = MmvqFamily::q4k_plain;
+    uint32_t quant_block_elements = 0;
+    size_t quant_block_bytes = 0;
+    uint32_t output_rows_per_block = 1;
     size_t bank_bytes = 0;
     size_t active_weight_bytes = 0;
     uint64_t rows = 0;
@@ -504,30 +711,34 @@ bool prepare_expert_bank_candidate(const void *host_function, dim3 grid,
     }
 
     const std::string name = registered_kernel_name(host_function);
-    MmvqFamily family{};
-    if (name == q4k_mmvq_name) {
-        family = MmvqFamily::q4k_plain;
-    } else if (name == q4k_mmvq_gate_name) {
-        family = MmvqFamily::q4k_gate_fused;
-    } else {
-        return false;
-    }
+    v200_operator_mmvq_kernel_descriptor descriptor{};
+    if (!describe_mmvq_name(name.c_str(), &descriptor)) return false;
+    const MmvqFamily family = static_cast<MmvqFamily>(descriptor.family);
+    const bool q6 = is_q6_family(family);
+    const bool extended_enabled = extended_expert_compute_enabled();
+    if (q6 && !extended_enabled) return false;
 
     ExpertBankCandidate candidate{};
     candidate.family = family;
+    candidate.quant_block_elements = descriptor.quant_block_elements;
+    candidate.quant_block_bytes = descriptor.quant_block_bytes;
+    candidate.output_rows_per_block = descriptor.output_rows_per_block;
     if (!capture_q4k_arguments(arguments, &candidate.args)) return false;
     const Q4KMmvqArgs &args = candidate.args;
     if (args.ids == nullptr || args.vx == nullptr || args.vy == nullptr ||
-        args.dst == nullptr || args.ncols_x < 2048 ||
-        args.ncols_x % q4k_block_elements != 0 ||
+        args.dst == nullptr || args.ncols_x < descriptor.minimum_expert_columns ||
+        (!q6 && args.ncols_x < 2048 && !extended_enabled) ||
+        args.ncols_x % descriptor.quant_block_elements != 0 ||
         args.ncols_x % q8_1_block_elements != 0 || args.stride_row_x == 0 ||
-        args.stride_row_x > SIZE_MAX / q4k_block_bytes ||
-        static_cast<size_t>(args.stride_row_x) * q4k_block_elements != args.ncols_x ||
+        (descriptor.output_rows_per_block != 1 &&
+         descriptor.output_rows_per_block != 4) ||
+        args.stride_row_x > SIZE_MAX / descriptor.quant_block_bytes ||
+        static_cast<size_t>(args.stride_row_x) * descriptor.quant_block_elements != args.ncols_x ||
         args.stride_sample_x == 0 || args.stride_channel_y == 0 ||
-        args.nchannels_y.z == 0 || args.stride_channel_dst < grid.x) {
+        args.nchannels_y.z == 0 || args.stride_col_dst == 0) {
         return false;
     }
-    if (family == MmvqFamily::q4k_plain) {
+    if (!is_gate_fused_family(family)) {
         if (!all_null(args.fusion)) return false;
     } else if (args.fusion.gate == nullptr || args.fusion.x_bias != nullptr ||
                args.fusion.gate_bias != nullptr || args.fusion.x_scale != nullptr ||
@@ -537,6 +748,8 @@ bool prepare_expert_bank_candidate(const void *host_function, dim3 grid,
 
     size_t row_bytes = 0;
     size_t active_rows = 0;
+    size_t grid_rows = 0;
+    size_t output_rows_per_channel = 0;
     size_t id_bytes = 0;
     size_t blocks_per_input = 0;
     size_t last_input_channel = 0;
@@ -544,10 +757,16 @@ bool prepare_expert_bank_candidate(const void *host_function, dim3 grid,
     size_t one_expert_bytes = 0;
     size_t output_elements = 0;
     size_t output_offset = 0;
-    if (!checked_multiply(args.stride_row_x, q4k_block_bytes, &row_bytes) ||
-        !checked_multiply(grid.x, grid.y, &active_rows) ||
+    if (!checked_multiply(args.stride_row_x, descriptor.quant_block_bytes, &row_bytes) ||
+        !checked_multiply(grid.x, candidate.output_rows_per_block, &grid_rows)) {
+        return false;
+    }
+    output_rows_per_channel = std::min(grid_rows, static_cast<size_t>(args.stride_col_dst));
+    if (output_rows_per_channel == 0 ||
+        args.stride_channel_dst < output_rows_per_channel ||
+        !checked_multiply(output_rows_per_channel, grid.y, &active_rows) ||
         !checked_multiply(active_rows, row_bytes, &candidate.active_weight_bytes) ||
-        !checked_multiply(grid.x, row_bytes, &one_expert_bytes) ||
+        !checked_multiply(output_rows_per_channel, row_bytes, &one_expert_bytes) ||
         !checked_multiply(grid.y, sizeof(int32_t), &id_bytes) ||
         !checked_multiply(args.ncols_x / q8_1_block_elements,
                           q8_1_block_bytes, &blocks_per_input) ||
@@ -558,11 +777,11 @@ bool prepare_expert_bank_candidate(const void *host_function, dim3 grid,
         !checked_add(last_input_offset_bytes, blocks_per_input,
                      &candidate.input_bytes) ||
         !checked_multiply(grid.y - 1, args.stride_channel_dst, &output_offset) ||
-        !checked_add(output_offset, grid.x, &output_elements) ||
+        !checked_add(output_offset, output_rows_per_channel, &output_elements) ||
         !checked_multiply(output_elements, sizeof(float), &candidate.output_bytes) ||
         !checked_add(candidate.input_bytes, candidate.output_bytes,
                      &candidate.remote_transfer_bytes) ||
-        !checked_multiply(args.stride_sample_x, q4k_block_bytes,
+        !checked_multiply(args.stride_sample_x, descriptor.quant_block_bytes,
                           &candidate.bank_bytes)) {
         return false;
     }
@@ -602,7 +821,7 @@ bool prepare_expert_bank_candidate(const void *host_function, dim3 grid,
                                     candidate.profile, &candidate.owner_index)) {
         return false;
     }
-    if (family == MmvqFamily::q4k_gate_fused) {
+    if (is_gate_fused_family(family)) {
         v200_allocation_info gate_allocation{};
         uint32_t gate_owner = 0;
         if (!query_pair_managed_range(args.fusion.gate, candidate.bank_bytes,
@@ -632,12 +851,128 @@ bool above_peer_work_threshold(const ExpertBankCandidate &candidate) noexcept {
            candidate.active_weight_bytes >= threshold;
 }
 
+int try_launch_q6_expert_bank(const void *host_function, dim3 grid, dim3 block,
+                              void **arguments, size_t shared_bytes,
+                              cudaStream_t anchor_stream,
+                              v200_operator_native_launch_fn native_launch,
+                              cudaError_t *status) noexcept {
+    if (status == nullptr || v200_frontdoor_mode() != 2 ||
+        !extended_expert_compute_enabled()) return 0;
+    ExpertBankCandidate candidate{};
+    if (!prepare_expert_bank_candidate(host_function, grid, block, arguments,
+                                       &candidate) ||
+        !is_q6_family(candidate.family)) {
+        return 0;
+    }
+
+    Q6ExpertCounters &counters = q6_expert_counters();
+    counters.matched_calls.fetch_add(1);
+    if (candidate.owner_index == 0 || !above_peer_work_threshold(candidate)) {
+        const uint64_t local = counters.anchor_local_calls.fetch_add(1) + 1;
+        counters.anchor_rows.fetch_add(candidate.rows);
+        if (candidate.owner_index == 1)
+            counters.small_peer_fallback_calls.fetch_add(1);
+        if (local == 1 || (local % 64) == 0) {
+            write_q6_expert_event(
+                candidate.owner_index == 0 ? "q6k_mmvq_expert_anchor_bank"
+                                           : "q6k_mmvq_expert_small_peer_fallback",
+                candidate.owner_index == 0 ? "anchor-owner" : "small-peer-fallback",
+                counters, -1.0f, 0);
+            if (local == 1)
+                v200_frontdoor_snapshot("operator_q6k_mmvq_expert_anchor");
+        }
+        return 0;
+    }
+
+    v200::operators::OwnerPartition partition{};
+    partition.device = candidate.profile.owner_device[candidate.owner_index];
+    partition.grid = grid;
+    partition.arguments = arguments;
+    static std::atomic<bool> plain_verification_attempted{false};
+    static std::atomic<bool> fused_verification_attempted{false};
+    const char *verify_enabled = std::getenv("V200_OPERATOR_VERIFY");
+    const bool verify_requested = verify_enabled != nullptr &&
+        std::strcmp(verify_enabled, "1") == 0 &&
+        candidate.output_bytes <= max_verify_output_bytes;
+    std::atomic<bool> &verify_attempted =
+        candidate.family == MmvqFamily::q6k_plain
+            ? plain_verification_attempted : fused_verification_attempted;
+    const bool verify_this_route = verify_requested &&
+                                   !verify_attempted.exchange(true);
+    VerificationResult verification{};
+    if (verify_this_route) {
+        verification = verify_owner_launch(
+            host_function, grid, block, arguments, shared_bytes, anchor_stream,
+            native_launch, &partition, 1, candidate.args.dst,
+            candidate.output_bytes);
+    }
+    if (!verification.performed) {
+        *status = v200::operators::launch_owner_partitions(
+            &partition, 1, host_function, block, shared_bytes, anchor_stream,
+            native_launch);
+    } else {
+        *status = verification.status;
+    }
+
+    const bool launch_succeeded = verification.performed
+        ? verification.partition_launch_succeeded : *status == cudaSuccess;
+    const bool verification_failed = verification.mismatch ||
+        (verification.performed && verification.status != cudaSuccess);
+    if (verification_failed)
+        counters.verification_failures.fetch_add(1);
+    if (verification.compared) {
+        const uint64_t output_count = candidate.output_bytes / sizeof(float);
+        counters.verified_calls.fetch_add(1);
+        counters.verified_outputs.fetch_add(output_count);
+        if (candidate.family == MmvqFamily::q6k_plain) {
+            counters.plain_verified_calls.fetch_add(1);
+            counters.plain_verified_outputs.fetch_add(output_count);
+        } else {
+            counters.fused_verified_calls.fetch_add(1);
+            counters.fused_verified_outputs.fetch_add(output_count);
+        }
+    }
+    uint64_t peer_calls = counters.peer_owner_calls.load();
+    if (launch_succeeded) {
+        peer_calls = counters.peer_owner_calls.fetch_add(1) + 1;
+        counters.rows.fetch_add(candidate.rows);
+        counters.peer_rows.fetch_add(candidate.rows);
+        if (candidate.family == MmvqFamily::q6k_plain)
+            counters.plain_peer_owner_calls.fetch_add(1);
+        else
+            counters.fused_peer_owner_calls.fetch_add(1);
+    }
+    if (launch_succeeded || verification.performed) {
+        if (peer_calls == 1 || (peer_calls % 64) == 0 || verification.performed ||
+            verification_failed) {
+            write_q6_expert_event(
+                verification_failed ? "q6k_mmvq_expert_verification_failed"
+                    : verification.performed ? "q6k_mmvq_expert_verification"
+                                             : "q6k_mmvq_expert_peer_bank",
+                candidate.family == MmvqFamily::q6k_plain
+                    ? "peer-bank-plain" : "peer-bank-gate-fused",
+                counters, verification.max_abs_error, *status);
+            if (peer_calls == 1 || verification.performed || verification_failed)
+                v200_frontdoor_snapshot("operator_q6k_mmvq_expert_peer_bank");
+        }
+    }
+    return 1;
+}
+
 int try_launch_expert_bank(const void *host_function, dim3 grid, dim3 block,
                            void **arguments, size_t shared_bytes,
                            cudaStream_t anchor_stream,
                            v200_operator_native_launch_fn native_launch,
                            cudaError_t *status) noexcept {
     if (status == nullptr || v200_frontdoor_mode() != 2) return 0;
+    const std::string registered_name = registered_kernel_name(host_function);
+    v200_operator_mmvq_kernel_descriptor registered_descriptor{};
+    if (describe_mmvq_name(registered_name.c_str(), &registered_descriptor) &&
+        is_q6_family(static_cast<MmvqFamily>(registered_descriptor.family))) {
+        return try_launch_q6_expert_bank(host_function, grid, block, arguments,
+                                         shared_bytes, anchor_stream,
+                                         native_launch, status);
+    }
     ExpertBankCandidate candidate{};
     if (!prepare_expert_bank_candidate(host_function, grid, block, arguments,
                                        &candidate)) {
@@ -671,7 +1006,12 @@ int try_launch_expert_bank(const void *host_function, dim3 grid, dim3 block,
                 counters.expert_plain_verified_outputs.load(),
                 counters.expert_fused_verified_calls.load(),
                 counters.expert_fused_verified_outputs.load(),
-                counters.expert_verification_failures.load());
+                counters.expert_verification_failures.load(),
+                counters.expert_extended_peer_owner_calls.load(),
+                counters.expert_extended_plain_verified_calls.load(),
+                counters.expert_extended_plain_verified_outputs.load(),
+                counters.expert_plain_peer_owner_calls.load(),
+                counters.expert_fused_peer_owner_calls.load());
             if (local == 1)
                 v200_frontdoor_snapshot("operator_q4k_mmvq_expert_anchor");
         }
@@ -725,12 +1065,23 @@ int try_launch_expert_bank(const void *host_function, dim3 grid, dim3 block,
             counters.expert_fused_verified_calls.fetch_add(1);
             counters.expert_fused_verified_outputs.fetch_add(output_count);
         }
+        if (candidate.args.ncols_x < 2048 &&
+            candidate.family == MmvqFamily::q4k_plain) {
+            counters.expert_extended_plain_verified_calls.fetch_add(1);
+            counters.expert_extended_plain_verified_outputs.fetch_add(output_count);
+        }
     }
     uint64_t peer_calls = counters.expert_peer_owner_calls.load();
     if (launch_succeeded) {
         peer_calls = counters.expert_peer_owner_calls.fetch_add(1) + 1;
         counters.expert_rows.fetch_add(candidate.rows);
         counters.expert_peer_rows.fetch_add(candidate.rows);
+        if (candidate.family == MmvqFamily::q4k_plain)
+            counters.expert_plain_peer_owner_calls.fetch_add(1);
+        else
+            counters.expert_fused_peer_owner_calls.fetch_add(1);
+        if (candidate.args.ncols_x < 2048)
+            counters.expert_extended_peer_owner_calls.fetch_add(1);
     }
     if (launch_succeeded || verification.performed) {
         if (peer_calls == 1 || (peer_calls % 64) == 0 || verification.performed ||
@@ -756,7 +1107,12 @@ int try_launch_expert_bank(const void *host_function, dim3 grid, dim3 block,
                 counters.expert_plain_verified_outputs.load(),
                 counters.expert_fused_verified_calls.load(),
                 counters.expert_fused_verified_outputs.load(),
-                counters.expert_verification_failures.load());
+                counters.expert_verification_failures.load(),
+                counters.expert_extended_peer_owner_calls.load(),
+                counters.expert_extended_plain_verified_calls.load(),
+                counters.expert_extended_plain_verified_outputs.load(),
+                counters.expert_plain_peer_owner_calls.load(),
+                counters.expert_fused_peer_owner_calls.load());
             if (peer_calls == 1 || verification.performed || verification_failed)
                 v200_frontdoor_snapshot("operator_q4k_mmvq_expert_peer_bank");
         }
@@ -772,12 +1128,20 @@ extern "C" std::size_t v200_operator_list_mmvq_host_functions(
     std::lock_guard<std::mutex> lock(registered.mutex);
     std::size_t count = 0;
     for (const auto &entry : registered.names) {
-        if (entry.second != q4k_mmvq_name && entry.second != q4k_mmvq_gate_name)
+        v200_operator_mmvq_kernel_descriptor descriptor{};
+        if (!describe_mmvq_name(entry.second.c_str(), &descriptor))
             continue;
         if (out != nullptr && count < capacity) out[count] = entry.first;
         ++count;
     }
     return count;
+}
+
+extern "C" int v200_operator_describe_mmvq_kernel(
+    const char *registered_name,
+    v200_operator_mmvq_kernel_descriptor *descriptor) {
+    if (descriptor == nullptr) return 0;
+    return describe_mmvq_name(registered_name, descriptor) ? 1 : 0;
 }
 
 extern "C" int v200_operator_inspect_mmvq_bank(
@@ -838,17 +1202,20 @@ extern "C" int v200_operator_try_launch(
     }
 
     const std::string name = registered_kernel_name(host_function);
-    if (name == q4k_mmvq_gate_name) {
+    v200_operator_mmvq_kernel_descriptor descriptor{};
+    if (!describe_mmvq_name(name.c_str(), &descriptor)) return 0;
+    const MmvqFamily family = static_cast<MmvqFamily>(descriptor.family);
+    if (is_gate_fused_family(family)) {
         return try_launch_expert_bank(host_function, grid, block, arguments,
                                      shared_bytes, anchor_stream, native_launch,
                                      status);
     }
-    if (name != q4k_mmvq_name) return 0;
     if (grid.y > 1) {
         return try_launch_expert_bank(host_function, grid, block, arguments,
                                      shared_bytes, anchor_stream, native_launch,
                                      status);
     }
+    if (is_q6_family(family) || descriptor.output_rows_per_block != 1) return 0;
 
     // On Volta this exact Q4_K, single-column specialization uses one output
     // row per block. Small grids stay on the original launch to avoid paying

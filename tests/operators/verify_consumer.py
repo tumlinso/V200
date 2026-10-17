@@ -11,7 +11,8 @@ sys.path.insert(0, str(ROOT / "tests/capacity"))
 import verify_capacity as capacity
 
 
-def verify(run, require_experts=False, require_graphs=False):
+def verify(run, require_experts=False, require_graphs=False,
+           require_extended_experts=False):
     read = capacity._json
     require = capacity._require
     controller = read(run.with_name(run.name + ".controller-result.json"))
@@ -74,6 +75,41 @@ def verify(run, require_experts=False, require_graphs=False):
                                         r.get("expert_verified_outputs", 0) > 0
                                         for r in expert_verified),
                 "expert route lacks a completed exact native-output comparison")
+    q6_summaries = [r for r in operations
+                    if r["event"] == "q6k_mmvq_expert_process_exit"]
+    q6_verifications = [r for r in operations
+                        if r["event"] == "q6k_mmvq_expert_verification"]
+    if require_extended_experts:
+        require(totals.get("expert_extended_peer_owner_calls", 0) > 0 and
+                totals.get("expert_extended_plain_verified_calls", 0) > 0 and
+                totals.get("expert_extended_plain_verified_outputs", 0) > 0 and
+                totals.get("expert_verification_failures") == 0,
+                "no bitwise-verified 768-2047-column plain Q4_K expert route")
+        require(any(r["route"] == "peer-bank-plain" and
+                    r.get("expert_extended_plain_verified_calls", 0) > 0 and
+                    r["status"] == 0 and r["max_abs_error"] == 0
+                    for r in expert_verified),
+                "extended Q4_K route lacks its own exact native-output comparison")
+        require(len(q6_summaries) == 1, "missing Q6_K expert exit summary")
+        q6 = q6_summaries[0]
+        require(q6.get("q6_expert_peer_owner_calls", 0) > 0 and
+                q6.get("q6_expert_plain_peer_owner_calls", 0) > 0 and
+                q6.get("q6_expert_plain_verified_calls", 0) > 0 and
+                q6.get("q6_expert_plain_verified_outputs", 0) > 0 and
+                q6.get("q6_expert_verification_failures") == 0,
+                "no bitwise-verified plain Q6_K expert execution on the peer")
+        require(any(r.get("q6_expert_plain_verified_calls", 0) > 0 and
+                    r["status"] == 0 and r["max_abs_error"] == 0
+                    for r in q6_verifications),
+                "Q6_K route lacks its own exact native-output comparison")
+        # If a fused expert family actually ran on the peer, it must have its
+        # independent first-family exact comparison as well.
+        require(q6.get("q6_expert_fused_peer_owner_calls", 0) == 0 or
+                q6.get("q6_expert_fused_verified_calls", 0) > 0,
+                "observed fused Q6_K route lacks an exact comparison")
+        require(totals.get("expert_fused_peer_owner_calls", 0) == 0 or
+                totals.get("expert_fused_verified_calls", 0) > 0,
+                "observed fused Q4_K route lacks an exact comparison")
     graph_records = [r for r in records if r.get("event", "").startswith("graph_")]
     graph_replays = [r for r in graph_records if r["event"] == "graph_replay" and
                      r.get("graph_rewritten_nodes", 0) > 0]
@@ -88,7 +124,7 @@ def verify(run, require_experts=False, require_graphs=False):
                         r["graph_handle"] == replay["graph_handle"] and
                         r["graph_rewritten_nodes"] == replay["graph_rewritten_nodes"]
                         for r in graph_records), "peer replay lacks executable provenance")
-    return {"status": "PASS_V200_10" if require_graphs else "PASS_V200_09" if require_experts else "PASS_V200_08", "controller_evidence_id": evidence["id"],
+    return {"status": "PASS_EXTENDED_EXPERTS" if require_extended_experts else "PASS_V200_10" if require_graphs else "PASS_V200_09" if require_experts else "PASS_V200_08", "controller_evidence_id": evidence["id"],
             "physical_uuids": pair, "capacity": result, "operator": totals,
             "verified_routes": [r["route"] for r in verified + expert_verified],
             "peer_graph_replay_samples": len(graph_replays),
@@ -100,10 +136,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-dir", type=Path, default=ROOT / "evidence/B03/operator-r2")
     parser.add_argument("--require-experts", action="store_true")
+    parser.add_argument("--require-extended-experts", action="store_true")
     parser.add_argument("--require-graphs", action="store_true")
     args = parser.parse_args()
     try:
-        print(json.dumps(verify(args.run_dir.resolve(), args.require_experts, args.require_graphs), indent=2))
+        print(json.dumps(verify(args.run_dir.resolve(), args.require_experts,
+                                args.require_graphs, args.require_extended_experts),
+                          indent=2))
     except (KeyError, OSError, TypeError, ValueError) as error:
         print(json.dumps({"status": "FAIL", "error": str(error)}), file=sys.stderr)
         sys.exit(1)

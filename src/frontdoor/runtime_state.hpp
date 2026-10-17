@@ -19,7 +19,10 @@ bool internal_call() noexcept;
 uint32_t current_mode() noexcept;
 bool pair_mode() noexcept;
 bool presentation_enabled() noexcept;
+uint32_t current_pair() noexcept;
+int select_pair(uint32_t pair_index) noexcept;
 uint64_t stream_id(const void *stream) noexcept;
+int stream_owner_pair(const void *stream) noexcept;
 void forget_stream(const void *stream) noexcept;
 
 template <class Function>
@@ -39,6 +42,7 @@ v200_execution_handle *execution_handle() noexcept;
 v200_logical_device_id execution_device() noexcept;
 v200_owner_id execution_owner() noexcept;
 int register_execution_stream(void *stream) noexcept;
+int register_execution_stream_for_pair(void *stream, uint32_t pair_index) noexcept;
 int observe_execution_submission(void *stream, int driver_result) noexcept;
 int execution_token_for_stream(void *stream, v200_completion_token *token) noexcept;
 int execution_token_for_device(v200_completion_token *token) noexcept;

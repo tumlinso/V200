@@ -28,7 +28,7 @@ PlanResult plan_extents(size_t logical_bytes, CUdevice preferred,
 
 class MemoryManager {
 public:
-    MemoryManager();
+    explicit MemoryManager(uint32_t pair_index = 0);
     ~MemoryManager();
     MemoryManager(const MemoryManager &) = delete;
     MemoryManager &operator=(const MemoryManager &) = delete;
@@ -41,6 +41,8 @@ public:
     CUresult query(const void *ptr, v200_allocation_info *out) const;
     bool is_configured() const noexcept;
     bool owns_pointer(const void *ptr) const;
+    bool owns_pointer_range(const void *ptr, size_t size) const;
+    bool owns_reservation_range(CUdeviceptr ptr, size_t size) const;
     CUresult get_profile(v200_memory_pair_profile *out) const;
     CUresult get_usage(v200_memory_usage_info *out) const;
 
@@ -83,6 +85,7 @@ private:
     std::unique_ptr<Impl> impl_;
 };
 
+MemoryManager *manager_for_pair(uint32_t pair_index) noexcept;
 MemoryManager &default_manager();
 
 } // namespace v200::memory

@@ -2,17 +2,26 @@
   "schema": "v200-operator-profile/v1",
   "consumer": "llama.cpp CUDA backend",
   "consumer_revision": "f280b26983ad0fdb705a0d9ebf0503e76f2899b0",
-  "operation": "Q4_K single-column quantized matrix-vector multiply",
+  "operation": "Q4_K and Q6_K single-column quantized matrix-vector multiply",
   "registered_kernel": "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb0ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj",
   "expert_registered_kernel": "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb1ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj",
+  "q6_k_registered_kernel": "_Z13mul_mat_vec_qIL9ggml_type14ELi1ELb0ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj",
+  "q6_k_expert_registered_kernel": "_Z13mul_mat_vec_qIL9ggml_type14ELi1ELb1ELb0ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj",
+  "small_k_registered_kernels": {
+    "q4_k_plain": "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb0ELb1ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj",
+    "q4_k_gate_fused": "_Z13mul_mat_vec_qIL9ggml_type12ELi1ELb1ELb1ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj",
+    "q6_k_plain": "_Z13mul_mat_vec_qIL9ggml_type14ELi1ELb0ELb1ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj",
+    "q6_k_gate_fused": "_Z13mul_mat_vec_qIL9ggml_type14ELi1ELb1ELb1ELb0EEvPKvS2_PKi31ggml_cuda_mm_fusion_args_devicePfj5uint3jjjS7_jjjS7_jjjj"
+  },
+  "extended_expert_opt_in": "V200_EXTENDED_EXPERT_COMPUTE=1 enables Q6_K expert banks and Q4_K expert banks with 768 through 2047 columns; existing Q4_K banks at 2048 or more columns retain their default route.",
   "scope": {
-    "ggml_type": "GGML_TYPE_Q4_K=12",
+    "ggml_type": "GGML_TYPE_Q4_K=12 or GGML_TYPE_Q6_K=14",
     "ncols_dst": 1,
     "fusion": "plain or gate-only fusion for expert-indexed banks",
-    "small_k": false,
+    "small_k": "Both false and true are recognized; the target 768-column expert-down banks use true on V100.",
     "halve_iters": false,
     "compute_capability": "Volta sm_70",
-    "rows_per_grid_block": 1,
+    "rows_per_grid_block": "1 for regular K; 4 for the recognized small-K family.",
     "grid_contract": {
       "x": "independent output rows",
       "y": "1 for plain row routing; >1 for expert-indexed routing",
@@ -26,6 +35,8 @@
     "runtime_argument_count": 19,
     "q4_k_elements_per_block": 256,
     "q4_k_bytes_per_block": 144,
+    "q6_k_elements_per_block": 256,
+    "q6_k_bytes_per_block": 210,
     "q8_1_elements_per_block": 32,
     "q8_1_bytes_per_block": 36
   },
@@ -41,22 +52,24 @@
   "expert_owner_routing": {
     "families": [
       "plain Q4_K",
-      "gate-only fused Q4_K"
+      "gate-only fused Q4_K",
+      "plain Q6_K (opt-in)",
+      "gate-only fused Q6_K (opt-in)"
     ],
-    "shape": "grid.y > 1, grid.z = 1, single-column decode, ncols_x >= 2048",
+    "shape": "grid.y > 1, grid.z = 1, single-column decode, ncols_x >= 2048 by default; opt-in lowers the expert-bank minimum to 768 columns",
     "placement": "Route the unchanged full grid to the owner of the complete expert weight bank; gate-fused weights must share that owner",
-    "active_weight_bytes": "grid.x * grid.y * Q4_K row_bytes",
+    "active_weight_bytes": "min(grid.x * rows_per_grid_block, stride_col_dst) * grid.y * quantized row_bytes; Q4_K uses 144 bytes per 256 columns and Q6_K uses 210",
     "minimum_peer_work_estimate": "4 MiB active weights plus the bounded activation and output byte spans",
     "threshold_basis": "Conservative initial policy informed by existing atlas event and NVLink measurements; the 4 MiB cutoff is an estimate, not a measured crossover for this operator bridge",
     "expert_ids": "Remain GPU-resident and unchanged; the hook does not copy IDs or specialize their values",
     "small_or_anchor_owned": "Keep the original anchor launch"
   },
-  "numerical_contract": "Each output row executes the original pinned llama Q4_K kernel exactly once; no floating-point reduction is split or reordered.",
+  "numerical_contract": "Each output row executes the original pinned llama Q4_K or Q6_K kernel exactly once; no floating-point reduction is split or reordered.",
   "verification": {
     "enable": "V200_OPERATOR_VERIFY=1",
-    "behavior": "On the first plain peer-owner and split route, and independently for the first peer-owner plain-expert and gate-fused-expert family, run an anchor reference then compare the routed output bitwise.",
+    "behavior": "On the first plain peer-owner and split route, and independently for the first peer-owner plain-expert and gate-fused-expert family for each quant type, run an anchor reference then compare the routed output bitwise.",
     "maximum_output_bytes": 1048576,
-    "diagnostics": "V200_PROFILE_LOG receives v200-operator-ledger/v1 route and process-exit records, including aggregate and per-family completed expert output comparisons, alongside frontdoor memory snapshots."
+    "diagnostics": "V200_PROFILE_LOG receives v200-operator-ledger/v1 route and process-exit records, including Q4_K extended-column and per-family peer/verification counters plus separate Q6_K expert-family counters, alongside frontdoor memory snapshots."
   },
   "fallbacks": [
     "grid.z is not one, or channel/index shape is unsupported",
@@ -102,5 +115,26 @@
     "plain_expert_family": "BUILD_CHECKED_NOT_OBSERVED",
     "graph_rewrite": "GPU_PASS: controller797dc352-ff64-40cf-ae18-3dcfc29874f2, maximum34peer nodes pergraph and2successfulreplay samples",
     "speedup": "NOT_ESTABLISHED"
+  },
+  "extended_expert_qualification": {
+    "status": "GPU_PASS_EXTENDED_EXPERTS",
+    "families": [
+      "Q4_K expert banks with 768-2047 columns",
+      "Q6_K plain expert banks",
+      "Q6_K gate-only fused expert banks"
+    ],
+    "required": "Run the finite controller-backed B03 bundle with V200_EXTENDED_EXPERT_COMPUTE=1 and independent bitwise verification for the Q4_K 768-column plain route, Q6_K plain route, and any fused family observed on the peer.",
+    "controller_evidence_id": "429d012d-d9d9-44a5-b6bd-88c105011a66",
+    "run_directory": "evidence/B03/extended-r2",
+    "q4_small_k_peer_calls": 18,
+    "q4_small_k_verified_outputs": 16384,
+    "q6_small_k_peer_calls": 18,
+    "q6_small_k_verified_outputs": 16384,
+    "maximum_peer_graph_nodes": 68,
+    "bitwise_native_equal": true,
+    "server_exit_code": 0,
+    "cleanup_accounting_zero": true,
+    "host_resources_released": true,
+    "performance": "NOT_MEASURED_FOR_THIS_EXTENSION"
   }
 }

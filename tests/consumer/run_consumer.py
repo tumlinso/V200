@@ -1122,6 +1122,13 @@ def _run_one(workload_name: str, control_name: str, fixture: dict[str, Any],
                     process, float(fixture["server"]["timeouts_seconds"]["shutdown"]))
                 result["server_process"]["exit_code"] = process.returncode
                 result["cleanup"] = cleanup
+                normal_stop = (process.returncode == -signal.SIGTERM
+                               and cleanup["signaled_owned_group"]
+                               and not cleanup["sigkill_escalation"])
+                if process.returncode != 0 and not normal_stop:
+                    result["application_status"] = "FAIL"
+                    result["failure"] = result["failure"] or (
+                        f"server exited unsuccessfully during cleanup: {process.returncode}")
                 if not cleanup["no_live_group_members"]:
                     result["application_status"] = "FAIL"
                     result["failure"] = result["failure"] or "owned process group did not terminate cleanly"

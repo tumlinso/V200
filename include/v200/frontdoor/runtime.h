@@ -29,6 +29,14 @@ V200_FRONTDOOR_API void v200_frontdoor_forget_stream(const void *stream);
 /* 0 means transparent native mode; 1 means anchor presentation; 2 means pair memory mode. */
 V200_FRONTDOOR_API uint32_t v200_frontdoor_mode(void);
 
+/* Select the active V200 pair on the calling host thread. Pair 0 preserves the
+ * original single-pair behavior; pair 1 is available only when four owner
+ * UUIDs were selected for pair mode. Selection can precede lazy initialization.
+ * The selector returns 0 on success and nonzero for an invalid/unavailable
+ * pair. */
+V200_FRONTDOOR_API uint32_t v200_frontdoor_current_pair(void);
+V200_FRONTDOOR_API int v200_frontdoor_select_pair(uint32_t pair_index);
+
 /* Resolve symbols from the exact already-loaded CUDA DSO, including one loaded
  * RTLD_LOCAL by a backend plugin. Handles are kept alive until process exit. */
 V200_FRONTDOOR_API void *v200_frontdoor_resolve_driver_symbol(const char *name);

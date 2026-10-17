@@ -73,8 +73,16 @@ typedef struct v200_memory_usage_info {
  * ledger contains live or cleanup-pending objects. */
 CUresult v200_memory_configure(const v200_memory_pair_profile *profile,
                                const v200_memory_driver_api *driver);
+/* Select the logical pair for subsequent selected-pair operations on this
+ * host thread. Pointer/handle operations resolve their owner when unique;
+ * pair-indexed forms below disambiguate identical addresses in separate
+ * contexts. */
+CUresult v200_memory_select_pair(uint32_t pair_index);
+uint32_t v200_memory_current_pair(void);
 int v200_memory_is_configured(void);
 CUresult v200_memory_get_profile(v200_memory_pair_profile *out);
+CUresult v200_memory_get_profile_for_pair(uint32_t pair_index,
+                                          v200_memory_pair_profile *out);
 
 /* Allocate one canonical VA range. `preferred_device` must identify one of
  * the two configured physical owners. The ordinary form uses default_owner. */
@@ -84,6 +92,13 @@ CUresult v200_memory_allocate(size_t bytes, size_t alignment, void **device_ptr)
 CUresult v200_memory_release(void *device_ptr);
 CUresult v200_memory_query(const void *ptr, v200_allocation_info *out);
 int v200_memory_owns_pointer(const void *ptr);
+/* Pair-indexed forms disambiguate identical CUDA VA values in separate pair
+ * contexts. They do not change the thread's selected pair. */
+CUresult v200_memory_query_for_pair(uint32_t pair_index, const void *ptr,
+                                    v200_allocation_info *out);
+int v200_memory_owns_pointer_for_pair(uint32_t pair_index, const void *ptr);
+int v200_memory_owns_range_for_pair(uint32_t pair_index, const void *ptr,
+                                    size_t size);
 /* The frontdoor attaches a sealed logical-stream prefix to managed memory so
  * teardown can wait before unmapping or returning its backing to CUDA. A
  * nonzero stream ID coalesces a newer dominating prefix over the older prefix
@@ -91,6 +106,10 @@ int v200_memory_owns_pointer(const void *ptr);
  * cannot prove stream identity and dominance. */
 CUresult v200_memory_retain_use(const void *ptr, uint64_t logical_stream_id,
                                uint64_t token_slot, uint64_t token_generation);
+CUresult v200_memory_retain_use_for_pair(uint32_t pair_index, const void *ptr,
+                                         uint64_t logical_stream_id,
+                                         uint64_t token_slot,
+                                         uint64_t token_generation);
 /* For opaque kernel launches whose pointer arguments cannot be inspected,
  * conservatively retain every live managed allocation to the sealed prefix.
  * A newer prefix replaces the older retained prefix for the same logical
@@ -103,7 +122,14 @@ CUresult v200_memory_retain_all_use(uint64_t logical_stream_id,
  * wait for outstanding leases. A zero lease means the manager was unconfigured. */
 CUresult v200_memory_begin_submission(uint64_t *lease);
 CUresult v200_memory_end_submission(uint64_t lease, int completion_recorded);
+CUresult v200_memory_begin_submission_for_pair(uint32_t pair_index,
+                                               uint64_t *lease);
+CUresult v200_memory_end_submission_for_pair(uint32_t pair_index,
+                                             uint64_t lease,
+                                             int completion_recorded);
 CUresult v200_memory_get_usage(v200_memory_usage_info *out);
+CUresult v200_memory_get_usage_for_pair(uint32_t pair_index,
+                                        v200_memory_usage_info *out);
 CUresult v200_memory_retry_cleanup(void);
 
 /* Driver VMM gateway used by the frontdoor. Compound handles are synthetic

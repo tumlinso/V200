@@ -15,6 +15,9 @@ struct RuntimeInitInputs {
   const char *b01_evidence_id{};
   const char *owner0_budget_mib{};
   const char *owner1_budget_mib{};
+  // CUDA logical IDs are 1-based in the execution/frontdoor registries. Keep
+  // pair 0's historical ID when callers use the original four-field aggregate.
+  std::uint64_t logical_device_id{1};
 };
 
 struct RuntimeInitApi {
