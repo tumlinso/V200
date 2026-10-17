@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T16:00:46Z",
+  "generated_at": "2026-10-17T16:23:00Z",
   "project": {
     "configuration": {
       "busy_timeout_ms": 5000,
@@ -19,13 +19,13 @@
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "schema_version": 2
   },
-  "project_revision": 134,
+  "project_revision": 135,
   "schema_version": 2,
   "semantic_context": {
     "declarations": [],
     "invalidations": [],
     "orientation": [],
-    "project_revision": 134,
+    "project_revision": 135,
     "project_uuid": "6c6463a7-0f66-4e12-813f-c17e46185775",
     "skill_uses": []
   },
@@ -1538,6 +1538,16 @@
         "revision": 134,
         "seq": 134,
         "timestamp": "2026-10-17T16:00:46Z"
+      },
+      {
+        "actor_session_id": null,
+        "entity_id": "V200-14",
+        "entity_type": "task",
+        "event_type": "workflow.task.handoff",
+        "payload_json": "{\"reason\": \"User explicitly requested pause at the next reasonable checkpoint.\"}",
+        "revision": 135,
+        "seq": 135,
+        "timestamp": "2026-10-17T16:23:00Z"
       }
     ],
     "evidence": [
@@ -2359,6 +2369,16 @@
         "note": "Preview checkpoint 16f756b plus release/evidence-verifier commit. docs/v200/release.md records working18.55GB one-logical-device GPU payload, Q4/Q6 peer expert execution and bitwise checks, singlepairgraph68nodes, two logicaldevices across4owners, finiteHTTPsmoke, reproducedDSOidentity and exactremaininglimits. python3 tests/release/verify_preview.py PASS CPU-only; packagebuild13CTests,20multipair,11comparison,4deploymentchecks pass. B07 descriptive64.095V200vs124.951nativeTPS: do not claim native-competitive throughput. Final acceptance is NOT complete. Continue with bounded diagnosis and implementation of dominant decode/prefill locality/launch bottleneck, then same native comparison; expand actual-needed paths without replacing transparentpair interface. All admittedhostowners released, finalGPUprocessqueryempty; optionalPCinferenceservice stopped supportedlifecycle,observerpreserved. No userdecision or lease is pending.",
         "payload_json": "{\"authority_commit\": \"d4cdecfea17ea37b765dd7dbfff3102cf3ce71a6\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-14-READY\", \"reached_at\": null, \"state\": \"pending\"}], \"gates\": [], \"git_diffstat\": \"\", \"git_head\": \"d4cdecfea17ea37b765dd7dbfff3102cf3ce71a6\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"Preview checkpoint 16f756b plus release/evidence-verifier commit. docs/v200/release.md records working18.55GB one-logical-device GPU payload, Q4/Q6 peer expert execution and bitwise checks, singlepairgraph68nodes, two logicaldevices across4owners, finiteHTTPsmoke, reproducedDSOidentity and exactremaininglimits. python3 tests/release/verify_preview.py PASS CPU-only; packagebuild13CTests,20multipair,11comparison,4deploymentchecks pass. B07 descriptive64.095V200vs124.951nativeTPS: do not claim native-competitive throughput. Final acceptance is NOT complete. Continue with bounded diagnosis and implementation of dominant decode/prefill locality/launch bottleneck, then same native comparison; expand actual-needed paths without replacing transparentpair interface. All admittedhostowners released, finalGPUprocessqueryempty; optionalPCinferenceservice stopped supportedlifecycle,observerpreserved. No userdecision or lease is pending.\", \"producer_commit\": \"d4cdecfea17ea37b765dd7dbfff3102cf3ce71a6\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-14\"}",
         "revision": 132,
+        "task_id": "V200-14"
+      },
+      {
+        "claim_id": null,
+        "created_at": "2026-10-17T16:23:00Z",
+        "id": "d5cf07cf-002b-4d21-b4a2-3bb3519dfb56",
+        "kind": "handoff",
+        "note": "PAUSED by user after validated locality improvement and deployable opt-in checkpoint b2721bd. Resume docs/v200/pause-checkpoint.md. Same-binary ablation: placement off63.146TPS, on78.053TPS (+23.6%); matched native123.357. Full18.55GB GPU tensor residency, Q4/Q6peercompute, graphs, exact generatedoutputs, normalexit/zeroledger and canonicalrelease pass in827f2d85-d588-4403-84ff-56d185933cdb andd2b1df8f-1b21-4a5d-862f-2ca225abb94f. Frozen build/ andbuild-multipair unchanged; candidatebuild-perf exposedwith--prefer-local-hbm. 15CPU CTests(including45consumer),16comparison,4deployment andsaved-evidenceverifiers pass. FailedNSysdiagnosticda67c8cc producednokerneldata/requiredSIGKILL; retainedasFAIL, resourcesreleased, notsteady-stateevidence. Remaining78vs123gapunresolved; finalV200acceptanceopen. AllLunastreamsreturned, noGPUprocess/activelease/backgroundcampaign; PCinferenceoff,observerpreserved. Do not resume implementation/GPUchecks until usercontinues.",
+        "payload_json": "{\"authority_commit\": \"b2721bda294fd7ce8d4ae5c270384fd5ad602973\", \"changed_owned_paths\": [], \"checkpoints\": [{\"id\": \"V200-14-READY\", \"reached_at\": null, \"state\": \"pending\"}], \"gates\": [], \"git_diffstat\": \"\", \"git_head\": \"b2721bda294fd7ce8d4ae5c270384fd5ad602973\", \"integration_commit\": null, \"interfaces\": [], \"note\": \"PAUSED by user after validated locality improvement and deployable opt-in checkpoint b2721bd. Resume docs/v200/pause-checkpoint.md. Same-binary ablation: placement off63.146TPS, on78.053TPS (+23.6%); matched native123.357. Full18.55GB GPU tensor residency, Q4/Q6peercompute, graphs, exact generatedoutputs, normalexit/zeroledger and canonicalrelease pass in827f2d85-d588-4403-84ff-56d185933cdb andd2b1df8f-1b21-4a5d-862f-2ca225abb94f. Frozen build/ andbuild-multipair unchanged; candidatebuild-perf exposedwith--prefer-local-hbm. 15CPU CTests(including45consumer),16comparison,4deployment andsaved-evidenceverifiers pass. FailedNSysdiagnosticda67c8cc producednokerneldata/requiredSIGKILL; retainedasFAIL, resourcesreleased, notsteady-stateevidence. Remaining78vs123gapunresolved; finalV200acceptanceopen. AllLunastreamsreturned, noGPUprocess/activelease/backgroundcampaign; PCinferenceoff,observerpreserved. Do not resume implementation/GPUchecks until usercontinues.\", \"producer_commit\": \"b2721bda294fd7ce8d4ae5c270384fd5ad602973\", \"producer_root\": \"/home/tumlinson/V200\", \"resources\": [], \"task_id\": \"V200-14\"}",
+        "revision": 135,
         "task_id": "V200-14"
       },
       {
@@ -4383,7 +4403,7 @@
         "version": 6
       },
       {
-        "attention_reason": "Usable restricted preview delivered; full V200 final acceptance remains open for performance and broader transparent CUDA execution.",
+        "attention_reason": "User explicitly requested pause at the next reasonable checkpoint.",
         "completion_commit": null,
         "completion_git_head": null,
         "completion_revision": null,
@@ -4404,8 +4424,8 @@
         "status": "in_progress",
         "tags_json": "[]",
         "title": "Integrate and hand off the accepted V200 release",
-        "updated_at": "2026-10-17T16:00:46Z",
-        "version": 7
+        "updated_at": "2026-10-17T16:23:00Z",
+        "version": 8
       },
       {
         "attention_reason": null,
@@ -5462,13 +5482,13 @@
         "task_id": "V200-13"
       },
       {
-        "activated_at": "2026-10-17T15:59:11Z",
+        "activated_at": null,
         "completed_at": null,
         "enqueued_at": "2026-10-17T15:16:35Z",
         "lane_id": "V200-DELIVERY-1-MAIN",
         "position": 1,
-        "revision": 134,
-        "state": "active",
+        "revision": 135,
+        "state": "queued",
         "task_id": "V200-14"
       },
       {
@@ -5740,11 +5760,11 @@
         "created_at": "2026-10-17T15:16:35Z",
         "id": "V200-DELIVERY-1-MAIN",
         "parent_lane_id": null,
-        "revision": 134,
+        "revision": 135,
         "role": "integrator",
         "run_id": "V200-DELIVERY-1",
-        "state": "active",
-        "updated_at": "2026-10-17T16:00:46Z",
+        "state": "ready",
+        "updated_at": "2026-10-17T16:23:00Z",
         "workspace_mode": "exclusive"
       },
       {
